@@ -1,7 +1,13 @@
 package com.tuorg.veterinaria.notificaciones.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuorg.veterinaria.common.constants.AppConstants;
+import com.tuorg.veterinaria.common.exception.BusinessException;
 import com.tuorg.veterinaria.common.exception.ResourceNotFoundException;
+import com.tuorg.veterinaria.notificaciones.dto.NotificacionEnviarRequest;
+import com.tuorg.veterinaria.notificaciones.dto.NotificacionProgramarRequest;
+import com.tuorg.veterinaria.notificaciones.dto.NotificacionResponse;
 import com.tuorg.veterinaria.notificaciones.model.CanalEnvio;
 import com.tuorg.veterinaria.notificaciones.model.Notificacion;
 import com.tuorg.veterinaria.notificaciones.repository.CanalEnvioRepository;
@@ -11,99 +17,128 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Servicio para la gestión de notificaciones.
- * 
- * Este servicio utiliza el patrón Strategy para enviar notificaciones
- * a través de diferentes canales (Email, SMS, App) sin modificar
- * el código cliente.
- * 
- * @author Equipo de Desarrollo
- * @version 1.0.0
+ *
+ * Implementa el patrón Strategy para delegar el envío en los canales concretos
+ * y expone DTOs desacoplados de las entidades JPA.
  */
 @Service
 public class NotificacionService {
 
-    /**
-     * Repositorio de notificaciones.
-     */
     private final NotificacionRepository notificacionRepository;
-
-    /**
-     * Repositorio de canales de envío.
-     */
     private final CanalEnvioRepository canalEnvioRepository;
+    private final ObjectMapper objectMapper;
 
-    /**
-     * Constructor con inyección de dependencias.
-     * 
-     * @param notificacionRepository Repositorio de notificaciones
-     * @param canalEnvioRepository Repositorio de canales de envío
-     */
     @Autowired
     public NotificacionService(NotificacionRepository notificacionRepository,
-                              CanalEnvioRepository canalEnvioRepository) {
+                               CanalEnvioRepository canalEnvioRepository,
+                               ObjectMapper objectMapper) {
         this.notificacionRepository = notificacionRepository;
         this.canalEnvioRepository = canalEnvioRepository;
+        this.objectMapper = objectMapper;
     }
 
     /**
      * Programa el envío de una notificación para una fecha futura.
-     * 
-     * @param notificacion Notificación a programar
-     * @param fechaEnvio Fecha programada para el envío
-     * @return Notificacion programada
      */
     @Transactional
-    public Notificacion programarEnvio(Notificacion notificacion, LocalDateTime fechaEnvio) {
-        notificacion.setFechaEnvioProgramada(fechaEnvio);
+    public NotificacionResponse programarEnvio(NotificacionProgramarRequest request) {
+        Notificacion notificacion = new Notificacion();
+        notificacion.setTipo(request.getTipo());
+        notificacion.setMensaje(request.getMensaje());
+        notificacion.setFechaEnvioProgramada(request.getFechaEnvio());
         notificacion.setEstado(AppConstants.ESTADO_NOTIFICACION_PENDIENTE);
-        return notificacionRepository.save(notificacion);
+        notificacion.setDatos(toJson(request.getDatos()));
+
+        Notificacion guardada = notificacionRepository.save(notificacion);
+        return mapToResponse(guardada);
     }
 
     /**
      * Envía una notificación inmediatamente usando el canal especificado (Strategy pattern).
-     * 
-     * @param notificacion Notificación a enviar
-     * @param canalId ID del canal de envío
-     * @return Notificacion enviada
      */
     @Transactional
-    public Notificacion enviarAhora(Notificacion notificacion, Long canalId) {
-        CanalEnvio canal = canalEnvioRepository.findById(canalId)
-                .orElseThrow(() -> new ResourceNotFoundException("CanalEnvio", "id", canalId));
+    public NotificacionResponse enviarAhora(NotificacionEnviarRequest request) {
+        Notificacion notificacion = new Notificacion();
+        notificacion.setTipo(request.getTipo());
+        notificacion.setMensaje(request.getMensaje());
+        notificacion.setEstado(AppConstants.ESTADO_NOTIFICACION_PENDIENTE);
+        notificacion.setDatos(toJson(request.getDatos()));
 
-        // Usar Strategy pattern: el canal concreto decide cómo enviar
+        CanalEnvio canal = canalEnvioRepository.findById(request.getCanalId())
+                .orElseThrow(() -> new ResourceNotFoundException("CanalEnvio", "id", request.getCanalId()));
+
         boolean enviado = canal.enviar(notificacion);
 
         notificacion.setFechaEnvioReal(LocalDateTime.now());
-        notificacion.setEstado(enviado ? 
-                AppConstants.ESTADO_NOTIFICACION_ENVIADA : 
-                AppConstants.ESTADO_NOTIFICACION_FALLIDA);
+        notificacion.setEstado(enviado
+                ? AppConstants.ESTADO_NOTIFICACION_ENVIADA
+                : AppConstants.ESTADO_NOTIFICACION_FALLIDA);
 
-        return notificacionRepository.save(notificacion);
+        Notificacion guardada = notificacionRepository.save(notificacion);
+        return mapToResponse(guardada);
     }
 
     /**
      * Obtiene notificaciones pendientes programadas para enviar.
-     * 
-     * @return Lista de notificaciones pendientes
      */
     @Transactional(readOnly = true)
-    public List<Notificacion> obtenerPendientes() {
-        return notificacionRepository.findNotificacionesPendientes(LocalDateTime.now());
+    public List<NotificacionResponse> obtenerPendientes() {
+        return notificacionRepository.findNotificacionesPendientes(LocalDateTime.now())
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
     /**
      * Obtiene todas las notificaciones.
-     * 
-     * @return Lista de todas las notificaciones
      */
     @Transactional(readOnly = true)
-    public List<Notificacion> obtenerTodas() {
-        return notificacionRepository.findAll();
+    public List<NotificacionResponse> obtenerTodas() {
+        return notificacionRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
+    private NotificacionResponse mapToResponse(Notificacion notificacion) {
+        return NotificacionResponse.builder()
+                .id(notificacion.getIdNotificacion())
+                .tipo(notificacion.getTipo())
+                .mensaje(notificacion.getMensaje())
+                .estado(notificacion.getEstado())
+                .fechaEnvioProgramada(notificacion.getFechaEnvioProgramada())
+                .fechaEnvioReal(notificacion.getFechaEnvioReal())
+                .datos(toMap(notificacion.getDatos()))
+                .build();
+    }
+
+    private String toJson(Map<String, Object> datos) {
+        if (datos == null || datos.isEmpty()) {
+            return null;
+        }
+        try {
+            return objectMapper.writeValueAsString(datos);
+        } catch (JsonProcessingException e) {
+            throw new BusinessException("Los datos de la notificación no tienen un formato JSON válido");
+        }
+    }
+
+    private Map<String, Object> toMap(String datosJson) {
+        if (datosJson == null || datosJson.isBlank()) {
+            return Collections.emptyMap();
+        }
+        try {
+            return objectMapper.readValue(datosJson, Map.class);
+        } catch (JsonProcessingException e) {
+            return Collections.emptyMap();
+        }
     }
 }
 

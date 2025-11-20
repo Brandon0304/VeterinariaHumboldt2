@@ -64,6 +64,11 @@ public final class AppConstants {
      */
     public static final String ESTADO_CITA_CANCELADA = "CANCELADA";
 
+    /**
+     * Duración estándar de una cita en minutos.
+     */
+    public static final int DURACION_CITA_MINUTOS = 30;
+
     // ==================== Tipos de Movimiento de Inventario ====================
 
     /**

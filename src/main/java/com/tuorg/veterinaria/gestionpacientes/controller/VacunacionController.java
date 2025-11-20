@@ -1,16 +1,17 @@
 package com.tuorg.veterinaria.gestionpacientes.controller;
 
 import com.tuorg.veterinaria.common.dto.ApiResponse;
-import com.tuorg.veterinaria.gestionpacientes.model.Vacunacion;
+import com.tuorg.veterinaria.gestionpacientes.dto.ProgramarProximaDosisRequest;
+import com.tuorg.veterinaria.gestionpacientes.dto.VacunacionRequest;
+import com.tuorg.veterinaria.gestionpacientes.dto.VacunacionResponse;
 import com.tuorg.veterinaria.gestionpacientes.service.VacunacionService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Controlador REST para la gestión de vacunaciones.
@@ -22,7 +23,7 @@ import java.util.Map;
  * @version 1.0.0
  */
 @RestController
-@RequestMapping("/api/vacunaciones")
+@RequestMapping("/vacunaciones")
 public class VacunacionController {
 
     /**
@@ -47,8 +48,8 @@ public class VacunacionController {
      * @return Respuesta con la vacunación creada
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<Vacunacion>> registrar(@RequestBody Vacunacion vacunacion) {
-        Vacunacion vacunacionCreada = vacunacionService.registrarVacuna(vacunacion);
+    public ResponseEntity<ApiResponse<VacunacionResponse>> registrar(@Valid @RequestBody VacunacionRequest request) {
+        VacunacionResponse vacunacionCreada = vacunacionService.registrarVacuna(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Vacunación registrada exitosamente", vacunacionCreada));
     }
@@ -61,11 +62,10 @@ public class VacunacionController {
      * @return Respuesta con la vacunación actualizada
      */
     @PutMapping("/{vacunacionId}/proxima-dosis")
-    public ResponseEntity<ApiResponse<Vacunacion>> programarProximaDosis(
+    public ResponseEntity<ApiResponse<VacunacionResponse>> programarProximaDosis(
             @PathVariable Long vacunacionId,
-            @RequestBody Map<String, String> requestBody) {
-        LocalDate proximaDosis = LocalDate.parse(requestBody.get("proximaDosis"));
-        Vacunacion vacunacion = vacunacionService.programarProximaDosis(vacunacionId, proximaDosis);
+            @Valid @RequestBody ProgramarProximaDosisRequest request) {
+        VacunacionResponse vacunacion = vacunacionService.programarProximaDosis(vacunacionId, request);
         return ResponseEntity.ok(ApiResponse.success("Próxima dosis programada exitosamente", vacunacion));
     }
 
@@ -76,8 +76,8 @@ public class VacunacionController {
      * @return Respuesta con la lista de vacunaciones
      */
     @GetMapping("/paciente/{pacienteId}")
-    public ResponseEntity<ApiResponse<List<Vacunacion>>> obtenerPorPaciente(@PathVariable Long pacienteId) {
-        List<Vacunacion> vacunaciones = vacunacionService.obtenerPorPaciente(pacienteId);
+    public ResponseEntity<ApiResponse<List<VacunacionResponse>>> obtenerPorPaciente(@PathVariable Long pacienteId) {
+        List<VacunacionResponse> vacunaciones = vacunacionService.obtenerPorPaciente(pacienteId);
         return ResponseEntity.ok(ApiResponse.success("Vacunaciones obtenidas exitosamente", vacunaciones));
     }
 
@@ -88,9 +88,9 @@ public class VacunacionController {
      * @return Respuesta con la lista de vacunaciones pendientes
      */
     @GetMapping("/pendientes")
-    public ResponseEntity<ApiResponse<List<Vacunacion>>> obtenerPendientes(
+    public ResponseEntity<ApiResponse<List<VacunacionResponse>>> obtenerPendientes(
             @RequestParam(defaultValue = "30") int dias) {
-        List<Vacunacion> vacunaciones = vacunacionService.obtenerVacunacionesPendientes(dias);
+        List<VacunacionResponse> vacunaciones = vacunacionService.obtenerVacunacionesPendientes(dias);
         return ResponseEntity.ok(ApiResponse.success("Vacunaciones pendientes obtenidas exitosamente", vacunaciones));
     }
 }

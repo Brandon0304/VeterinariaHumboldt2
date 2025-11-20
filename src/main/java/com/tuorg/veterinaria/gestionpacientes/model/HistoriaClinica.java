@@ -5,8 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * Entidad que representa la historia clínica de un paciente.
@@ -59,7 +62,8 @@ public class HistoriaClinica {
      * Metadatos adicionales en formato JSON.
      * Puede incluir información contextual adicional.
      */
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "metadatos", columnDefinition = "JSONB")
-    private String metadatos;
+    private Map<String, Object> metadatos;
 }
 

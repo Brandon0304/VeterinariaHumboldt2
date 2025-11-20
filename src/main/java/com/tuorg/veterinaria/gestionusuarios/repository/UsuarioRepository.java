@@ -49,5 +49,22 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
      * @return true si existe, false en caso contrario
      */
     boolean existsByCorreo(String correo);
+
+    /**
+     * Verifica si existe un usuario con el correo especificado excluyendo un ID.
+     * 
+     * @param correo Correo electrónico
+     * @param idPersona ID de la persona (usuario) a excluir
+     * @return true si existe, false en caso contrario
+     */
+    boolean existsByCorreoAndIdPersonaNot(String correo, Long idPersona);
+
+    /**
+     * Busca un usuario por su token de recuperación de contraseña.
+     * 
+     * @param token Token de recuperación
+     * @return Optional con el usuario si existe, vacío en caso contrario
+     */
+    Optional<Usuario> findByPasswordResetToken(String token);
 }
 

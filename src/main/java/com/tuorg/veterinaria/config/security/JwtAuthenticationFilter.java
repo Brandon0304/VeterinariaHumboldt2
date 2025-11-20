@@ -62,20 +62,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+        // Ignorar rutas públicas (login, registro, etc.)
+        // El context-path es /api, así que las rutas aquí son relativas a ese path
+        String servletPath = request.getServletPath(); // Esto devuelve la ruta sin el context-path
+        
+        // Verificar si es una ruta pública (sin /api porque el context-path ya lo incluye)
+        if (servletPath.startsWith("/auth/") || servletPath.startsWith("/configuracion/parametros/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         try {
             String jwt = getJwtFromRequest(request);
 
-            if (jwt != null && tokenProvider.validateToken(jwt, userDetailsService.loadUserByUsername(
-                    tokenProvider.getUsernameFromToken(jwt)))) {
+            if (jwt != null) {
                 String username = tokenProvider.getUsernameFromToken(jwt);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        userDetails, null, userDetails.getAuthorities());
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                
+                if (tokenProvider.validateToken(jwt, userDetails)) {
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userDetails, null, userDetails.getAuthorities());
+                    authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             }
         } catch (Exception ex) {
-            logger.error("No se pudo establecer la autenticación del usuario: {}", ex);
+            logger.error("No se pudo establecer la autenticación del usuario: " + ex.getMessage(), ex);
+            // No lanzar excepción, permitir que continúe el filtro para rutas públicas
         }
 
         filterChain.doFilter(request, response);

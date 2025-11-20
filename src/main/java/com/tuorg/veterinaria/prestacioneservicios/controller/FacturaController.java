@@ -1,15 +1,17 @@
 package com.tuorg.veterinaria.prestacioneservicios.controller;
 
 import com.tuorg.veterinaria.common.dto.ApiResponse;
-import com.tuorg.veterinaria.prestacioneservicios.model.Factura;
+import com.tuorg.veterinaria.prestacioneservicios.dto.FacturaPagoRequest;
+import com.tuorg.veterinaria.prestacioneservicios.dto.FacturaRequest;
+import com.tuorg.veterinaria.prestacioneservicios.dto.FacturaResponse;
 import com.tuorg.veterinaria.prestacioneservicios.service.FacturaService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * Controlador REST para la gestión de facturas.
@@ -21,7 +23,7 @@ import java.util.Map;
  * @version 1.0.0
  */
 @RestController
-@RequestMapping("/api/facturas")
+@RequestMapping("/facturas")
 public class FacturaController {
 
     /**
@@ -46,10 +48,21 @@ public class FacturaController {
      * @return Respuesta con la factura creada
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<Factura>> crear(@RequestBody Factura factura) {
-        Factura facturaCreada = facturaService.crear(factura);
+    public ResponseEntity<ApiResponse<FacturaResponse>> crear(@RequestBody @Valid FacturaRequest factura) {
+        FacturaResponse facturaCreada = facturaService.crear(factura);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Factura creada exitosamente", facturaCreada));
+    }
+
+    /**
+     * Obtiene todas las facturas.
+     * 
+     * @return Respuesta con la lista de facturas
+     */
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<FacturaResponse>>> obtenerTodas() {
+        List<FacturaResponse> facturas = facturaService.obtenerTodas();
+        return ResponseEntity.ok(ApiResponse.success("Facturas obtenidas exitosamente", facturas));
     }
 
     /**
@@ -59,8 +72,8 @@ public class FacturaController {
      * @return Respuesta con la factura
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Factura>> obtener(@PathVariable Long id) {
-        Factura factura = facturaService.obtener(id);
+    public ResponseEntity<ApiResponse<FacturaResponse>> obtener(@PathVariable Long id) {
+        FacturaResponse factura = facturaService.obtener(id);
         return ResponseEntity.ok(ApiResponse.success("Factura obtenida exitosamente", factura));
     }
 
@@ -71,8 +84,8 @@ public class FacturaController {
      * @return Respuesta con la lista de facturas
      */
     @GetMapping("/cliente/{clienteId}")
-    public ResponseEntity<ApiResponse<List<Factura>>> obtenerPorCliente(@PathVariable Long clienteId) {
-        List<Factura> facturas = facturaService.obtenerPorCliente(clienteId);
+    public ResponseEntity<ApiResponse<List<FacturaResponse>>> obtenerPorCliente(@PathVariable Long clienteId) {
+        List<FacturaResponse> facturas = facturaService.obtenerPorCliente(clienteId);
         return ResponseEntity.ok(ApiResponse.success("Facturas obtenidas exitosamente", facturas));
     }
 
@@ -98,8 +111,8 @@ public class FacturaController {
      * @return Respuesta con la factura anulada
      */
     @PutMapping("/{id}/anular")
-    public ResponseEntity<ApiResponse<Factura>> anular(@PathVariable Long id) {
-        Factura factura = facturaService.anular(id);
+    public ResponseEntity<ApiResponse<FacturaResponse>> anular(@PathVariable Long id) {
+        FacturaResponse factura = facturaService.anular(id);
         return ResponseEntity.ok(ApiResponse.success("Factura anulada exitosamente", factura));
     }
 
@@ -111,11 +124,10 @@ public class FacturaController {
      * @return Respuesta con la factura actualizada
      */
     @PutMapping("/{id}/pagar")
-    public ResponseEntity<ApiResponse<Factura>> registrarPago(
+    public ResponseEntity<ApiResponse<FacturaResponse>> registrarPago(
             @PathVariable Long id,
-            @RequestBody Map<String, String> requestBody) {
-        String formaPago = requestBody.get("formaPago");
-        Factura factura = facturaService.registrarPago(id, formaPago);
+            @RequestBody @Valid FacturaPagoRequest request) {
+        FacturaResponse factura = facturaService.registrarPago(id, request);
         return ResponseEntity.ok(ApiResponse.success("Pago registrado exitosamente", factura));
     }
 }

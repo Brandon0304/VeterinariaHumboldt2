@@ -3,8 +3,12 @@ package com.tuorg.veterinaria.gestioninventario.service;
 import com.tuorg.veterinaria.common.constants.AppConstants;
 import com.tuorg.veterinaria.common.exception.BusinessException;
 import com.tuorg.veterinaria.common.exception.ResourceNotFoundException;
+import com.tuorg.veterinaria.gestioninventario.dto.MovimientoEntradaRequest;
+import com.tuorg.veterinaria.gestioninventario.dto.MovimientoInventarioResponse;
+import com.tuorg.veterinaria.gestioninventario.dto.MovimientoSalidaRequest;
 import com.tuorg.veterinaria.gestioninventario.model.MovimientoInventario;
 import com.tuorg.veterinaria.gestioninventario.model.Producto;
+import com.tuorg.veterinaria.gestioninventario.model.Proveedor;
 import com.tuorg.veterinaria.gestioninventario.repository.MovimientoInventarioRepository;
 import com.tuorg.veterinaria.gestioninventario.repository.ProductoRepository;
 import com.tuorg.veterinaria.gestioninventario.repository.ProveedorRepository;
@@ -16,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Servicio para la gestión de movimientos de inventario.
@@ -91,42 +96,35 @@ public class MovimientoInventarioService {
      * @return MovimientoInventario creado
      */
     @Transactional
-    public MovimientoInventario registrarEntrada(Long productoId, Long proveedorId,
-                                                  Integer cantidad, String referencia, Long usuarioId) {
-        // Validar cantidad
-        if (cantidad <= 0) {
+    public MovimientoInventarioResponse registrarEntrada(MovimientoEntradaRequest request) {
+        if (request.getCantidad() <= 0) {
             throw new BusinessException("La cantidad debe ser mayor que cero");
         }
 
-        // Obtener producto
-        Producto producto = productoRepository.findById(productoId)
-                .orElseThrow(() -> new ResourceNotFoundException("Producto", "id", productoId));
+        Producto producto = productoRepository.findById(request.getProductoId())
+                .orElseThrow(() -> new ResourceNotFoundException("Producto", "id", request.getProductoId()));
 
-        // Obtener proveedor si se especificó
         MovimientoInventario movimiento = new MovimientoInventario();
         movimiento.setProducto(producto);
         movimiento.setTipoMovimiento(AppConstants.TIPO_MOVIMIENTO_ENTRADA);
-        movimiento.setCantidad(cantidad);
+        movimiento.setCantidad(request.getCantidad());
         movimiento.setFecha(LocalDateTime.now());
-        movimiento.setReferencia(referencia);
+        movimiento.setReferencia(request.getReferencia());
 
-        if (proveedorId != null) {
-            movimiento.setProveedor(proveedorRepository.findById(proveedorId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Proveedor", "id", proveedorId)));
+        if (request.getProveedorId() != null) {
+            Proveedor proveedor = proveedorRepository.findById(request.getProveedorId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Proveedor", "id", request.getProveedorId()));
+            movimiento.setProveedor(proveedor);
         }
 
-        if (usuarioId != null) {
-            movimiento.setUsuario(usuarioRepository.findById(usuarioId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Usuario", "id", usuarioId)));
+        if (request.getUsuarioId() != null) {
+            movimiento.setUsuario(usuarioRepository.findById(request.getUsuarioId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Usuario", "id", request.getUsuarioId())));
         }
 
-        // Guardar movimiento
-        MovimientoInventario movimientoGuardado = movimientoInventarioRepository.save(movimiento);
-
-        // Actualizar stock (incrementar)
-        productoService.actualizarStock(productoId, cantidad);
-
-        return movimientoGuardado;
+        MovimientoInventario guardado = movimientoInventarioRepository.save(movimiento);
+        Producto actualizado = productoService.actualizarStock(request.getProductoId(), request.getCantidad());
+        return mapToResponse(guardado, actualizado.getStock());
     }
 
     /**
@@ -142,43 +140,34 @@ public class MovimientoInventarioService {
      * @return MovimientoInventario creado
      */
     @Transactional
-    public MovimientoInventario registrarSalida(Long productoId, Integer cantidad,
-                                                 String referencia, Long usuarioId) {
-        // Validar cantidad
-        if (cantidad <= 0) {
+    public MovimientoInventarioResponse registrarSalida(MovimientoSalidaRequest request) {
+        if (request.getCantidad() <= 0) {
             throw new BusinessException("La cantidad debe ser mayor que cero");
         }
 
-        // Verificar disponibilidad de stock
-        if (!productoService.verificarDisponibilidad(productoId, cantidad)) {
-            Producto producto = productoService.obtener(productoId);
+        if (!productoService.verificarDisponibilidad(request.getProductoId(), request.getCantidad())) {
+            Producto producto = productoService.obtenerEntidad(request.getProductoId());
             throw new BusinessException("Stock insuficiente. Stock disponible: " + producto.getStock());
         }
 
-        // Obtener producto
-        Producto producto = productoRepository.findById(productoId)
-                .orElseThrow(() -> new ResourceNotFoundException("Producto", "id", productoId));
+        Producto producto = productoRepository.findById(request.getProductoId())
+                .orElseThrow(() -> new ResourceNotFoundException("Producto", "id", request.getProductoId()));
 
-        // Crear movimiento
         MovimientoInventario movimiento = new MovimientoInventario();
         movimiento.setProducto(producto);
         movimiento.setTipoMovimiento(AppConstants.TIPO_MOVIMIENTO_SALIDA);
-        movimiento.setCantidad(cantidad);
+        movimiento.setCantidad(request.getCantidad());
         movimiento.setFecha(LocalDateTime.now());
-        movimiento.setReferencia(referencia);
+        movimiento.setReferencia(request.getReferencia());
 
-        if (usuarioId != null) {
-            movimiento.setUsuario(usuarioRepository.findById(usuarioId)
-                    .orElseThrow(() -> new ResourceNotFoundException("Usuario", "id", usuarioId)));
+        if (request.getUsuarioId() != null) {
+            movimiento.setUsuario(usuarioRepository.findById(request.getUsuarioId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Usuario", "id", request.getUsuarioId())));
         }
 
-        // Guardar movimiento
-        MovimientoInventario movimientoGuardado = movimientoInventarioRepository.save(movimiento);
-
-        // Actualizar stock (decrementar)
-        productoService.actualizarStock(productoId, -cantidad);
-
-        return movimientoGuardado;
+        MovimientoInventario guardado = movimientoInventarioRepository.save(movimiento);
+        Producto actualizado = productoService.actualizarStock(request.getProductoId(), -request.getCantidad());
+        return mapToResponse(guardado, actualizado.getStock());
     }
 
     /**
@@ -188,8 +177,11 @@ public class MovimientoInventarioService {
      * @return Lista de movimientos del producto
      */
     @Transactional(readOnly = true)
-    public List<MovimientoInventario> obtenerPorProducto(Long productoId) {
-        return movimientoInventarioRepository.findByProductoId(productoId);
+    public List<MovimientoInventarioResponse> obtenerPorProducto(Long productoId) {
+        return movimientoInventarioRepository.findByProductoId(productoId)
+                .stream()
+                .map(mov -> mapToResponse(mov, null))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -200,8 +192,50 @@ public class MovimientoInventarioService {
      * @return Lista de movimientos en el rango especificado
      */
     @Transactional(readOnly = true)
-    public List<MovimientoInventario> obtenerPorRangoFechas(LocalDateTime fechaInicio, LocalDateTime fechaFin) {
-        return movimientoInventarioRepository.findByFechaBetween(fechaInicio, fechaFin);
+    public List<MovimientoInventarioResponse> obtenerPorRangoFechas(LocalDateTime fechaInicio, LocalDateTime fechaFin) {
+        return movimientoInventarioRepository.findByFechaBetween(fechaInicio, fechaFin)
+                .stream()
+                .map(mov -> mapToResponse(mov, null))
+                .collect(Collectors.toList());
+    }
+
+    private MovimientoInventarioResponse mapToResponse(MovimientoInventario movimiento, Integer stockResultante) {
+        MovimientoInventarioResponse.ProductoSummary productoSummary = new MovimientoInventarioResponse.ProductoSummary(
+                movimiento.getProducto().getIdProducto(),
+                movimiento.getProducto().getSku(),
+                movimiento.getProducto().getNombre()
+        );
+
+        MovimientoInventarioResponse.ProveedorSummary proveedorSummary = null;
+        if (movimiento.getProveedor() != null) {
+            proveedorSummary = new MovimientoInventarioResponse.ProveedorSummary(
+                    movimiento.getProveedor().getIdProveedor(),
+                    movimiento.getProveedor().getNombre()
+            );
+        }
+
+        MovimientoInventarioResponse.UsuarioSummary usuarioSummary = null;
+        if (movimiento.getUsuario() != null) {
+            Usuario usuario = movimiento.getUsuario();
+            usuarioSummary = new MovimientoInventarioResponse.UsuarioSummary(
+                    usuario.getIdUsuario(),
+                    usuario.getUsername(),
+                    usuario.getNombre(),
+                    usuario.getApellido()
+            );
+        }
+
+        return new MovimientoInventarioResponse(
+                movimiento.getIdMovimiento(),
+                movimiento.getTipoMovimiento(),
+                movimiento.getCantidad(),
+                movimiento.getFecha(),
+                movimiento.getReferencia(),
+                productoSummary,
+                proveedorSummary,
+                usuarioSummary,
+                stockResultante
+        );
     }
 }
 

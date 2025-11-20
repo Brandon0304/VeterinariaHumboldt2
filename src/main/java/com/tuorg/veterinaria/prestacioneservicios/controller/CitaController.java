@@ -1,16 +1,18 @@
 package com.tuorg.veterinaria.prestacioneservicios.controller;
 
 import com.tuorg.veterinaria.common.dto.ApiResponse;
-import com.tuorg.veterinaria.prestacioneservicios.model.Cita;
+import com.tuorg.veterinaria.prestacioneservicios.dto.CitaCancelarRequest;
+import com.tuorg.veterinaria.prestacioneservicios.dto.CitaRequest;
+import com.tuorg.veterinaria.prestacioneservicios.dto.CitaResponse;
+import com.tuorg.veterinaria.prestacioneservicios.dto.CitaReprogramarRequest;
 import com.tuorg.veterinaria.prestacioneservicios.service.CitaService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Controlador REST para la gestión de citas.
@@ -22,7 +24,7 @@ import java.util.Map;
  * @version 1.0.0
  */
 @RestController
-@RequestMapping("/api/citas")
+@RequestMapping("/citas")
 public class CitaController {
 
     /**
@@ -47,8 +49,8 @@ public class CitaController {
      * @return Respuesta con la cita creada
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<Cita>> programar(@RequestBody Cita cita) {
-        Cita citaCreada = citaService.programar(cita);
+    public ResponseEntity<ApiResponse<CitaResponse>> programar(@RequestBody @Valid CitaRequest cita) {
+        CitaResponse citaCreada = citaService.programar(cita);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Cita programada exitosamente", citaCreada));
     }
@@ -61,11 +63,10 @@ public class CitaController {
      * @return Respuesta con la cita actualizada
      */
     @PutMapping("/{citaId}/reprogramar")
-    public ResponseEntity<ApiResponse<Cita>> reprogramar(
+    public ResponseEntity<ApiResponse<CitaResponse>> reprogramar(
             @PathVariable Long citaId,
-            @RequestBody Map<String, String> requestBody) {
-        LocalDateTime nuevaFechaHora = LocalDateTime.parse(requestBody.get("fechaHora"));
-        Cita cita = citaService.reprogramar(citaId, nuevaFechaHora);
+            @RequestBody @Valid CitaReprogramarRequest request) {
+        CitaResponse cita = citaService.reprogramar(citaId, request);
         return ResponseEntity.ok(ApiResponse.success("Cita reprogramada exitosamente", cita));
     }
 
@@ -77,11 +78,10 @@ public class CitaController {
      * @return Respuesta con la cita cancelada
      */
     @PutMapping("/{citaId}/cancelar")
-    public ResponseEntity<ApiResponse<Cita>> cancelar(
+    public ResponseEntity<ApiResponse<CitaResponse>> cancelar(
             @PathVariable Long citaId,
-            @RequestBody Map<String, String> requestBody) {
-        String motivo = requestBody.get("motivo");
-        Cita cita = citaService.cancelar(citaId, motivo);
+            @RequestBody @Valid CitaCancelarRequest request) {
+        CitaResponse cita = citaService.cancelar(citaId, request);
         return ResponseEntity.ok(ApiResponse.success("Cita cancelada exitosamente", cita));
     }
 
@@ -92,9 +92,20 @@ public class CitaController {
      * @return Respuesta con la cita completada
      */
     @PutMapping("/{citaId}/completar")
-    public ResponseEntity<ApiResponse<Cita>> completar(@PathVariable Long citaId) {
-        Cita cita = citaService.completar(citaId);
+    public ResponseEntity<ApiResponse<CitaResponse>> completar(@PathVariable Long citaId) {
+        CitaResponse cita = citaService.completar(citaId);
         return ResponseEntity.ok(ApiResponse.success("Cita completada exitosamente", cita));
+    }
+
+    /**
+     * Obtiene todas las citas.
+     * 
+     * @return Respuesta con la lista de todas las citas
+     */
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<CitaResponse>>> obtenerTodas() {
+        List<CitaResponse> citas = citaService.obtenerTodas();
+        return ResponseEntity.ok(ApiResponse.success("Citas obtenidas exitosamente", citas));
     }
 
     /**
@@ -104,8 +115,8 @@ public class CitaController {
      * @return Respuesta con la lista de citas
      */
     @GetMapping("/paciente/{pacienteId}")
-    public ResponseEntity<ApiResponse<List<Cita>>> obtenerPorPaciente(@PathVariable Long pacienteId) {
-        List<Cita> citas = citaService.obtenerPorPaciente(pacienteId);
+    public ResponseEntity<ApiResponse<List<CitaResponse>>> obtenerPorPaciente(@PathVariable Long pacienteId) {
+        List<CitaResponse> citas = citaService.obtenerPorPaciente(pacienteId);
         return ResponseEntity.ok(ApiResponse.success("Citas obtenidas exitosamente", citas));
     }
 
@@ -116,9 +127,27 @@ public class CitaController {
      * @return Respuesta con la lista de citas
      */
     @GetMapping("/veterinario/{veterinarioId}")
-    public ResponseEntity<ApiResponse<List<Cita>>> obtenerPorVeterinario(@PathVariable Long veterinarioId) {
-        List<Cita> citas = citaService.obtenerPorVeterinario(veterinarioId);
+    public ResponseEntity<ApiResponse<List<CitaResponse>>> obtenerPorVeterinario(@PathVariable Long veterinarioId) {
+        List<CitaResponse> citas = citaService.obtenerPorVeterinario(veterinarioId);
         return ResponseEntity.ok(ApiResponse.success("Citas obtenidas exitosamente", citas));
+    }
+
+    /**
+     * Verifica si una fecha y hora está disponible para un veterinario.
+     * 
+     * @param veterinarioId ID del veterinario
+     * @param fechaHora Fecha y hora a verificar (formato: yyyy-MM-ddTHH:mm)
+     * @return Respuesta indicando si está disponible
+     */
+    @GetMapping("/disponibilidad")
+    public ResponseEntity<ApiResponse<Boolean>> verificarDisponibilidad(
+            @RequestParam Long veterinarioId,
+            @RequestParam String fechaHora) {
+        java.time.LocalDateTime fechaHoraParsed = java.time.LocalDateTime.parse(fechaHora);
+        boolean disponible = citaService.verificarDisponibilidad(veterinarioId, fechaHoraParsed);
+        return ResponseEntity.ok(ApiResponse.success(
+                disponible ? "La fecha y hora están disponibles" : "La fecha y hora no están disponibles",
+                disponible));
     }
 }
 

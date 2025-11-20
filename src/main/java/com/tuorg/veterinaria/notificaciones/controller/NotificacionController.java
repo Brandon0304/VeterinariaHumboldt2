@@ -1,16 +1,17 @@
 package com.tuorg.veterinaria.notificaciones.controller;
 
 import com.tuorg.veterinaria.common.dto.ApiResponse;
-import com.tuorg.veterinaria.notificaciones.model.Notificacion;
+import com.tuorg.veterinaria.notificaciones.dto.NotificacionEnviarRequest;
+import com.tuorg.veterinaria.notificaciones.dto.NotificacionProgramarRequest;
+import com.tuorg.veterinaria.notificaciones.dto.NotificacionResponse;
 import com.tuorg.veterinaria.notificaciones.service.NotificacionService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Controlador REST para la gestión de notificaciones.
@@ -47,14 +48,9 @@ public class NotificacionController {
      * @return Respuesta con la notificación programada
      */
     @PostMapping("/programar")
-    public ResponseEntity<ApiResponse<Notificacion>> programar(@RequestBody Map<String, Object> requestBody) {
-        Notificacion notificacion = new Notificacion();
-        notificacion.setTipo((String) requestBody.get("tipo"));
-        notificacion.setMensaje((String) requestBody.get("mensaje"));
-        
-        LocalDateTime fechaEnvio = LocalDateTime.parse((String) requestBody.get("fechaEnvio"));
-        Notificacion notificacionProgramada = notificacionService.programarEnvio(notificacion, fechaEnvio);
-        
+    public ResponseEntity<ApiResponse<NotificacionResponse>> programar(
+            @RequestBody @Valid NotificacionProgramarRequest request) {
+        NotificacionResponse notificacionProgramada = notificacionService.programarEnvio(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Notificación programada exitosamente", notificacionProgramada));
     }
@@ -66,14 +62,9 @@ public class NotificacionController {
      * @return Respuesta con la notificación enviada
      */
     @PostMapping("/enviar")
-    public ResponseEntity<ApiResponse<Notificacion>> enviar(@RequestBody Map<String, Object> requestBody) {
-        Notificacion notificacion = new Notificacion();
-        notificacion.setTipo((String) requestBody.get("tipo"));
-        notificacion.setMensaje((String) requestBody.get("mensaje"));
-        
-        Long canalId = Long.valueOf(requestBody.get("canalId").toString());
-        Notificacion notificacionEnviada = notificacionService.enviarAhora(notificacion, canalId);
-        
+    public ResponseEntity<ApiResponse<NotificacionResponse>> enviar(
+            @RequestBody @Valid NotificacionEnviarRequest request) {
+        NotificacionResponse notificacionEnviada = notificacionService.enviarAhora(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Notificación enviada exitosamente", notificacionEnviada));
     }
@@ -84,8 +75,8 @@ public class NotificacionController {
      * @return Respuesta con la lista de notificaciones pendientes
      */
     @GetMapping("/pendientes")
-    public ResponseEntity<ApiResponse<List<Notificacion>>> obtenerPendientes() {
-        List<Notificacion> notificaciones = notificacionService.obtenerPendientes();
+    public ResponseEntity<ApiResponse<List<NotificacionResponse>>> obtenerPendientes() {
+        List<NotificacionResponse> notificaciones = notificacionService.obtenerPendientes();
         return ResponseEntity.ok(ApiResponse.success("Notificaciones pendientes obtenidas exitosamente", notificaciones));
     }
 
@@ -95,8 +86,8 @@ public class NotificacionController {
      * @return Respuesta con la lista de notificaciones
      */
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Notificacion>>> obtenerTodas() {
-        List<Notificacion> notificaciones = notificacionService.obtenerTodas();
+    public ResponseEntity<ApiResponse<List<NotificacionResponse>>> obtenerTodas() {
+        List<NotificacionResponse> notificaciones = notificacionService.obtenerTodas();
         return ResponseEntity.ok(ApiResponse.success("Notificaciones obtenidas exitosamente", notificaciones));
     }
 }

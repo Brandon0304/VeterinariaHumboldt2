@@ -60,5 +60,23 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
     boolean existeCitaEnFechaHora(@Param("veterinarioId") Long veterinarioId,
                                    @Param("fechaHora") LocalDateTime fechaHora,
                                    @Param("estado") String estado);
+
+    /**
+     * Verifica si existe una cita programada para un veterinario en un rango de tiempo.
+     * Considera un margen de tiempo antes y después de la fecha/hora solicitada.
+     * 
+     * @param veterinarioId ID del veterinario
+     * @param fechaHoraInicio Inicio del rango de tiempo
+     * @param fechaHoraFin Fin del rango de tiempo
+     * @param estado Estado de la cita (solo PROGRAMADA)
+     * @return true si existe conflicto, false en caso contrario
+     */
+    @Query("SELECT COUNT(c) > 0 FROM Cita c WHERE c.veterinario.idPersona = :veterinarioId " +
+           "AND c.estado = :estado " +
+           "AND c.fechaHora >= :fechaHoraInicio AND c.fechaHora < :fechaHoraFin")
+    boolean existeCitaEnRango(@Param("veterinarioId") Long veterinarioId,
+                              @Param("fechaHoraInicio") LocalDateTime fechaHoraInicio,
+                              @Param("fechaHoraFin") LocalDateTime fechaHoraFin,
+                              @Param("estado") String estado);
 }
 

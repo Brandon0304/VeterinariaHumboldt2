@@ -124,6 +124,12 @@
             <version>2.2.0</version>
         </dependency>
 
+        <!-- Soporte de Jackson para proxys de Hibernate -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-hibernate5-jakarta</artifactId>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -157,6 +163,13 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+        <!-- PDF generation -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>2.0.29</version>
+        </dependency>
 
     <build>
         <plugins>

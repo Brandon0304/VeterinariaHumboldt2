@@ -1,10 +1,16 @@
 package com.tuorg.veterinaria.prestacioneservicios.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuorg.veterinaria.common.constants.AppConstants;
 import com.tuorg.veterinaria.common.exception.BusinessException;
 import com.tuorg.veterinaria.common.exception.ResourceNotFoundException;
 import com.tuorg.veterinaria.gestionusuarios.model.Cliente;
+import com.tuorg.veterinaria.gestionusuarios.model.Usuario;
 import com.tuorg.veterinaria.gestionusuarios.repository.UsuarioRepository;
+import com.tuorg.veterinaria.prestacioneservicios.dto.FacturaPagoRequest;
+import com.tuorg.veterinaria.prestacioneservicios.dto.FacturaRequest;
+import com.tuorg.veterinaria.prestacioneservicios.dto.FacturaResponse;
 import com.tuorg.veterinaria.prestacioneservicios.model.Factura;
 import com.tuorg.veterinaria.prestacioneservicios.repository.FacturaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,66 +20,58 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Servicio para la gestión de facturas.
- * 
- * Este servicio implementa el patrón Factory/Builder para crear facturas
- * y proporciona métodos para generar PDFs y anular facturas.
- * 
- * @author Equipo de Desarrollo
- * @version 1.0.0
+ *
+ * Implementa el patrón Factory/Builder para encapsular la lógica de creación
+ * y expone DTOs para separar la capa de exposición de las entidades JPA.
  */
 @Service
 public class FacturaService {
 
-    /**
-     * Repositorio de facturas.
-     */
     private final FacturaRepository facturaRepository;
-
-    /**
-     * Repositorio de usuarios (para obtener clientes).
-     */
     private final UsuarioRepository usuarioRepository;
+    private final ObjectMapper objectMapper;
 
-    /**
-     * Constructor con inyección de dependencias.
-     * 
-     * @param facturaRepository Repositorio de facturas
-     * @param usuarioRepository Repositorio de usuarios
-     */
     @Autowired
     public FacturaService(FacturaRepository facturaRepository,
-                         UsuarioRepository usuarioRepository) {
+                          UsuarioRepository usuarioRepository,
+                          ObjectMapper objectMapper) {
         this.facturaRepository = facturaRepository;
         this.usuarioRepository = usuarioRepository;
+        this.objectMapper = objectMapper;
     }
 
     /**
-     * Crea una nueva factura (Factory pattern).
-     * 
-     * Genera automáticamente el número de factura único.
-     * 
-     * @param factura Factura a crear
-     * @return Factura creada
+     * Crea una nueva factura con validaciones de negocio.
      */
     @Transactional
-    public Factura crear(Factura factura) {
-        // Validar que el cliente exista
-        Cliente cliente = (Cliente) usuarioRepository.findById(factura.getCliente().getIdUsuario())
-                .orElseThrow(() -> new ResourceNotFoundException("Cliente", "id", 
-                        factura.getCliente().getIdUsuario()));
+    public FacturaResponse crear(FacturaRequest request) {
+        Usuario usuario = usuarioRepository.findById(request.getClienteId())
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente", "id", request.getClienteId()));
 
-        // Generar número de factura único
+        if (!(usuario instanceof Cliente cliente)) {
+            throw new BusinessException("El identificador proporcionado no corresponde a un cliente registrado");
+        }
+
+        Factura factura = new Factura();
+        factura.setCliente(cliente);
+        factura.setTotal(request.getTotal());
+        factura.setFormaPago(request.getFormaPago());
+        factura.setContenido(asJsonString(request.getContenido()));
+
+        // Generar número único
         String numeroFactura = generarNumeroFactura();
         while (facturaRepository.findByNumero(numeroFactura).isPresent()) {
             numeroFactura = generarNumeroFactura();
         }
         factura.setNumero(numeroFactura);
 
-        // Validar total
         if (factura.getTotal() == null || factura.getTotal().compareTo(BigDecimal.ZERO) < 0) {
             throw new BusinessException("El total de la factura debe ser mayor o igual a cero");
         }
@@ -81,70 +79,50 @@ public class FacturaService {
         factura.setFechaEmision(LocalDateTime.now());
         factura.setEstado(AppConstants.ESTADO_FACTURA_PENDIENTE);
 
-        return facturaRepository.save(factura);
+        Factura guardada = facturaRepository.save(factura);
+        return mapToResponse(guardada);
     }
 
-    /**
-     * Genera un número de factura único.
-     * 
-     * Formato: FACT-YYYYMMDD-XXXX
-     * 
-     * @return Número de factura generado
-     */
     private String generarNumeroFactura() {
         String fecha = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         String secuencia = String.format("%04d", (int) (Math.random() * 10000));
         return "FACT-" + fecha + "-" + secuencia;
     }
 
-    /**
-     * Obtiene una factura por su ID.
-     * 
-     * @param id ID de la factura
-     * @return Factura encontrada
-     */
     @Transactional(readOnly = true)
-    public Factura obtener(Long id) {
-        return facturaRepository.findById(id)
+    public FacturaResponse obtener(Long id) {
+        Factura factura = facturaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Factura", "id", id));
+        return mapToResponse(factura);
     }
 
-    /**
-     * Obtiene todas las facturas de un cliente.
-     * 
-     * @param clienteId ID del cliente
-     * @return Lista de facturas del cliente
-     */
     @Transactional(readOnly = true)
-    public List<Factura> obtenerPorCliente(Long clienteId) {
-        return facturaRepository.findByClienteId(clienteId);
+    public List<FacturaResponse> obtenerTodas() {
+        return facturaRepository.findAll()
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
     }
 
-    /**
-     * Genera el PDF de una factura (simplificado).
-     * 
-     * En una implementación completa, esto generaría un PDF real con iText o JasperReports.
-     * 
-     * @param facturaId ID de la factura
-     * @return Array de bytes representando el PDF
-     */
+    @Transactional(readOnly = true)
+    public List<FacturaResponse> obtenerPorCliente(Long clienteId) {
+        return facturaRepository.findByClienteId(clienteId)
+                .stream()
+                .map(this::mapToResponse)
+                .collect(Collectors.toList());
+    }
+
     @Transactional(readOnly = true)
     public byte[] generarPDF(Long facturaId) {
-        Factura factura = obtener(facturaId);
+        obtener(facturaId);
         // TODO: Implementar generación real de PDF con iText o JasperReports
-        // Por ahora retornamos un array vacío
         return new byte[0];
     }
 
-    /**
-     * Anula una factura.
-     * 
-     * @param facturaId ID de la factura
-     * @return Factura anulada
-     */
     @Transactional
-    public Factura anular(Long facturaId) {
-        Factura factura = obtener(facturaId);
+    public FacturaResponse anular(Long facturaId) {
+        Factura factura = facturaRepository.findById(facturaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Factura", "id", facturaId));
 
         if (AppConstants.ESTADO_FACTURA_ANULADA.equals(factura.getEstado())) {
             throw new BusinessException("La factura ya está anulada");
@@ -155,27 +133,66 @@ public class FacturaService {
         }
 
         factura.setEstado(AppConstants.ESTADO_FACTURA_ANULADA);
-        return facturaRepository.save(factura);
+        Factura anulada = facturaRepository.save(factura);
+        return mapToResponse(anulada);
     }
 
-    /**
-     * Registra el pago de una factura.
-     * 
-     * @param facturaId ID de la factura
-     * @param formaPago Forma de pago utilizada
-     * @return Factura actualizada
-     */
     @Transactional
-    public Factura registrarPago(Long facturaId, String formaPago) {
-        Factura factura = obtener(facturaId);
+    public FacturaResponse registrarPago(Long facturaId, FacturaPagoRequest request) {
+        Factura factura = facturaRepository.findById(facturaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Factura", "id", facturaId));
 
         if (!AppConstants.ESTADO_FACTURA_PENDIENTE.equals(factura.getEstado())) {
             throw new BusinessException("Solo se pueden pagar facturas en estado PENDIENTE");
         }
 
         factura.setEstado(AppConstants.ESTADO_FACTURA_PAGADA);
-        factura.setFormaPago(formaPago);
-        return facturaRepository.save(factura);
+        factura.setFormaPago(request.getFormaPago());
+        factura.setFechaEmision(factura.getFechaEmision() != null ? factura.getFechaEmision() : LocalDateTime.now());
+
+        Factura pagada = facturaRepository.save(factura);
+        return mapToResponse(pagada);
+    }
+
+    private FacturaResponse mapToResponse(Factura factura) {
+        Cliente cliente = factura.getCliente();
+        return FacturaResponse.builder()
+                .idFactura(factura.getIdFactura())
+                .numero(factura.getNumero())
+                .fechaEmision(factura.getFechaEmision())
+                .total(factura.getTotal())
+                .formaPago(factura.getFormaPago())
+                .estado(factura.getEstado())
+                .contenido(asMap(factura.getContenido()))
+                .cliente(cliente != null ? FacturaResponse.ClienteSummary.builder()
+                        .id(cliente.getIdUsuario())
+                        .nombreCompleto(cliente.getNombre() + " " + cliente.getApellido())
+                        .correo(cliente.getCorreo())
+                        .telefono(cliente.getTelefono())
+                        .build() : null)
+                .build();
+    }
+
+    private String asJsonString(Map<String, Object> contenido) {
+        if (contenido == null || contenido.isEmpty()) {
+            return null;
+        }
+        try {
+            return objectMapper.writeValueAsString(contenido);
+        } catch (JsonProcessingException e) {
+            throw new BusinessException("El contenido de la factura no tiene un formato JSON válido");
+        }
+    }
+
+    private Map<String, Object> asMap(String contenido) {
+        if (contenido == null || contenido.isBlank()) {
+            return Collections.emptyMap();
+        }
+        try {
+            return objectMapper.readValue(contenido, Map.class);
+        } catch (JsonProcessingException e) {
+            return Collections.emptyMap();
+        }
     }
 }
 
