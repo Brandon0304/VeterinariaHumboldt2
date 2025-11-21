@@ -1,8 +1,11 @@
 package com.tuorg.veterinaria.gestioninventario.controller;
 
 import com.tuorg.veterinaria.common.dto.ApiResponse;
-import com.tuorg.veterinaria.gestioninventario.model.Producto;
+import com.tuorg.veterinaria.gestioninventario.dto.ProductoRequest;
+import com.tuorg.veterinaria.gestioninventario.dto.ProductoResponse;
+import com.tuorg.veterinaria.gestioninventario.dto.ProductoUpdateRequest;
 import com.tuorg.veterinaria.gestioninventario.service.ProductoService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,8 +48,8 @@ public class ProductoController {
      * @return Respuesta con el producto creado
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<Producto>> crear(@RequestBody Producto producto) {
-        Producto productoCreado = productoService.crear(producto);
+    public ResponseEntity<ApiResponse<ProductoResponse>> crear(@Valid @RequestBody ProductoRequest request) {
+        ProductoResponse productoCreado = productoService.crear(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Producto creado exitosamente", productoCreado));
     }
@@ -58,8 +61,8 @@ public class ProductoController {
      * @return Respuesta con el producto
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Producto>> obtener(@PathVariable Long id) {
-        Producto producto = productoService.obtener(id);
+    public ResponseEntity<ApiResponse<ProductoResponse>> obtener(@PathVariable Long id) {
+        ProductoResponse producto = productoService.obtener(id);
         return ResponseEntity.ok(ApiResponse.success("Producto obtenido exitosamente", producto));
     }
 
@@ -69,8 +72,8 @@ public class ProductoController {
      * @return Respuesta con la lista de productos
      */
     @GetMapping
-    public ResponseEntity<ApiResponse<List<Producto>>> obtenerTodos() {
-        List<Producto> productos = productoService.obtenerTodos();
+    public ResponseEntity<ApiResponse<List<ProductoResponse>>> obtenerTodos() {
+        List<ProductoResponse> productos = productoService.obtenerTodos();
         return ResponseEntity.ok(ApiResponse.success("Productos obtenidos exitosamente", productos));
     }
 
@@ -96,10 +99,25 @@ public class ProductoController {
      * @return Respuesta con la lista de productos con stock bajo
      */
     @GetMapping("/stock-bajo")
-    public ResponseEntity<ApiResponse<List<Producto>>> obtenerProductosConStockBajo(
+    public ResponseEntity<ApiResponse<List<ProductoResponse>>> obtenerProductosConStockBajo(
             @RequestParam(defaultValue = "10") Integer nivelStock) {
-        List<Producto> productos = productoService.obtenerProductosConStockBajo(nivelStock);
+        List<ProductoResponse> productos = productoService.obtenerProductosConStockBajo(nivelStock);
         return ResponseEntity.ok(ApiResponse.success("Productos con stock bajo obtenidos exitosamente", productos));
+    }
+
+    /**
+     * Actualiza un producto existente.
+     * 
+     * @param id ID del producto
+     * @param request Datos actualizados del producto
+     * @return Respuesta con el producto actualizado
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<ProductoResponse>> actualizar(
+            @PathVariable Long id,
+            @Valid @RequestBody ProductoUpdateRequest request) {
+        ProductoResponse producto = productoService.actualizar(id, request);
+        return ResponseEntity.ok(ApiResponse.success("Producto actualizado exitosamente", producto));
     }
 }
 

@@ -1,8 +1,11 @@
 package com.tuorg.veterinaria.gestioninventario.controller;
 
 import com.tuorg.veterinaria.common.dto.ApiResponse;
-import com.tuorg.veterinaria.gestioninventario.model.MovimientoInventario;
+import com.tuorg.veterinaria.gestioninventario.dto.MovimientoEntradaRequest;
+import com.tuorg.veterinaria.gestioninventario.dto.MovimientoInventarioResponse;
+import com.tuorg.veterinaria.gestioninventario.dto.MovimientoSalidaRequest;
 import com.tuorg.veterinaria.gestioninventario.service.MovimientoInventarioService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Controlador REST para la gestión de movimientos de inventario.
@@ -47,18 +49,9 @@ public class MovimientoInventarioController {
      * @return Respuesta con el movimiento creado
      */
     @PostMapping("/entrada")
-    public ResponseEntity<ApiResponse<MovimientoInventario>> registrarEntrada(
-            @RequestBody Map<String, Object> requestBody) {
-        Long productoId = Long.valueOf(requestBody.get("productoId").toString());
-        Integer cantidad = Integer.valueOf(requestBody.get("cantidad").toString());
-        Long proveedorId = requestBody.get("proveedorId") != null ?
-                Long.valueOf(requestBody.get("proveedorId").toString()) : null;
-        String referencia = (String) requestBody.get("referencia");
-        Long usuarioId = requestBody.get("usuarioId") != null ?
-                Long.valueOf(requestBody.get("usuarioId").toString()) : null;
-
-        MovimientoInventario movimiento = movimientoInventarioService.registrarEntrada(
-                productoId, proveedorId, cantidad, referencia, usuarioId);
+    public ResponseEntity<ApiResponse<MovimientoInventarioResponse>> registrarEntrada(
+            @Valid @RequestBody MovimientoEntradaRequest request) {
+        MovimientoInventarioResponse movimiento = movimientoInventarioService.registrarEntrada(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Entrada de inventario registrada exitosamente", movimiento));
     }
@@ -70,16 +63,9 @@ public class MovimientoInventarioController {
      * @return Respuesta con el movimiento creado
      */
     @PostMapping("/salida")
-    public ResponseEntity<ApiResponse<MovimientoInventario>> registrarSalida(
-            @RequestBody Map<String, Object> requestBody) {
-        Long productoId = Long.valueOf(requestBody.get("productoId").toString());
-        Integer cantidad = Integer.valueOf(requestBody.get("cantidad").toString());
-        String referencia = (String) requestBody.get("referencia");
-        Long usuarioId = requestBody.get("usuarioId") != null ?
-                Long.valueOf(requestBody.get("usuarioId").toString()) : null;
-
-        MovimientoInventario movimiento = movimientoInventarioService.registrarSalida(
-                productoId, cantidad, referencia, usuarioId);
+    public ResponseEntity<ApiResponse<MovimientoInventarioResponse>> registrarSalida(
+            @Valid @RequestBody MovimientoSalidaRequest request) {
+        MovimientoInventarioResponse movimiento = movimientoInventarioService.registrarSalida(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Salida de inventario registrada exitosamente", movimiento));
     }
@@ -91,9 +77,9 @@ public class MovimientoInventarioController {
      * @return Respuesta con la lista de movimientos
      */
     @GetMapping("/producto/{productoId}")
-    public ResponseEntity<ApiResponse<List<MovimientoInventario>>> obtenerPorProducto(
+    public ResponseEntity<ApiResponse<List<MovimientoInventarioResponse>>> obtenerPorProducto(
             @PathVariable Long productoId) {
-        List<MovimientoInventario> movimientos = movimientoInventarioService.obtenerPorProducto(productoId);
+        List<MovimientoInventarioResponse> movimientos = movimientoInventarioService.obtenerPorProducto(productoId);
         return ResponseEntity.ok(ApiResponse.success("Movimientos obtenidos exitosamente", movimientos));
     }
 
@@ -105,12 +91,13 @@ public class MovimientoInventarioController {
      * @return Respuesta con la lista de movimientos
      */
     @GetMapping("/rango-fechas")
-    public ResponseEntity<ApiResponse<List<MovimientoInventario>>> obtenerPorRangoFechas(
+    public ResponseEntity<ApiResponse<List<MovimientoInventarioResponse>>> obtenerPorRangoFechas(
             @RequestParam String fechaInicio,
             @RequestParam String fechaFin) {
-        LocalDateTime inicio = LocalDateTime.parse(fechaInicio);
-        LocalDateTime fin = LocalDateTime.parse(fechaFin);
-        List<MovimientoInventario> movimientos = movimientoInventarioService.obtenerPorRangoFechas(inicio, fin);
+        List<MovimientoInventarioResponse> movimientos = movimientoInventarioService.obtenerPorRangoFechas(
+                LocalDateTime.parse(fechaInicio),
+                LocalDateTime.parse(fechaFin)
+        );
         return ResponseEntity.ok(ApiResponse.success("Movimientos obtenidos exitosamente", movimientos));
     }
 }
