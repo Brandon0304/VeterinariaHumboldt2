@@ -10,10 +10,10 @@ import java.time.LocalDateTime;
 
 /**
  * Entidad que representa un usuario del sistema.
- *
+ * 
  * Esta clase extiende de Persona y agrega información específica
  * de autenticación y autorización del usuario.
- *
+ * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
  */
@@ -73,4 +73,19 @@ public class Usuario extends Persona {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rol_id", nullable = false)
     private Rol rol;
+
+    /**
+     * Token único para recuperación de contraseña.
+     * Se genera cuando el usuario solicita restablecer su contraseña.
+     */
+    @Column(name = "password_reset_token", length = 255)
+    private String passwordResetToken;
+
+    /**
+     * Fecha y hora de expiración del token de recuperación de contraseña.
+     * El token es válido por un período limitado (ej: 1 hora).
+     */
+    @Column(name = "password_reset_token_expiry")
+    private LocalDateTime passwordResetTokenExpiry;
 }
+

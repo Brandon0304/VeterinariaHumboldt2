@@ -10,10 +10,10 @@ import java.time.LocalDateTime;
 
 /**
  * Entidad que representa un cliente del sistema.
- *
+ * 
  * Esta clase extiende de Usuario y agrega información específica
  * de los clientes que son dueños de mascotas.
- *
+ * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
  */
@@ -39,3 +39,4 @@ public class Cliente extends Usuario {
     @Column(name = "documento_identidad", length = 50)
     private String documentoIdentidad;
 }
+

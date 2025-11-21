@@ -8,11 +8,11 @@ import lombok.Setter;
 
 /**
  * Entidad que representa un permiso en el sistema.
- *
+ * 
  * Los permisos definen acciones específicas que un usuario puede realizar.
  * Los permisos se asignan a roles, y los usuarios heredan los permisos
  * de su rol asignado.
- *
+ * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
  */
@@ -46,3 +46,4 @@ public class Permiso {
     @Column(name = "descripcion", length = 255)
     private String descripcion;
 }
+

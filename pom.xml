@@ -156,6 +156,11 @@
             <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
+        <!-- Jackson Hibernate5 Module para Jakarta EE (Spring Boot 3.x) -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-hibernate5-jakarta</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
@@ -206,4 +211,3 @@
         </plugins>
     </build>
 </project>
-

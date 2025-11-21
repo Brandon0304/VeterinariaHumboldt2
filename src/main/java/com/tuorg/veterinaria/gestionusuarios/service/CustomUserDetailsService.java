@@ -12,15 +12,16 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.List;
 
 /**
  * Servicio personalizado para cargar detalles de usuario para Spring Security.
- *
+ * 
  * Este servicio implementa UserDetailsService y se utiliza para autenticación
  * con Spring Security y JWT.
- *
+ * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
  */
@@ -34,7 +35,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     /**
      * Constructor con inyección de dependencias.
-     *
+     * 
      * @param usuarioRepository Repositorio de usuarios
      */
     @Autowired
@@ -44,7 +45,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     /**
      * Carga un usuario por su nombre de usuario.
-     *
+     * 
      * @param username Nombre de usuario
      * @return UserDetails con la información del usuario
      * @throws UsernameNotFoundException Si el usuario no existe
@@ -71,14 +72,22 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     /**
-     * Obtiene las autoridades (roles y permisos) del usuario.
-     *
+     * Obtiene las autoridades (roles) del usuario.
+     * 
      * @param usuario Usuario del cual obtener las autoridades
      * @return Colección de autoridades
      */
     private Collection<? extends GrantedAuthority> getAuthorities(Usuario usuario) {
-        return usuario.getRol().getPermisos().stream()
-                .map(permiso -> new SimpleGrantedAuthority("ROLE_" + permiso.getNombre()))
-                .collect(Collectors.toList());
+        List<GrantedAuthority> authorities = new ArrayList<>();
+        
+        // Agregar el rol del usuario como autoridad
+        if (usuario.getRol() != null && usuario.getRol().getNombreRol() != null) {
+            String roleName = usuario.getRol().getNombreRol().toUpperCase();
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + roleName));
+        }
+        
+        return authorities;
     }
 }
+
+

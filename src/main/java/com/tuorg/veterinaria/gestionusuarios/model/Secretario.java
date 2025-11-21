@@ -8,10 +8,10 @@ import lombok.Setter;
 
 /**
  * Entidad que representa un secretario del sistema.
- *
+ * 
  * Esta clase extiende de Usuario y agrega información específica
  * de los secretarios que gestionan citas e inventario.
- *
+ * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
  */
@@ -30,3 +30,4 @@ public class Secretario extends Usuario {
     @Column(name = "extension", length = 20)
     private String extension;
 }
+

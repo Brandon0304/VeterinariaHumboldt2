@@ -5,13 +5,17 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import java.util.Map;
 
 /**
  * Entidad que representa un usuario veterinario del sistema.
- *
+ * 
  * Esta clase extiende de Usuario y agrega información específica
  * de los veterinarios, como licencia profesional y especialidad.
- *
+ * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
  */
@@ -41,6 +45,8 @@ public class UsuarioVeterinario extends Usuario {
      * Almacena los horarios disponibles por día de la semana.
      * Ejemplo: {"lunes": [{"inicio": "09:00", "fin": "13:00"}, ...]}
      */
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "disponibilidad", columnDefinition = "JSONB")
-    private String disponibilidad;
+    private Map<String, Object> disponibilidad;
 }
+
