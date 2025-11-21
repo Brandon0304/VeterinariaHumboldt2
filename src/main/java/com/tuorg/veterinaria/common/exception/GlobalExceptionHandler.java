@@ -15,10 +15,10 @@ import java.util.Map;
 
 /**
  * Manejador global de excepciones para toda la aplicación.
- * 
+ *
  * Esta clase captura todas las excepciones no manejadas y las convierte
  * en respuestas HTTP apropiadas con formato estándar.
- * 
+ *
  * @author Equipo de Desarrollo
  * @version 1.0.0
  */
@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
 
     /**
      * Maneja excepciones de recursos no encontrados.
-     * 
+     *
      * @param ex Excepción de recurso no encontrado
      * @return Respuesta HTTP 404 con mensaje de error
      */
@@ -42,7 +42,7 @@ public class GlobalExceptionHandler {
 
     /**
      * Maneja excepciones de negocio.
-     * 
+     *
      * @param ex Excepción de negocio
      * @return Respuesta HTTP 400 con mensaje de error
      */
@@ -55,7 +55,7 @@ public class GlobalExceptionHandler {
 
     /**
      * Maneja excepciones de validación de argumentos.
-     * 
+     *
      * @param ex Excepción de validación
      * @return Respuesta HTTP 400 con detalles de validación
      */
@@ -63,14 +63,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<Map<String, String>>> handleValidationExceptions(
             MethodArgumentNotValidException ex) {
         logger.warn("Error de validación: {}", ex.getMessage());
-        
+
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach((error) -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-        
+
         ApiResponse<Map<String, String>> response = ApiResponse.error("Error de validación");
         response.setData(errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
@@ -78,7 +78,7 @@ public class GlobalExceptionHandler {
 
     /**
      * Maneja excepciones genéricas no previstas.
-     * 
+     *
      * @param ex Excepción genérica
      * @return Respuesta HTTP 500 con mensaje de error genérico
      */

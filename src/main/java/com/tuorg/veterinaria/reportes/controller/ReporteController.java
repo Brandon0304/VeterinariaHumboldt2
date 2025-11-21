@@ -1,14 +1,14 @@
 package com.tuorg.veterinaria.reportes.controller;
 
 import com.tuorg.veterinaria.common.dto.ApiResponse;
-import com.tuorg.veterinaria.reportes.model.Reporte;
+import com.tuorg.veterinaria.reportes.dto.ReporteRequest;
+import com.tuorg.veterinaria.reportes.dto.ReporteResponse;
 import com.tuorg.veterinaria.reportes.service.ReporteService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 /**
  * Controlador REST para la gestión de reportes (Facade pattern).
@@ -45,13 +45,8 @@ public class ReporteController {
      * @return Respuesta con el reporte generado
      */
     @PostMapping("/generar")
-    public ResponseEntity<ApiResponse<Reporte>> generar(@RequestBody Map<String, Object> requestBody) {
-        String nombre = (String) requestBody.get("nombre");
-        String tipo = (String) requestBody.get("tipo");
-        @SuppressWarnings("unchecked")
-        Map<String, Object> parametros = (Map<String, Object>) requestBody.get("parametros");
-        
-        Reporte reporte = reporteService.generar(nombre, tipo, parametros);
+    public ResponseEntity<ApiResponse<ReporteResponse>> generar(@RequestBody @Valid ReporteRequest request) {
+        ReporteResponse reporte = reporteService.generar(request);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Reporte generado exitosamente", reporte));
     }
