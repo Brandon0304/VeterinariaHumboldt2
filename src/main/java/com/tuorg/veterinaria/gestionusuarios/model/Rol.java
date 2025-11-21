@@ -11,10 +11,10 @@ import java.util.Set;
 
 /**
  * Entidad que representa un rol en el sistema.
- *
+ * 
  * Los roles definen los permisos y capacidades que tiene un usuario
  * dentro del sistema. Un rol puede tener múltiples permisos asociados.
- *
+ * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
  */
@@ -60,3 +60,4 @@ public class Rol {
     )
     private Set<Permiso> permisos = new HashSet<>();
 }
+

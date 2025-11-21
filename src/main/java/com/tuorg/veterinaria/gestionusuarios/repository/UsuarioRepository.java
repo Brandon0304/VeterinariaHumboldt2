@@ -8,10 +8,10 @@ import java.util.Optional;
 
 /**
  * Repositorio para la entidad Usuario.
- *
+ * 
  * Proporciona métodos de acceso a datos para usuarios
  * utilizando Spring Data JPA.
- *
+ * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
  */
@@ -20,7 +20,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     /**
      * Busca un usuario por su nombre de usuario.
-     *
+     * 
      * @param username Nombre de usuario
      * @return Optional con el usuario si existe, vacío en caso contrario
      */
@@ -28,7 +28,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     /**
      * Verifica si existe un usuario con el nombre de usuario especificado.
-     *
+     * 
      * @param username Nombre de usuario
      * @return true si existe, false en caso contrario
      */
@@ -36,7 +36,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     /**
      * Busca un usuario por su correo electrónico.
-     *
+     * 
      * @param correo Correo electrónico
      * @return Optional con el usuario si existe, vacío en caso contrario
      */
@@ -44,9 +44,27 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
 
     /**
      * Verifica si existe un usuario con el correo especificado.
-     *
+     * 
      * @param correo Correo electrónico
      * @return true si existe, false en caso contrario
      */
     boolean existsByCorreo(String correo);
+
+    /**
+     * Verifica si existe un usuario con el correo especificado excluyendo un ID.
+     * 
+     * @param correo Correo electrónico
+     * @param idPersona ID de la persona (usuario) a excluir
+     * @return true si existe, false en caso contrario
+     */
+    boolean existsByCorreoAndIdPersonaNot(String correo, Long idPersona);
+
+    /**
+     * Busca un usuario por su token de recuperación de contraseña.
+     * 
+     * @param token Token de recuperación
+     * @return Optional con el usuario si existe, vacío en caso contrario
+     */
+    Optional<Usuario> findByPasswordResetToken(String token);
 }
+

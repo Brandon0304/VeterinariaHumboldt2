@@ -10,10 +10,10 @@ import java.time.LocalDateTime;
 
 /**
  * Entidad que representa un registro en el historial de acciones.
- *
+ * 
  * Esta clase almacena todas las acciones importantes realizadas
  * por los usuarios del sistema para auditoría y seguimiento.
- *
+ * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
  */
@@ -62,3 +62,4 @@ public class HistorialAccion {
     @Column(name = "metadata", columnDefinition = "JSONB")
     private String metadata;
 }
+

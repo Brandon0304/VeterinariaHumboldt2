@@ -4,8 +4,6 @@ import com.tuorg.veterinaria.gestionusuarios.model.HistorialAccion;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -13,10 +11,10 @@ import java.util.List;
 
 /**
  * Repositorio para la entidad HistorialAccion.
- *
+ * 
  * Proporciona métodos de acceso a datos para el historial de acciones
  * utilizando Spring Data JPA.
- *
+ * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
  */
@@ -25,7 +23,7 @@ public interface HistorialAccionRepository extends JpaRepository<HistorialAccion
 
     /**
      * Busca acciones por usuario.
-     *
+     * 
      * @param usuarioId ID del usuario
      * @return Lista de acciones del usuario
      */
@@ -34,7 +32,7 @@ public interface HistorialAccionRepository extends JpaRepository<HistorialAccion
 
     /**
      * Busca acciones en un rango de fechas.
-     *
+     * 
      * @param fechaInicio Fecha de inicio
      * @param fechaFin Fecha de fin
      * @return Lista de acciones en el rango especificado
@@ -44,3 +42,4 @@ public interface HistorialAccionRepository extends JpaRepository<HistorialAccion
             @Param("fechaInicio") LocalDateTime fechaInicio,
             @Param("fechaFin") LocalDateTime fechaFin);
 }
+

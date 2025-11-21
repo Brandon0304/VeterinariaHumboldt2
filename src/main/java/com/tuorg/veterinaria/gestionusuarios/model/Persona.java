@@ -8,13 +8,13 @@ import lombok.Setter;
 
 /**
  * Clase abstracta que representa una persona en el sistema.
- *
+ * 
  * Esta clase actúa como entidad base para todas las personas
  * que interactúan con el sistema (usuarios, clientes, etc.).
- *
+ * 
  * Utiliza la estrategia de herencia JOINED para mapear la jerarquía
  * de clases a tablas separadas en la base de datos.
- *
+ * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
  */
