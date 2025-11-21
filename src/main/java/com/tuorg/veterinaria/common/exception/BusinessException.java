@@ -2,10 +2,10 @@ package com.tuorg.veterinaria.common.exception;
 
 /**
  * Excepción personalizada para errores de negocio.
- * 
+ *
  * Esta excepción se utiliza para lanzar errores relacionados con
  * reglas de negocio, validaciones de dominio o lógica de aplicación.
- * 
+ *
  * @author Equipo de Desarrollo
  * @version 1.0.0
  */
@@ -20,7 +20,7 @@ public class BusinessException extends RuntimeException {
 
     /**
      * Constructor con mensaje.
-     * 
+     *
      * @param message Mensaje descriptivo del error
      */
     public BusinessException(String message) {
@@ -30,7 +30,7 @@ public class BusinessException extends RuntimeException {
 
     /**
      * Constructor con mensaje y código de error.
-     * 
+     *
      * @param message Mensaje descriptivo del error
      * @param errorCode Código de error de negocio
      */
@@ -41,7 +41,7 @@ public class BusinessException extends RuntimeException {
 
     /**
      * Constructor con mensaje y causa.
-     * 
+     *
      * @param message Mensaje descriptivo del error
      * @param cause Causa de la excepción
      */
@@ -52,7 +52,7 @@ public class BusinessException extends RuntimeException {
 
     /**
      * Constructor completo.
-     * 
+     *
      * @param message Mensaje descriptivo del error
      * @param errorCode Código de error de negocio
      * @param cause Causa de la excepción

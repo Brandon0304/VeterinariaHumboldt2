@@ -2,10 +2,10 @@ package com.tuorg.veterinaria.common.constants;
 
 /**
  * Clase de constantes de la aplicación.
- * 
+ *
  * Esta clase centraliza todas las constantes utilizadas en la aplicación,
  * incluyendo mensajes, códigos de error, valores por defecto, etc.
- * 
+ *
  * @author Equipo de Desarrollo
  * @version 1.0.0
  */
@@ -63,6 +63,11 @@ public final class AppConstants {
      * Estado de cita: Cancelada.
      */
     public static final String ESTADO_CITA_CANCELADA = "CANCELADA";
+
+    /**
+     * Duración estándar de una cita en minutos.
+     */
+    public static final int DURACION_CITA_MINUTOS = 30;
 
     // ==================== Tipos de Movimiento de Inventario ====================
 

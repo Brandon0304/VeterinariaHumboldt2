@@ -5,8 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 /**
  * Entidad que representa un producto en el inventario.
@@ -83,7 +86,8 @@ public class Producto {
      * Metadatos adicionales en formato JSON.
      * Puede incluir información como fecha de creación, proveedor preferido, etc.
      */
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "metadatos", columnDefinition = "JSONB")
-    private String metadatos;
+    private Map<String, Object> metadatos;
 }
 

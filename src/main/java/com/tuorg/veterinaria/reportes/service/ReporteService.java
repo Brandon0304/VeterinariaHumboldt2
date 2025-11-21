@@ -1,137 +1,132 @@
 package com.tuorg.veterinaria.reportes.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tuorg.veterinaria.common.exception.BusinessException;
+import com.tuorg.veterinaria.reportes.dto.EstadisticaResponse;
+import com.tuorg.veterinaria.reportes.dto.ReporteRequest;
+import com.tuorg.veterinaria.reportes.dto.ReporteResponse;
 import com.tuorg.veterinaria.reportes.model.Estadistica;
 import com.tuorg.veterinaria.reportes.model.Reporte;
-import com.tuorg.veterinaria.reportes.repository.EstadisticaRepository;
 import com.tuorg.veterinaria.reportes.repository.ReporteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Servicio para la gestión de reportes (Facade pattern).
- * 
- * Este servicio implementa el patrón Facade para simplificar la generación
- * de reportes y dashboards, agrupando múltiples consultas complejas y
- * cálculos estadísticos en una interfaz simple.
- * 
- * @author Equipo de Desarrollo
- * @version 1.0.0
+ *
+ * Coordina la generación de reportes combinando cálculos estadísticos y persistencia.
  */
 @Service
 public class ReporteService {
 
-    /**
-     * Repositorio de reportes.
-     */
     private final ReporteRepository reporteRepository;
-
-    /**
-     * Repositorio de estadísticas.
-     */
-    private final EstadisticaRepository estadisticaRepository;
-
-    /**
-     * Servicio de estadísticas.
-     */
     private final EstadisticaService estadisticaService;
+    private final ObjectMapper objectMapper;
 
-    /**
-     * Constructor con inyección de dependencias.
-     * 
-     * @param reporteRepository Repositorio de reportes
-     * @param estadisticaRepository Repositorio de estadísticas
-     * @param estadisticaService Servicio de estadísticas
-     */
     @Autowired
     public ReporteService(ReporteRepository reporteRepository,
-                         EstadisticaRepository estadisticaRepository,
-                         EstadisticaService estadisticaService) {
+                          EstadisticaService estadisticaService,
+                          ObjectMapper objectMapper) {
         this.reporteRepository = reporteRepository;
-        this.estadisticaRepository = estadisticaRepository;
         this.estadisticaService = estadisticaService;
+        this.objectMapper = objectMapper;
     }
 
     /**
-     * Genera un reporte completo (Facade pattern).
-     * 
-     * Este método simplifica la generación de reportes agrupando
-     * múltiples operaciones complejas:
-     * - Calcula estadísticas
-     * - Obtiene datos de múltiples fuentes
-     * - Genera el reporte
-     * 
-     * @param nombre Nombre del reporte
-     * @param tipo Tipo de reporte
-     * @param parametros Parámetros del reporte
-     * @return Reporte generado
+     * Genera un reporte y retorna un DTO listo para ser expuesto en la API.
      */
     @Transactional
-    public Reporte generar(String nombre, String tipo, Map<String, Object> parametros) {
+    public ReporteResponse generar(ReporteRequest request) {
         Reporte reporte = new Reporte();
-        reporte.setNombre(nombre);
-        reporte.setTipo(tipo);
+        reporte.setNombre(request.getNombre());
+        reporte.setTipo(request.getTipo());
+        reporte.setGeneradoPor(request.getGeneradoPor());
         reporte.setFechaGeneracion(LocalDateTime.now());
-        reporte.setParametros(convertirParametrosAJson(parametros));
+        reporte.setParametros(toJson(request.getParametros()));
 
-        // Calcular estadísticas relacionadas (operación compleja simplificada por Facade)
-        List<Estadistica> estadisticas = estadisticaService.calcularEstadisticasParaReporte(tipo, parametros);
-        
-        // Guardar reporte
-        return reporteRepository.save(reporte);
+        List<Estadistica> estadisticas = estadisticaService.calcularEstadisticasParaReporte(
+                request.getTipo(),
+                request.getParametros() != null ? request.getParametros() : Collections.emptyMap()
+        );
+
+        Reporte guardado = reporteRepository.save(reporte);
+        return mapToResponse(guardado, estadisticas);
     }
 
     /**
-     * Exporta un reporte como PDF (simplificado).
-     * 
-     * En una implementación completa, esto generaría un PDF real.
-     * 
-     * @param reporteId ID del reporte
-     * @return Array de bytes representando el PDF
+     * Exporta un reporte como PDF (implementación placeholder).
      */
     @Transactional(readOnly = true)
     public byte[] exportarPDF(Long reporteId) {
-        Reporte reporte = reporteRepository.findById(reporteId)
-                .orElseThrow(() -> new RuntimeException("Reporte no encontrado"));
-        
+        reporteRepository.findById(reporteId)
+                .orElseThrow(() -> new BusinessException("Reporte no encontrado para exportar a PDF"));
         // TODO: Implementar generación real de PDF con iText o JasperReports
-        // Por ahora retornamos un array vacío
         return new byte[0];
     }
 
     /**
-     * Exporta un reporte como Excel (simplificado).
-     * 
-     * En una implementación completa, esto generaría un archivo Excel real.
-     * 
-     * @param reporteId ID del reporte
-     * @return Array de bytes representando el archivo Excel
+     * Exporta un reporte como Excel (implementación placeholder).
      */
     @Transactional(readOnly = true)
     public byte[] exportarExcel(Long reporteId) {
-        Reporte reporte = reporteRepository.findById(reporteId)
-                .orElseThrow(() -> new RuntimeException("Reporte no encontrado"));
-        
+        reporteRepository.findById(reporteId)
+                .orElseThrow(() -> new BusinessException("Reporte no encontrado para exportar a Excel"));
         // TODO: Implementar generación real de Excel con Apache POI
-        // Por ahora retornamos un array vacío
         return new byte[0];
     }
 
-    /**
-     * Convierte parámetros a formato JSON (simplificado).
-     * 
-     * @param parametros Map con los parámetros
-     * @return String JSON
-     */
-    private String convertirParametrosAJson(Map<String, Object> parametros) {
-        // TODO: Implementar conversión real a JSON usando Jackson o Gson
-        return parametros != null ? parametros.toString() : "{}";
+    private ReporteResponse mapToResponse(Reporte reporte, List<Estadistica> estadisticas) {
+        return ReporteResponse.builder()
+                .id(reporte.getIdReporte())
+                .nombre(reporte.getNombre())
+                .tipo(reporte.getTipo())
+                .fechaGeneracion(reporte.getFechaGeneracion())
+                .generadoPor(reporte.getGeneradoPor())
+                .parametros(toMap(reporte.getParametros()))
+                .estadisticas(estadisticas.stream()
+                        .map(this::mapEstadistica)
+                        .collect(Collectors.toList()))
+                .build();
+    }
+
+    private EstadisticaResponse mapEstadistica(Estadistica estadistica) {
+        return EstadisticaResponse.builder()
+                .id(estadistica.getIdEstadistica())
+                .nombre(estadistica.getNombre())
+                .valor(estadistica.getValor())
+                .periodoInicio(estadistica.getPeriodoInicio())
+                .periodoFin(estadistica.getPeriodoFin())
+                .build();
+    }
+
+    private String toJson(Map<String, Object> parametros) {
+        if (parametros == null || parametros.isEmpty()) {
+            return null;
+        }
+        try {
+            return objectMapper.writeValueAsString(parametros);
+        } catch (JsonProcessingException e) {
+            throw new BusinessException("Los parámetros del reporte no tienen un formato JSON válido");
+        }
+    }
+
+    private Map<String, Object> toMap(String parametrosJson) {
+        if (parametrosJson == null || parametrosJson.isBlank()) {
+            return Collections.emptyMap();
+        }
+        try {
+            return objectMapper.readValue(parametrosJson, Map.class);
+        } catch (JsonProcessingException e) {
+            return Collections.emptyMap();
+        }
     }
 }
 
