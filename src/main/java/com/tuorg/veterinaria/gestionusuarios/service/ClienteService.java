@@ -18,8 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
-
 @Service
 public class ClienteService {
 
@@ -82,7 +80,7 @@ public class ClienteService {
         return clienteRepository.findAll()
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -144,6 +142,7 @@ public class ClienteService {
         );
     }
 }
+
 
 
 

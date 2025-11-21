@@ -1,4 +1,4 @@
-package com.tuorg.veterinaria.prestacioneservicios.dto;
+package com.tuorg.veterinaria.gestionfacturacion.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -17,5 +17,4 @@ public class FacturaPagoRequest {
     @Schema(description = "Medio de pago utilizado", example = "TARJETA", requiredMode = Schema.RequiredMode.REQUIRED)
     private String formaPago;
 }
-
 

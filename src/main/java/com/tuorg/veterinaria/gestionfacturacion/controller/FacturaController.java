@@ -1,10 +1,10 @@
-package com.tuorg.veterinaria.prestacioneservicios.controller;
+package com.tuorg.veterinaria.gestionfacturacion.controller;
 
 import com.tuorg.veterinaria.common.dto.ApiResponse;
-import com.tuorg.veterinaria.prestacioneservicios.dto.FacturaPagoRequest;
-import com.tuorg.veterinaria.prestacioneservicios.dto.FacturaRequest;
-import com.tuorg.veterinaria.prestacioneservicios.dto.FacturaResponse;
-import com.tuorg.veterinaria.prestacioneservicios.service.FacturaService;
+import com.tuorg.veterinaria.gestionfacturacion.dto.FacturaPagoRequest;
+import com.tuorg.veterinaria.gestionfacturacion.dto.FacturaRequest;
+import com.tuorg.veterinaria.gestionfacturacion.dto.FacturaResponse;
+import com.tuorg.veterinaria.gestionfacturacion.service.FacturaService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

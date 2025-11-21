@@ -18,8 +18,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * Servicio para la gestión de vacunaciones.
  * 
@@ -127,7 +125,7 @@ public class VacunacionService {
         return vacunacionRepository.findByPacienteId(pacienteId)
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -142,7 +140,7 @@ public class VacunacionService {
         return vacunacionRepository.findVacunacionesPendientes(fechaLimite)
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private VacunacionResponse mapToResponse(Vacunacion vacunacion) {
@@ -173,4 +171,5 @@ public class VacunacionService {
         );
     }
 }
+
 

@@ -1,6 +1,6 @@
-package com.tuorg.veterinaria.prestacioneservicios.repository;
+package com.tuorg.veterinaria.gestionfacturacion.repository;
 
-import com.tuorg.veterinaria.prestacioneservicios.model.Factura;
+import com.tuorg.veterinaria.gestionfacturacion.model.Factura;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

@@ -1,6 +1,7 @@
-package com.tuorg.veterinaria.prestacioneservicios.service;
+package com.tuorg.veterinaria.gestionfacturacion.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuorg.veterinaria.common.constants.AppConstants;
 import com.tuorg.veterinaria.common.exception.BusinessException;
@@ -8,11 +9,11 @@ import com.tuorg.veterinaria.common.exception.ResourceNotFoundException;
 import com.tuorg.veterinaria.gestionusuarios.model.Cliente;
 import com.tuorg.veterinaria.gestionusuarios.model.Usuario;
 import com.tuorg.veterinaria.gestionusuarios.repository.UsuarioRepository;
-import com.tuorg.veterinaria.prestacioneservicios.dto.FacturaPagoRequest;
-import com.tuorg.veterinaria.prestacioneservicios.dto.FacturaRequest;
-import com.tuorg.veterinaria.prestacioneservicios.dto.FacturaResponse;
-import com.tuorg.veterinaria.prestacioneservicios.model.Factura;
-import com.tuorg.veterinaria.prestacioneservicios.repository.FacturaRepository;
+import com.tuorg.veterinaria.gestionfacturacion.dto.FacturaPagoRequest;
+import com.tuorg.veterinaria.gestionfacturacion.dto.FacturaRequest;
+import com.tuorg.veterinaria.gestionfacturacion.dto.FacturaResponse;
+import com.tuorg.veterinaria.gestionfacturacion.model.Factura;
+import com.tuorg.veterinaria.gestionfacturacion.repository.FacturaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,8 +24,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
 /**
  * Servicio para la gestión de facturas.
  *
@@ -101,7 +100,7 @@ public class FacturaService {
         return facturaRepository.findAll()
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -109,13 +108,14 @@ public class FacturaService {
         return facturaRepository.findByClienteId(clienteId)
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional(readOnly = true)
     public byte[] generarPDF(Long facturaId) {
         obtener(facturaId);
-        // TODO: Implementar generación real de PDF con iText o JasperReports
+        // Nota: La generación real de PDF se implementará con iText o JasperReports
+        // cuando se requiera la funcionalidad completa de exportación
         return new byte[0];
     }
 
@@ -189,7 +189,7 @@ public class FacturaService {
             return Collections.emptyMap();
         }
         try {
-            return objectMapper.readValue(contenido, Map.class);
+            return objectMapper.readValue(contenido, new TypeReference<Map<String, Object>>() {});
         } catch (JsonProcessingException e) {
             return Collections.emptyMap();
         }

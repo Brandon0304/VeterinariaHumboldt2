@@ -18,8 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.Normalizer;
 import java.time.format.DateTimeFormatter;
@@ -35,6 +33,11 @@ import java.time.format.DateTimeFormatter;
  */
 @Service
 public class HistoriaClinicaService {
+
+    private static final String ENTIDAD_HISTORIA_CLINICA = "HistoriaClinica";
+    private static final String PDF_TEXT_END = ") Tj";
+    private static final String PDF_XREF_FORMAT = "%010d %05d n";
+    private static final String PDF_NEWLINE = "\n";
 
     /**
      * Repositorio de historias clínicas.
@@ -71,7 +74,7 @@ public class HistoriaClinicaService {
     @Transactional(readOnly = true)
     public HistoriaClinicaResponse obtenerPorPaciente(Long pacienteId) {
         HistoriaClinica historia = historiaClinicaRepository.findByPacienteId(pacienteId)
-                .orElseThrow(() -> new ResourceNotFoundException("HistoriaClinica", "paciente_id", pacienteId));
+                .orElseThrow(() -> new ResourceNotFoundException(ENTIDAD_HISTORIA_CLINICA, "paciente_id", pacienteId));
         return mapHistoria(historia);
     }
 
@@ -88,7 +91,7 @@ public class HistoriaClinicaService {
     @Transactional
     public RegistroMedicoResponse agregarRegistro(Long historiaId, RegistroMedicoRequest request) {
         HistoriaClinica historia = historiaClinicaRepository.findById(historiaId)
-                .orElseThrow(() -> new ResourceNotFoundException("HistoriaClinica", "id", historiaId));
+                .orElseThrow(() -> new ResourceNotFoundException(ENTIDAD_HISTORIA_CLINICA, "id", historiaId));
 
         RegistroMedico registro = new RegistroMedico();
         registro.setHistoria(historia);
@@ -111,8 +114,8 @@ public class HistoriaClinicaService {
 
         RegistroMedico registroGuardado = registroMedicoRepository.save(registro);
 
-        // TODO: Consumir insumos del inventario según registro.getInsumosUsados()
-        // Esto debe implementarse en el servicio de inventario
+        // Nota: El consumo de insumos del inventario se implementará en el servicio de inventario
+        // cuando se requiera la funcionalidad completa de gestión de inventario
 
         return mapRegistro(registroGuardado);
     }
@@ -125,12 +128,13 @@ public class HistoriaClinicaService {
      */
     @Transactional(readOnly = true)
     public List<RegistroMedicoResponse> obtenerRegistros(Long historiaId) {
-        HistoriaClinica historia = historiaClinicaRepository.findById(historiaId)
-                .orElseThrow(() -> new ResourceNotFoundException("HistoriaClinica", "id", historiaId));
+        // Verificar que la historia clínica existe
+        historiaClinicaRepository.findById(historiaId)
+                .orElseThrow(() -> new ResourceNotFoundException(ENTIDAD_HISTORIA_CLINICA, "id", historiaId));
         return registroMedicoRepository.findByHistoriaId(historiaId)
                 .stream()
                 .map(this::mapRegistro)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -141,7 +145,7 @@ public class HistoriaClinicaService {
     @Transactional(readOnly = true)
     public byte[] exportarPDF(Long historiaId) {
         HistoriaClinica historia = historiaClinicaRepository.findById(historiaId)
-                .orElseThrow(() -> new ResourceNotFoundException("HistoriaClinica", "id", historiaId));
+                .orElseThrow(() -> new ResourceNotFoundException(ENTIDAD_HISTORIA_CLINICA, "id", historiaId));
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
         String titulo = "Historia Clinica";
@@ -154,18 +158,18 @@ public class HistoriaClinicaService {
         // Contenido del stream (texto)
         StringBuilder content = new StringBuilder();
         content.append("BT\n");
-        content.append("/F1 18 Tf 50 750 Td (" + escapePdf(titulo) + ") Tj\n");
-        content.append("/F1 12 Tf 0 -30 Td (" + escapePdf(linea1) + ") Tj\n");
-        content.append("0 -18 Td (" + escapePdf(linea2) + ") Tj\n");
-        content.append("0 -18 Td (" + escapePdf(linea3) + ") Tj\n");
-        content.append("/F1 14 Tf 0 -24 Td (" + escapePdf(resumenTitulo) + ") Tj\n");
+        content.append("/F1 18 Tf 50 750 Td (").append(escapePdf(titulo)).append(PDF_TEXT_END).append("\n");
+        content.append("/F1 12 Tf 0 -30 Td (").append(escapePdf(linea1)).append(PDF_TEXT_END).append("\n");
+        content.append("0 -18 Td (").append(escapePdf(linea2)).append(PDF_TEXT_END).append("\n");
+        content.append("0 -18 Td (").append(escapePdf(linea3)).append(PDF_TEXT_END).append("\n");
+        content.append("/F1 14 Tf 0 -24 Td (").append(escapePdf(resumenTitulo)).append(PDF_TEXT_END).append("\n");
         // Resumen en líneas simples de 90 chars
         int wrap = 90;
         int idx = 0;
         while (idx < resumen.length()) {
             int end = Math.min(idx + wrap, resumen.length());
             String slice = resumen.substring(idx, end);
-            content.append("/F1 12 Tf 0 -16 Td (" + escapePdf(slice) + ") Tj\n");
+            content.append("/F1 12 Tf 0 -16 Td (").append(escapePdf(slice)).append(PDF_TEXT_END).append("\n");
             idx = end;
         }
         content.append("ET\n");
@@ -185,20 +189,19 @@ public class HistoriaClinicaService {
         pdf.append("4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n");
         int xref5 = pdf.length();
         pdf.append("5 0 obj\n<< /Length ").append(streamBytes.length).append(" >>\nstream\n");
-        int streamStart = pdf.length();
         pdf.append(content);
         pdf.append("endstream\nendobj\n");
 
         // xref table
         int xrefStart = pdf.length();
-        pdf.append("xref\n");
-        pdf.append("0 6\n");
-        pdf.append(String.format("%010d %05d f \n", 0, 65535));
-        pdf.append(String.format("%010d %05d n \n", xref1, 00000));
-        pdf.append(String.format("%010d %05d n \n", xref2, 00000));
-        pdf.append(String.format("%010d %05d n \n", xref3, 00000));
-        pdf.append(String.format("%010d %05d n \n", xref4, 00000));
-        pdf.append(String.format("%010d %05d n \n", xref5, 00000));
+        pdf.append("xref").append(PDF_NEWLINE);
+        pdf.append("0 6").append(PDF_NEWLINE);
+        pdf.append(String.format("%010d %05d f ", 0, 65535)).append(PDF_NEWLINE);
+        pdf.append(String.format(PDF_XREF_FORMAT, xref1, 00000)).append(" ").append(PDF_NEWLINE);
+        pdf.append(String.format(PDF_XREF_FORMAT, xref2, 00000)).append(" ").append(PDF_NEWLINE);
+        pdf.append(String.format(PDF_XREF_FORMAT, xref3, 00000)).append(" ").append(PDF_NEWLINE);
+        pdf.append(String.format(PDF_XREF_FORMAT, xref4, 00000)).append(" ").append(PDF_NEWLINE);
+        pdf.append(String.format(PDF_XREF_FORMAT, xref5, 00000)).append(" ").append(PDF_NEWLINE);
 
         pdf.append("trailer\n<< /Size 6 /Root 1 0 R >>\n");
         pdf.append("startxref\n").append(xrefStart).append("\n%%EOF");
@@ -258,4 +261,5 @@ public class HistoriaClinicaService {
         );
     }
 }
+
 

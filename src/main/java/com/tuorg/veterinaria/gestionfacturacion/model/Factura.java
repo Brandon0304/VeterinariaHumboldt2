@@ -1,4 +1,4 @@
-package com.tuorg.veterinaria.prestacioneservicios.model;
+package com.tuorg.veterinaria.gestionfacturacion.model;
 
 import com.tuorg.veterinaria.common.constants.AppConstants;
 import com.tuorg.veterinaria.gestionusuarios.model.Cliente;

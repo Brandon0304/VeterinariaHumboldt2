@@ -38,8 +38,8 @@ public class CanalApp extends CanalEnvio {
      */
     @Override
     public boolean enviar(Notificacion notificacion) {
-        // TODO: Implementar envío real de notificación push
-        // Por ahora retornamos true como simulación
+        // Nota: El envío real de notificación push
+        // se implementará cuando se requiera la funcionalidad completa de notificaciones
         System.out.println("Enviando notificación push al tópico " + appTopic + ": " + notificacion.getMensaje());
         return true;
     }

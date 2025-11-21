@@ -1,5 +1,6 @@
 package com.tuorg.veterinaria.config;
 
+import org.junit.jupiter.api.AfterAll;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
@@ -18,6 +19,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 @AutoConfigureMockMvc
 @Testcontainers
 @ActiveProfiles("test")
+@SuppressWarnings("resource") // Testcontainers maneja el cierre automático del contenedor
 public abstract class AbstractIntegrationTest {
 
     @Container
@@ -31,6 +33,13 @@ public abstract class AbstractIntegrationTest {
         registry.add("spring.datasource.url", postgres::getJdbcUrl);
         registry.add("spring.datasource.username", postgres::getUsername);
         registry.add("spring.datasource.password", postgres::getPassword);
+    }
+
+    @AfterAll
+    static void tearDown() {
+        if (postgres != null && postgres.isRunning()) {
+            postgres.stop();
+        }
     }
 }
 

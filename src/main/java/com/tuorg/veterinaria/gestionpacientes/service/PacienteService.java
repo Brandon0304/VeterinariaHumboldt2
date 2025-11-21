@@ -25,8 +25,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
-
 /**
  * Servicio para la gestión de pacientes.
  * 
@@ -157,7 +155,7 @@ public class PacienteService {
         return pacienteRepository.findAll()
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -172,7 +170,7 @@ public class PacienteService {
         return pacienteRepository.findByClienteId(clienteId)
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -293,4 +291,5 @@ public class PacienteService {
         );
     }
 }
+
 

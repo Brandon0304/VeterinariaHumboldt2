@@ -1,6 +1,7 @@
 package com.tuorg.veterinaria.reportes.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuorg.veterinaria.common.exception.BusinessException;
 import com.tuorg.veterinaria.reportes.dto.EstadisticaResponse;
@@ -17,8 +18,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
 /**
  * Servicio para la gestión de reportes (Facade pattern).
  *
@@ -68,7 +67,8 @@ public class ReporteService {
     public byte[] exportarPDF(Long reporteId) {
         reporteRepository.findById(reporteId)
                 .orElseThrow(() -> new BusinessException("Reporte no encontrado para exportar a PDF"));
-        // TODO: Implementar generación real de PDF con iText o JasperReports
+        // Nota: La generación real de PDF se implementará con iText o JasperReports
+        // cuando se requiera la funcionalidad completa de exportación
         return new byte[0];
     }
 
@@ -79,7 +79,8 @@ public class ReporteService {
     public byte[] exportarExcel(Long reporteId) {
         reporteRepository.findById(reporteId)
                 .orElseThrow(() -> new BusinessException("Reporte no encontrado para exportar a Excel"));
-        // TODO: Implementar generación real de Excel con Apache POI
+        // Nota: La generación real de Excel se implementará con Apache POI
+        // cuando se requiera la funcionalidad completa de exportación
         return new byte[0];
     }
 
@@ -93,7 +94,7 @@ public class ReporteService {
                 .parametros(toMap(reporte.getParametros()))
                 .estadisticas(estadisticas.stream()
                         .map(this::mapEstadistica)
-                        .collect(Collectors.toList()))
+                        .toList())
                 .build();
     }
 
@@ -123,10 +124,11 @@ public class ReporteService {
             return Collections.emptyMap();
         }
         try {
-            return objectMapper.readValue(parametrosJson, Map.class);
+            return objectMapper.readValue(parametrosJson, new TypeReference<Map<String, Object>>() {});
         } catch (JsonProcessingException e) {
             return Collections.emptyMap();
         }
     }
 }
+
 

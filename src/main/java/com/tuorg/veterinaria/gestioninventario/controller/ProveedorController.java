@@ -22,7 +22,7 @@ import java.util.List;
  * @version 1.0.0
  */
 @RestController
-@RequestMapping("/api/proveedores")
+@RequestMapping("/proveedores")  // Sin /api porque el context-path ya lo incluye
 public class ProveedorController {
 
     /**

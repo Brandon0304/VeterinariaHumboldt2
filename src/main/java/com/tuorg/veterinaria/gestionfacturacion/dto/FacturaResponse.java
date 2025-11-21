@@ -1,4 +1,4 @@
-package com.tuorg.veterinaria.prestacioneservicios.dto;
+package com.tuorg.veterinaria.gestionfacturacion.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -61,5 +61,4 @@ public class FacturaResponse {
         private String telefono;
     }
 }
-
 

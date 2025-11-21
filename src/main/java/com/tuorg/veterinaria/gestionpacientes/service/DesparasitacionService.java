@@ -13,8 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * Servicio para la gestión de desparasitaciones.
  * 
@@ -81,7 +79,7 @@ public class DesparasitacionService {
         return desparasitacionRepository.findByPacienteIdPaciente(pacienteId)
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -98,7 +96,7 @@ public class DesparasitacionService {
         return desparasitacionRepository.findByProximaAplicacionBetween(fechaInicio, fechaFin)
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -111,7 +109,7 @@ public class DesparasitacionService {
         return desparasitacionRepository.findAll()
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private DesparasitacionResponse mapToResponse(Desparasitacion desparasitacion) {
@@ -128,4 +126,5 @@ public class DesparasitacionService {
                 .build();
     }
 }
+
 

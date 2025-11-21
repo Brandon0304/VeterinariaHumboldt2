@@ -1,6 +1,5 @@
 package com.tuorg.veterinaria.gestionpacientes.model;
 
-import com.tuorg.veterinaria.common.constants.AppConstants;
 import com.tuorg.veterinaria.gestionusuarios.model.Cliente;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -1,4 +1,4 @@
-package com.tuorg.veterinaria.prestacioneservicios.dto;
+package com.tuorg.veterinaria.gestionfacturacion.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
@@ -30,5 +30,4 @@ public class FacturaRequest {
     @Schema(description = "Contenido detallado de la factura en formato JSON", example = "{\"servicios\":[{\"nombre\":\"Consulta\",\"monto\":40000}]}")
     private Map<String, Object> contenido;
 }
-
 

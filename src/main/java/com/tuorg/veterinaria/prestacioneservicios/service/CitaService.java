@@ -21,8 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * Servicio para la gestión de citas.
  *
@@ -157,7 +155,7 @@ public class CitaService {
         return citaRepository.findAll()
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -168,7 +166,7 @@ public class CitaService {
         return citaRepository.findByPacienteId(pacienteId)
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -179,7 +177,7 @@ public class CitaService {
         return citaRepository.findByVeterinarioId(veterinarioId)
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -244,7 +242,7 @@ public class CitaService {
                     return cFecha.isAfter(inicioRango) && cFecha.isBefore(finRango);
                 })
                 .filter(c -> !c.getFechaHora().equals(fechaHoraExcluir)) // Excluir la cita actual
-                .collect(Collectors.toList());
+                .toList();
         
         return citasEnRango.isEmpty();
     }
@@ -275,4 +273,5 @@ public class CitaService {
                 .build();
     }
 }
+
 

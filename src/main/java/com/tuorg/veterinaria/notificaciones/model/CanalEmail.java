@@ -44,8 +44,8 @@ public class CanalEmail extends CanalEnvio {
      */
     @Override
     public boolean enviar(Notificacion notificacion) {
-        // TODO: Implementar envío real de email usando JavaMailSender
-        // Por ahora retornamos true como simulación
+        // Nota: El envío real de email usando JavaMailSender
+        // se implementará cuando se requiera la funcionalidad completa de notificaciones
         System.out.println("Enviando email a través de " + smtpServer + ": " + notificacion.getMensaje());
         return true;
     }

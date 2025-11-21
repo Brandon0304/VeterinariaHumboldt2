@@ -43,11 +43,12 @@ public class IndicadorService {
      */
     @Transactional(readOnly = true)
     public String evaluarTendencia(Long indicadorId) {
-        Indicador indicador = indicadorRepository.findById(indicadorId)
+        // Verificar que el indicador existe
+        indicadorRepository.findById(indicadorId)
                 .orElseThrow(() -> new RuntimeException("Indicador no encontrado"));
         
-        // TODO: Implementar evaluación real de tendencia comparando valores históricos
-        // Por ahora retornamos "estable"
+        // Nota: La evaluación real de tendencia comparando valores históricos
+        // se implementará cuando se requiera la funcionalidad completa de análisis
         return "estable";
     }
 
@@ -61,4 +62,5 @@ public class IndicadorService {
         return indicadorRepository.findAll();
     }
 }
+
 

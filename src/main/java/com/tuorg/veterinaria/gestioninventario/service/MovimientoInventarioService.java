@@ -20,8 +20,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * Servicio para la gestión de movimientos de inventario.
  * 
@@ -181,7 +179,7 @@ public class MovimientoInventarioService {
         return movimientoInventarioRepository.findByProductoId(productoId)
                 .stream()
                 .map(mov -> mapToResponse(mov, null))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -196,7 +194,7 @@ public class MovimientoInventarioService {
         return movimientoInventarioRepository.findByFechaBetween(fechaInicio, fechaFin)
                 .stream()
                 .map(mov -> mapToResponse(mov, null))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private MovimientoInventarioResponse mapToResponse(MovimientoInventario movimiento, Integer stockResultante) {
@@ -238,4 +236,5 @@ public class MovimientoInventarioService {
         );
     }
 }
+
 

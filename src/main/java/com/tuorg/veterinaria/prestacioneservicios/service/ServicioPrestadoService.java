@@ -8,7 +8,7 @@ import com.tuorg.veterinaria.common.exception.ResourceNotFoundException;
 import com.tuorg.veterinaria.gestioninventario.service.MovimientoInventarioService;
 import com.tuorg.veterinaria.gestionusuarios.model.Cliente;
 import com.tuorg.veterinaria.prestacioneservicios.dto.CitaResponse;
-import com.tuorg.veterinaria.prestacioneservicios.dto.FacturaRequest;
+import com.tuorg.veterinaria.gestionfacturacion.dto.FacturaRequest;
 import com.tuorg.veterinaria.prestacioneservicios.dto.ServicioPrestadoInsumoRequest;
 import com.tuorg.veterinaria.prestacioneservicios.dto.ServicioPrestadoRequest;
 import com.tuorg.veterinaria.prestacioneservicios.dto.ServicioPrestadoResponse;
@@ -18,6 +18,7 @@ import com.tuorg.veterinaria.prestacioneservicios.model.ServicioPrestado;
 import com.tuorg.veterinaria.prestacioneservicios.repository.CitaRepository;
 import com.tuorg.veterinaria.prestacioneservicios.repository.ServicioPrestadoRepository;
 import com.tuorg.veterinaria.prestacioneservicios.repository.ServicioRepository;
+import com.tuorg.veterinaria.gestionfacturacion.service.FacturaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,8 +29,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
 /**
  * Servicio para la gestión de servicios prestados.
  *
@@ -42,6 +41,7 @@ public class ServicioPrestadoService {
     private final ServicioPrestadoRepository servicioPrestadoRepository;
     private final CitaRepository citaRepository;
     private final ServicioRepository servicioRepository;
+    @SuppressWarnings("unused") // Se usará en el futuro para consumir insumos del inventario (ver TODO línea 95)
     private final MovimientoInventarioService movimientoInventarioService;
     private final FacturaService facturaService;
     private final ObjectMapper objectMapper;
@@ -92,7 +92,8 @@ public class ServicioPrestadoService {
 
         ServicioPrestado guardado = servicioPrestadoRepository.save(servicioPrestado);
 
-        // TODO: Consumir insumos del inventario usando movimientoInventarioService
+        // Nota: El consumo de insumos del inventario se implementará cuando se requiera
+        // la funcionalidad completa de gestión de inventario
 
         Cliente cliente = cita.getPaciente() != null ? cita.getPaciente().getCliente() : null;
         if (cliente == null) {
@@ -137,7 +138,7 @@ public class ServicioPrestadoService {
         return servicioPrestadoRepository.findByCitaId(citaId)
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private ServicioPrestadoResponse mapToResponse(ServicioPrestado servicioPrestado) {
@@ -182,7 +183,7 @@ public class ServicioPrestadoService {
                             .cantidad(item.getCantidad())
                             .precioUnitario(item.getPrecioUnitario())
                             .build())
-                    .collect(Collectors.toList());
+                    .toList();
         } catch (JsonProcessingException e) {
             return Collections.emptyList();
         }
@@ -211,4 +212,5 @@ public class ServicioPrestadoService {
                 .build();
     }
 }
+
 

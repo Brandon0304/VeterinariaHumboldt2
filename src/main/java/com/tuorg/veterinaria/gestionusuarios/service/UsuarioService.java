@@ -11,7 +11,6 @@ import com.tuorg.veterinaria.gestionusuarios.dto.UsuarioUpdateRequest;
 import com.tuorg.veterinaria.gestionusuarios.model.Permiso;
 import com.tuorg.veterinaria.gestionusuarios.model.Rol;
 import com.tuorg.veterinaria.gestionusuarios.model.Usuario;
-import com.tuorg.veterinaria.gestionusuarios.model.UsuarioVeterinario;
 import com.tuorg.veterinaria.gestionusuarios.repository.RolRepository;
 import com.tuorg.veterinaria.gestionusuarios.repository.UsuarioRepository;
 import com.tuorg.veterinaria.gestionusuarios.repository.UsuarioVeterinarioRepository;
@@ -140,7 +139,7 @@ public class UsuarioService {
         return usuarioRepository.findAll()
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -236,7 +235,7 @@ public class UsuarioService {
         return veterinarioRepository.findAllActivos()
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private Rol obtenerRol(Long rolId) {
@@ -276,4 +275,5 @@ public class UsuarioService {
         return new PermisoResponse(permiso.getIdPermiso(), permiso.getNombre(), permiso.getDescripcion());
     }
 }
+
 

@@ -1,14 +1,14 @@
-package com.tuorg.veterinaria.prestacioneservicios.service;
+package com.tuorg.veterinaria.gestionfacturacion.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuorg.veterinaria.common.exception.BusinessException;
 import com.tuorg.veterinaria.gestionusuarios.model.Cliente;
 import com.tuorg.veterinaria.gestionusuarios.model.Usuario;
 import com.tuorg.veterinaria.gestionusuarios.repository.UsuarioRepository;
-import com.tuorg.veterinaria.prestacioneservicios.dto.FacturaRequest;
-import com.tuorg.veterinaria.prestacioneservicios.dto.FacturaResponse;
-import com.tuorg.veterinaria.prestacioneservicios.model.Factura;
-import com.tuorg.veterinaria.prestacioneservicios.repository.FacturaRepository;
+import com.tuorg.veterinaria.gestionfacturacion.dto.FacturaRequest;
+import com.tuorg.veterinaria.gestionfacturacion.dto.FacturaResponse;
+import com.tuorg.veterinaria.gestionfacturacion.model.Factura;
+import com.tuorg.veterinaria.gestionfacturacion.repository.FacturaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,6 +26,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 /**

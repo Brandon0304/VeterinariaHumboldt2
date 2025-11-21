@@ -1,6 +1,7 @@
 package com.tuorg.veterinaria.notificaciones.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuorg.veterinaria.common.constants.AppConstants;
 import com.tuorg.veterinaria.common.exception.BusinessException;
@@ -20,7 +21,6 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Servicio para la gestión de notificaciones.
@@ -93,7 +93,7 @@ public class NotificacionService {
         return notificacionRepository.findNotificacionesPendientes(LocalDateTime.now())
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -104,7 +104,7 @@ public class NotificacionService {
         return notificacionRepository.findAll()
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     private NotificacionResponse mapToResponse(Notificacion notificacion) {
@@ -135,10 +135,11 @@ public class NotificacionService {
             return Collections.emptyMap();
         }
         try {
-            return objectMapper.readValue(datosJson, Map.class);
+            return objectMapper.readValue(datosJson, new TypeReference<Map<String, Object>>() {});
         } catch (JsonProcessingException e) {
             return Collections.emptyMap();
         }
     }
 }
+
 

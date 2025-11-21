@@ -12,7 +12,6 @@ import com.tuorg.veterinaria.gestionusuarios.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -105,8 +104,8 @@ public class AuthService {
                 throw new BusinessException("Usuario inactivo: " + username);
             }
             
-            // Autenticar usuario
-            Authentication authentication = authenticationManager.authenticate(
+            // Autenticar usuario (si falla, lanza AuthenticationException)
+            authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password));
 
             // Obtener detalles del usuario autenticado
@@ -158,8 +157,16 @@ public class AuthService {
             throw new BusinessException("El correo electrónico ya está en uso");
         }
 
-        Rol rolCliente = rolRepository.findByNombreRol("CLIENTE")
-                .orElseThrow(() -> new BusinessException("El rol CLIENTE no está configurado en el sistema"));
+        // Validar y codificar contraseña
+        ValidationUtil.validatePassword(request.getPassword());
+
+        // Determinar el rol: usar el especificado en el request o CLIENTE por defecto
+        String nombreRol = (request.getRol() != null && !request.getRol().trim().isEmpty()) 
+                ? request.getRol().trim().toUpperCase() 
+                : "CLIENTE";
+
+        Rol rol = rolRepository.findByNombreRol(nombreRol)
+                .orElseThrow(() -> new BusinessException("El rol '" + nombreRol + "' no está configurado en el sistema"));
 
         Usuario usuario = new Usuario();
         usuario.setUsername(username);
@@ -168,7 +175,7 @@ public class AuthService {
         usuario.setNombre(request.getNombre());
         usuario.setApellido(request.getApellido());
         usuario.setActivo(true);
-        usuario.setRol(rolCliente);
+        usuario.setRol(rol);
 
         return usuarioRepository.save(usuario);
     }
@@ -263,4 +270,5 @@ public class AuthService {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(tokenBytes);
     }
 }
+
 
