@@ -85,16 +85,31 @@ public class CanalEmail extends CanalEnvio {
 
     /**
      * Extrae el email del destinatario desde los datos de la notificación.
-     * Por ahora usa el from_address como destinatario de prueba.
-     * 
-     * TODO: Implementar lógica para obtener el email real del cliente asociado a la notificación
+     * Lee el campo "destinatario" del JSON almacenado en notificacion.datos
      */
     private String extraerEmailDestinatario(Notificacion notificacion) {
-        // En una implementación completa, aquí obtendrías el email del cliente
-        // desde la relación notificacion -> cita -> paciente -> cliente -> email
+        try {
+            // Parsear el JSON de datos para obtener el destinatario
+            String datosJson = notificacion.getDatos();
+            if (datosJson != null && !datosJson.isEmpty()) {
+                // Buscar el campo "destinatario" en el JSON
+                // Formato esperado: {"destinatario":"email@ejemplo.com", ...}
+                if (datosJson.contains("\"destinatario\"")) {
+                    int inicioEmail = datosJson.indexOf("\"destinatario\":\"") + 16;
+                    int finEmail = datosJson.indexOf("\"", inicioEmail);
+                    if (finEmail > inicioEmail) {
+                        String emailDestinatario = datosJson.substring(inicioEmail, finEmail);
+                        System.out.println("📧 Destinatario extraído: " + emailDestinatario);
+                        return emailDestinatario;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("⚠️ Error al extraer destinatario, usando from_address: " + e.getMessage());
+        }
         
-        // Por ahora, retornamos el from_address como destinatario de prueba
-        // Esto enviará el email a ti mismo para verificar que funciona
+        // Fallback: Si no se puede extraer el destinatario, usar from_address
+        System.out.println("⚠️ No se pudo extraer destinatario, usando from_address: " + fromAddress);
         return fromAddress;
     }
 

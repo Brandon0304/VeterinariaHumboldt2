@@ -89,7 +89,10 @@ public class CitaService {
         Cita guardada = citaRepository.save(cita);
         
         // Enviar notificación por email al cliente
-        enviarNotificacionCitaCreada(guardada);
+        // Recargar la cita con todas las relaciones necesarias para evitar LazyInitializationException
+        Cita citaCompleta = citaRepository.findByIdWithDetails(guardada.getIdCita())
+                .orElse(guardada);
+        enviarNotificacionCitaCreada(citaCompleta);
         
         return mapToResponse(guardada);
     }
@@ -121,7 +124,10 @@ public class CitaService {
         Cita actualizada = citaRepository.save(cita);
         
         // Enviar notificación de reprogramación al cliente
-        enviarNotificacionCitaReprogramada(actualizada, fechaHoraActual);
+        // Recargar la cita con todas las relaciones necesarias para evitar LazyInitializationException
+        Cita citaCompleta = citaRepository.findByIdWithDetails(actualizada.getIdCita())
+                .orElse(actualizada);
+        enviarNotificacionCitaReprogramada(citaCompleta, fechaHoraActual);
         
         return mapToResponse(actualizada);
     }
@@ -299,7 +305,13 @@ public class CitaService {
             Paciente paciente = cita.getPaciente();
             Cliente cliente = paciente != null ? paciente.getCliente() : null;
             
+            System.out.println("🔍 DEBUG - Paciente ID: " + (paciente != null ? paciente.getIdPaciente() : "NULL"));
+            System.out.println("🔍 DEBUG - Paciente Nombre: " + (paciente != null ? paciente.getNombre() : "NULL"));
+            System.out.println("🔍 DEBUG - Cliente ID: " + (cliente != null ? cliente.getIdUsuario() : "NULL"));
+            System.out.println("🔍 DEBUG - Cliente Correo: " + (cliente != null ? cliente.getCorreo() : "NULL"));
+            
             if (cliente == null || cliente.getCorreo() == null || cliente.getCorreo().isEmpty()) {
+                System.out.println("⚠️ No se puede enviar email - Cliente o correo no disponible");
                 return; // No enviar si no hay cliente o email
             }
             
@@ -362,7 +374,11 @@ public class CitaService {
             Paciente paciente = cita.getPaciente();
             Cliente cliente = paciente != null ? paciente.getCliente() : null;
             
+            System.out.println("🔍 DEBUG REPROGRAMAR - Paciente ID: " + (paciente != null ? paciente.getIdPaciente() : "NULL"));
+            System.out.println("🔍 DEBUG REPROGRAMAR - Cliente Correo: " + (cliente != null ? cliente.getCorreo() : "NULL"));
+            
             if (cliente == null || cliente.getCorreo() == null || cliente.getCorreo().isEmpty()) {
+                System.out.println("⚠️ No se puede enviar email - Cliente o correo no disponible");
                 return;
             }
             

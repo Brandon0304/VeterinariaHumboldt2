@@ -157,7 +157,7 @@ export const CitaDetailModal = ({ isOpen, cita, onClose }: CitaDetailModalProps)
     if (!cita) return;
     cancelarMutation.mutate({
       citaId: cita.idCita,
-      request: { motivoCancelacion: data.motivoCancelacion },
+      request: { motivo: data.motivoCancelacion },
     });
   };
 

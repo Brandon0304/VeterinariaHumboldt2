@@ -20,7 +20,7 @@ export interface CitaReprogramarRequest {
 }
 
 export interface CitaCancelarRequest {
-  readonly motivoCancelacion: string;
+  readonly motivo: string;
 }
 
 export const CitasRepository = {

@@ -103,7 +103,8 @@ public class PacienteService {
 
         Paciente paciente = new Paciente();
         paciente.setNombre(request.getNombre());
-        paciente.setEspecie(request.getEspecie());
+        // Normalizar especie a minúsculas para cumplir CHECK constraint de BD
+        paciente.setEspecie(request.getEspecie() != null ? request.getEspecie().toLowerCase() : null);
         paciente.setRaza(request.getRaza());
         paciente.setFechaNacimiento(request.getFechaNacimiento());
         paciente.setSexo(request.getSexo());

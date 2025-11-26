@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repositorio para la entidad Cita.
@@ -78,5 +79,19 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
                               @Param("fechaHoraInicio") LocalDateTime fechaHoraInicio,
                               @Param("fechaHoraFin") LocalDateTime fechaHoraFin,
                               @Param("estado") String estado);
+
+    /**
+     * Busca una cita por ID cargando todas las relaciones necesarias para notificaciones.
+     * Realiza JOIN FETCH para evitar LazyInitializationException.
+     * 
+     * @param id ID de la cita
+     * @return Cita con paciente, cliente y veterinario cargados
+     */
+    @Query("SELECT c FROM Cita c " +
+           "LEFT JOIN FETCH c.paciente p " +
+           "LEFT JOIN FETCH p.cliente cl " +
+           "LEFT JOIN FETCH c.veterinario v " +
+           "WHERE c.idCita = :id")
+    java.util.Optional<Cita> findByIdWithDetails(@Param("id") Long id);
 }
 
