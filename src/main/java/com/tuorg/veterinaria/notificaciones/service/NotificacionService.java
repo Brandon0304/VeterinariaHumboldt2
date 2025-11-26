@@ -11,9 +11,11 @@ import com.tuorg.veterinaria.notificaciones.dto.NotificacionProgramarRequest;
 import com.tuorg.veterinaria.notificaciones.dto.NotificacionResponse;
 import com.tuorg.veterinaria.notificaciones.model.CanalEnvio;
 import com.tuorg.veterinaria.notificaciones.model.Notificacion;
+import com.tuorg.veterinaria.common.event.NotificacionEvent;
 import com.tuorg.veterinaria.notificaciones.repository.CanalEnvioRepository;
 import com.tuorg.veterinaria.notificaciones.repository.NotificacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,14 +36,17 @@ public class NotificacionService {
     private final NotificacionRepository notificacionRepository;
     private final CanalEnvioRepository canalEnvioRepository;
     private final ObjectMapper objectMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
     public NotificacionService(NotificacionRepository notificacionRepository,
                                CanalEnvioRepository canalEnvioRepository,
-                               ObjectMapper objectMapper) {
+                               ObjectMapper objectMapper,
+                               ApplicationEventPublisher eventPublisher) {
         this.notificacionRepository = notificacionRepository;
         this.canalEnvioRepository = canalEnvioRepository;
         this.objectMapper = objectMapper;
+        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -57,6 +62,10 @@ public class NotificacionService {
         notificacion.setDatos(toJson(request.getDatos()));
 
         Notificacion guardada = notificacionRepository.save(notificacion);
+        
+        // Publicar evento (Observer pattern)
+        eventPublisher.publishEvent(new NotificacionEvent(this, guardada, "PROGRAMADA"));
+        
         return mapToResponse(guardada);
     }
 
@@ -82,6 +91,11 @@ public class NotificacionService {
                 : AppConstants.ESTADO_NOTIFICACION_FALLIDA);
 
         Notificacion guardada = notificacionRepository.save(notificacion);
+        
+        // Publicar evento (Observer pattern)
+        String tipoEvento = enviado ? "ENVIADA" : "FALLIDA";
+        eventPublisher.publishEvent(new NotificacionEvent(this, guardada, tipoEvento));
+        
         return mapToResponse(guardada);
     }
 

@@ -33,6 +33,7 @@ const navigationItems: NavigationItem[] = [
   { label: "Reportes", to: "/reportes", icon: "chart", roles: ["VETERINARIO", "SECRETARIO"] },
   { label: "Notificaciones", to: "/notificaciones", icon: "bell", roles: ["VETERINARIO", "SECRETARIO"] },
   // Solo administradores
+  { label: "Dashboard", to: "/admin/dashboard", icon: "dashboard", roles: ["ADMIN"] },
   { label: "Configuración", to: "/configuracion", icon: "settings", roles: ["ADMIN"] },
   { label: "Usuarios", to: "/usuarios", icon: "user", roles: ["ADMIN"] },
 ];
@@ -60,6 +61,8 @@ const getIcon = (icon?: string) => {
       return "📊";
     case "bell":
       return "🔔";
+    case "dashboard":
+      return "📈";
     case "settings":
       return "⚙️";
     case "user":

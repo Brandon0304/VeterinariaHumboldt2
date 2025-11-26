@@ -7,10 +7,12 @@ import com.tuorg.veterinaria.common.exception.BusinessException;
 import com.tuorg.veterinaria.reportes.dto.EstadisticaResponse;
 import com.tuorg.veterinaria.reportes.dto.ReporteRequest;
 import com.tuorg.veterinaria.reportes.dto.ReporteResponse;
+import com.tuorg.veterinaria.common.event.ReporteGeneradoEvent;
 import com.tuorg.veterinaria.reportes.model.Estadistica;
 import com.tuorg.veterinaria.reportes.model.Reporte;
 import com.tuorg.veterinaria.reportes.repository.ReporteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,14 +31,17 @@ public class ReporteService {
     private final ReporteRepository reporteRepository;
     private final EstadisticaService estadisticaService;
     private final ObjectMapper objectMapper;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
     public ReporteService(ReporteRepository reporteRepository,
                           EstadisticaService estadisticaService,
-                          ObjectMapper objectMapper) {
+                          ObjectMapper objectMapper,
+                          ApplicationEventPublisher eventPublisher) {
         this.reporteRepository = reporteRepository;
         this.estadisticaService = estadisticaService;
         this.objectMapper = objectMapper;
+        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -57,6 +62,10 @@ public class ReporteService {
         );
 
         Reporte guardado = reporteRepository.save(reporte);
+        
+        // Publicar evento (Observer pattern)
+        eventPublisher.publishEvent(new ReporteGeneradoEvent(this, guardado, request.getTipo()));
+        
         return mapToResponse(guardado, estadisticas);
     }
 

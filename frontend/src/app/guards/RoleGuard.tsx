@@ -1,6 +1,5 @@
 import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
-import toast from "react-hot-toast";
 import { authStore } from "../../shared/state/authStore";
 
 interface RoleGuardProps {
@@ -17,18 +16,15 @@ export const RoleGuard = ({ children, allowedRoles, redirectTo }: RoleGuardProps
   const user = authStore((state) => state.user);
   const userRole = user?.rol?.toUpperCase() || "";
 
+  // Verificar si el rol del usuario está en la lista de roles permitidos
+  const hasAccess = user ? allowedRoles.some((role) => role.toUpperCase() === userRole) : false;
+
   // Si no hay usuario autenticado, redirigir al login
   if (!user) {
     return <Navigate to="/auth/login" replace />;
   }
 
-  // Verificar si el rol del usuario está en la lista de roles permitidos
-  const hasAccess = allowedRoles.some((role) => role.toUpperCase() === userRole);
-
   if (!hasAccess) {
-    // Mostrar mensaje de error
-    toast.error(`No tienes permisos para acceder a esta página. Se requiere uno de los siguientes roles: ${allowedRoles.join(", ")}`);
-    
     // Redirigir según el rol del usuario o a la ruta especificada
     if (redirectTo) {
       return <Navigate to={redirectTo} replace />;
@@ -42,7 +38,10 @@ export const RoleGuard = ({ children, allowedRoles, redirectTo }: RoleGuardProps
       return <Navigate to="/veterinario/inicio" replace />;
     }
     if (userRole === "ADMIN") {
-      return <Navigate to="/usuarios" replace />;
+      return <Navigate to="/admin/dashboard" replace />;
+    }
+    if (userRole === "CLIENTE") {
+      return <Navigate to="/cliente/inicio" replace />;
     }
 
     // Por defecto, redirigir al login

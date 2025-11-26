@@ -4,7 +4,7 @@ import type { ApiResponse } from "../../../shared/api/types";
 
 import type { ApiProveedorResponse } from "../../shared/types/backend";
 
-const BASE_PATH = "/api/proveedores";
+const BASE_PATH = "/proveedores";
 
 export interface ProveedorRequest {
   readonly nombre: string;

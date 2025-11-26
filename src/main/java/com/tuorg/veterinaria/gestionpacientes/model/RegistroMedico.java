@@ -1,5 +1,6 @@
 package com.tuorg.veterinaria.gestionpacientes.model;
 
+import com.tuorg.veterinaria.common.converter.JsonbListMapConverter;
 import com.tuorg.veterinaria.gestionusuarios.model.UsuarioVeterinario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -92,7 +93,7 @@ public class RegistroMedico {
      * Insumos utilizados durante la consulta en formato JSON.
      * Ejemplo: [{"productoId": 1, "cantidad": 2}, ...]
      */
-    @JdbcTypeCode(SqlTypes.JSON)
+    @Convert(converter = JsonbListMapConverter.class)
     @Column(name = "insumos_usados", columnDefinition = "JSONB")
     private List<Map<String, Object>> insumosUsados;
 

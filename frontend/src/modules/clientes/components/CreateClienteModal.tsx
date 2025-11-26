@@ -16,6 +16,8 @@ interface ClienteFormData {
   readonly telefono?: string;
   readonly direccion?: string;
   readonly identificacion?: string;
+  readonly username: string;
+  readonly password: string;
 }
 
 export const CreateClienteModal = ({ isOpen, onClose }: CreateClienteModalProps) => {
@@ -34,6 +36,8 @@ export const CreateClienteModal = ({ isOpen, onClose }: CreateClienteModalProps)
       telefono: "",
       direccion: "",
       identificacion: "",
+      username: "",
+      password: "",
     },
   });
 
@@ -58,6 +62,8 @@ export const CreateClienteModal = ({ isOpen, onClose }: CreateClienteModalProps)
       telefono: data.telefono?.trim() || undefined,
       direccion: data.direccion?.trim() || undefined,
       identificacion: data.identificacion?.trim() || undefined,
+      username: data.username.trim(),
+      password: data.password,
     });
   };
 
@@ -121,6 +127,37 @@ export const CreateClienteModal = ({ isOpen, onClose }: CreateClienteModalProps)
                 })}
               />
               {errors.correo && <p className="mt-1 text-xs text-danger">{errors.correo.message}</p>}
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Usuario <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="text"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  {...register("username", { required: "El nombre de usuario es obligatorio" })}
+                />
+                {errors.username && <p className="mt-1 text-xs text-danger">{errors.username.message}</p>}
+              </div>
+              <div>
+                <label className="mb-1 block text-sm font-medium text-gray-700">
+                  Contraseña <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="password"
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  {...register("password", {
+                    required: "La contraseña es obligatoria",
+                    minLength: {
+                      value: 8,
+                      message: "La contraseña debe tener al menos 8 caracteres",
+                    },
+                  })}
+                />
+                {errors.password && <p className="mt-1 text-xs text-danger">{errors.password.message}</p>}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

@@ -65,11 +65,15 @@ public class GlobalExceptionHandler {
         logger.warn("Error de validación: {}", ex.getMessage());
         
         Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
+        for (org.springframework.validation.ObjectError error : ex.getBindingResult().getAllErrors()) {
+            if (error instanceof FieldError fieldError) {
+                String fieldName = fieldError.getField();
+                String errorMessage = fieldError.getDefaultMessage();
+                if (errorMessage != null) {
+                    errors.put(fieldName, errorMessage);
+                }
+            }
+        }
         
         ApiResponse<Map<String, String>> response = ApiResponse.error("Error de validación");
         response.setData(errors);

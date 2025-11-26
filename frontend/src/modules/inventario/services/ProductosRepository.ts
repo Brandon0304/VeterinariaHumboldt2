@@ -4,7 +4,7 @@ import type { ApiResponse } from "../../../shared/api/types";
 
 import type { ApiProductoResponse } from "../../shared/types/backend";
 
-const BASE_PATH = "/api/productos";
+const BASE_PATH = "/productos";
 
 export interface ProductoRequest {
   readonly sku: string;

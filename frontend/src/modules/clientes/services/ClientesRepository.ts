@@ -13,6 +13,8 @@ export interface ClienteRequest {
   readonly telefono?: string;
   readonly direccion?: string;
   readonly identificacion?: string;
+  readonly username: string;
+  readonly password: string;
 }
 
 export interface ClienteUpdateRequest {

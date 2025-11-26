@@ -104,6 +104,7 @@ class AuthServiceTest {
         when(userDetailsService.loadUserByUsername(username)).thenReturn(userDetails);
         when(tokenProvider.generateToken(userDetails)).thenReturn(token);
         when(usuarioRepository.save(any(Usuario.class))).thenReturn(usuario);
+        when(usuarioRepository.findByUsernameWithRol(username)).thenReturn(Optional.of(usuario));
 
         // Act
         LoginResponse response = authService.login(username, password);
@@ -111,8 +112,9 @@ class AuthServiceTest {
         // Assert
         assertThat(response).isNotNull();
         assertThat(response.getToken()).isEqualTo(token);
-        assertThat(response.getType()).isEqualTo("Bearer");
+        assertThat(response.getTokenType()).isEqualTo("Bearer");
         assertThat(response.getUsuario()).isNotNull();
+        assertThat(response.getUsuario().getUsername()).isEqualTo("testuser");
         assertThat(response.getUsuario().getNombre()).isEqualTo("Test");
 
         verify(usuarioRepository).findByUsername(username);

@@ -3,7 +3,7 @@ import { unwrapResponse } from "../../../shared/api/ApiResponseAdapter";
 import type { ApiResponse } from "../../../shared/api/types";
 import type { ApiReporteResponse } from "../../shared/types/backend";
 
-const BASE_PATH = "/api/reportes";
+const BASE_PATH = "/reportes";
 
 export interface ReporteRequest {
   readonly nombre: string;

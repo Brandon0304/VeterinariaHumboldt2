@@ -49,5 +49,13 @@ public interface MovimientoInventarioRepository extends JpaRepository<Movimiento
     List<MovimientoInventario> findByFechaBetween(
             @Param("fechaInicio") LocalDateTime fechaInicio,
             @Param("fechaFin") LocalDateTime fechaFin);
+
+    /**
+     * Verifica si existe un movimiento con la referencia especificada.
+     * 
+     * @param referencia Referencia del movimiento
+     * @return true si existe, false en caso contrario
+     */
+    boolean existsByReferencia(String referencia);
 }
 

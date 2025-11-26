@@ -49,6 +49,13 @@ const VeterinarianFollowUpsPage = lazy(() =>
   })),
 );
 
+// Páginas del cliente
+const ClienteDashboardPage = lazy(() =>
+  import("../../modules/cliente/pages/ClienteDashboardPage").then((module) => ({
+    default: module.ClienteDashboardPage,
+  })),
+);
+
 // Páginas del secretario
 const SecretaryDashboardPage = lazy(() =>
   import("../../modules/secretario/pages/SecretaryDashboardPage").then((module) => ({
@@ -116,6 +123,12 @@ const ProveedoresPage = lazy(() =>
   })),
 );
 
+const AdminDashboardPage = lazy(() =>
+  import("../../modules/dashboard/pages/AdminDashboardPage").then((module) => ({
+    default: module.AdminDashboardPage,
+  })),
+);
+
 const LoginPage = lazy(() =>
   import("../../modules/auth/pages/LoginPage").then((module) => ({ default: module.LoginPage })),
 );
@@ -142,7 +155,10 @@ const RootRedirect = () => {
     return <Navigate to="/veterinario/inicio" replace />;
   }
   if (userRole === "ADMIN") {
-    return <Navigate to="/usuarios" replace />;
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+  if (userRole === "CLIENTE") {
+    return <Navigate to="/cliente/inicio" replace />;
   }
   
   // Por defecto, redirigir al login si el rol no está reconocido
@@ -160,11 +176,14 @@ const LoginGuard = () => {
     if (userRole === "SECRETARIO") {
       return <Navigate to="/secretario/inicio" replace />;
     }
+    if (userRole === "CLIENTE") {
+      return <Navigate to="/cliente/inicio" replace />;
+    }
     if (userRole === "VETERINARIO") {
       return <Navigate to="/veterinario/inicio" replace />;
     }
     if (userRole === "ADMIN") {
-      return <Navigate to="/usuarios" replace />;
+      return <Navigate to="/admin/dashboard" replace />;
     }
   }
   
@@ -249,6 +268,16 @@ export const AppRoutes = ({ renderDashboard }: AppRoutesProps) => {
           }
         />
         
+        {/* Rutas del cliente */}
+        <Route
+          path="/cliente/inicio"
+          element={
+            <RoleGuard allowedRoles={["CLIENTE"]}>
+              <ClienteDashboardPage />
+            </RoleGuard>
+          }
+        />
+        
         {/* Rutas del secretario */}
         <Route
           path="/secretario/inicio"
@@ -310,6 +339,14 @@ export const AppRoutes = ({ renderDashboard }: AppRoutesProps) => {
         />
         
               {/* Rutas solo para Administradores */}
+              <Route
+                path="/admin/dashboard"
+                element={
+                  <RoleGuard allowedRoles={["ADMIN"]}>
+                    <AdminDashboardPage />
+                  </RoleGuard>
+                }
+              />
               <Route
                 path="/configuracion"
                 element={

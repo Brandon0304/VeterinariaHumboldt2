@@ -1,6 +1,6 @@
-// Página de visualización de pacientes para el secretario (solo lectura)
+// Página de gestión de pacientes para el secretario
 import { useMemo, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import "dayjs/locale/es";
 import toast from "react-hot-toast";
@@ -27,6 +27,9 @@ export const SecretaryPatientsPage = () => {
   const [speciesFilter, setSpeciesFilter] = useState<SpeciesFilter>("TODOS");
   const [order, setOrder] = useState<OrderOption>("nombre-asc");
   const [selectedPacienteId, setSelectedPacienteId] = useState<number | null>(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  
+  const queryClient = useQueryClient();
 
   const { data, isLoading } = useQuery({
     queryKey: ["pacientes"],
@@ -70,8 +73,14 @@ export const SecretaryPatientsPage = () => {
       <header className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h2 className="text-2xl font-semibold text-secondary">Pacientes</h2>
-          <p className="text-sm text-gray-500">Consulta la información de los pacientes registrados</p>
+          <p className="text-sm text-gray-500">Gestiona los pacientes registrados en el sistema</p>
         </div>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="rounded-2xl bg-primary px-6 py-2.5 text-sm font-semibold text-white shadow-md transition-all hover:bg-primary-dark hover:shadow-lg"
+        >
+          + Nuevo Paciente
+        </button>
       </header>
 
       <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -131,6 +140,15 @@ export const SecretaryPatientsPage = () => {
         isOpen={selectedPacienteId !== null}
         pacienteId={selectedPacienteId}
         onClose={() => setSelectedPacienteId(null)}
+      />
+      
+      <CreatePacienteModal
+        isOpen={showCreateModal}
+        onClose={() => setShowCreateModal(false)}
+        onSuccess={() => {
+          queryClient.invalidateQueries({ queryKey: ["pacientes"] });
+          setShowCreateModal(false);
+        }}
       />
     </div>
   );
@@ -229,6 +247,235 @@ const PatientCard = ({ paciente, onViewDetail }: PatientCardProps) => {
         </button>
       </div>
     </article>
+  );
+};
+
+interface CreatePacienteModalProps {
+  readonly isOpen: boolean;
+  readonly onClose: () => void;
+  readonly onSuccess: () => void;
+}
+
+const CreatePacienteModal = ({ isOpen, onClose, onSuccess }: CreatePacienteModalProps) => {
+  const queryClient = useQueryClient();
+  const [formData, setFormData] = useState({
+    nombre: "",
+    especie: "",
+    raza: "",
+    fechaNacimiento: "",
+    sexo: "",
+    peso: "",
+    estadoSalud: "",
+    clienteId: "",
+  });
+
+  const { data: clientes } = useQuery({
+    queryKey: ["clientes"],
+    queryFn: async () => {
+      const client = await import("../../../shared/api/ApiClient").then((m) => m.getApiClient());
+      const { data } = await client.get("/clientes");
+      return data.data || [];
+    },
+    enabled: isOpen,
+  });
+
+  const createMutation = useMutation({
+    mutationFn: async (data: typeof formData) => {
+      return PacientesRepository.create({
+        nombre: data.nombre,
+        especie: data.especie,
+        raza: data.raza,
+        fechaNacimiento: data.fechaNacimiento,
+        sexo: data.sexo,
+        peso: parseFloat(data.peso),
+        estadoSalud: data.estadoSalud || undefined,
+        clienteId: parseInt(data.clienteId),
+      });
+    },
+    onSuccess: () => {
+      toast.success("Paciente creado exitosamente");
+      queryClient.invalidateQueries({ queryKey: ["pacientes"] });
+      onSuccess();
+      resetForm();
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Error al crear paciente");
+    },
+  });
+
+  const resetForm = () => {
+    setFormData({
+      nombre: "",
+      especie: "",
+      raza: "",
+      fechaNacimiento: "",
+      sexo: "",
+      peso: "",
+      estadoSalud: "",
+      clienteId: "",
+    });
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.nombre || !formData.especie || !formData.clienteId) {
+      toast.error("Completa los campos requeridos: Nombre, Especie y Propietario");
+      return;
+    }
+    createMutation.mutate(formData);
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+      <div className="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-xl">
+        <div className="mb-6 flex items-center justify-between">
+          <h2 className="text-2xl font-semibold text-secondary">Nuevo Paciente</h2>
+          <button
+            onClick={handleClose}
+            className="rounded-full p-2 hover:bg-gray-100 transition-colors"
+          >
+            ✕
+          </button>
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Nombre * <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                value={formData.nombre}
+                onChange={(e) => setFormData({ ...formData, nombre: e.target.value })}
+                className="w-full rounded-xl border border-gray-200 px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Propietario <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={formData.clienteId}
+                onChange={(e) => setFormData({ ...formData, clienteId: e.target.value })}
+                className="w-full rounded-xl border border-gray-200 px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                required
+              >
+                <option value="">Seleccionar cliente</option>
+                {clientes?.map((cliente: any) => (
+                  <option key={cliente.id} value={cliente.id}>
+                    {cliente.nombre} {cliente.apellido}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Especie <span className="text-red-500">*</span>
+              </label>
+              <select
+                value={formData.especie}
+                onChange={(e) => setFormData({ ...formData, especie: e.target.value })}
+                className="w-full rounded-xl border border-gray-200 px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+                required
+              >
+                <option value="">Seleccionar especie</option>
+                <option value="Perro">Perro</option>
+                <option value="Gato">Gato</option>
+                <option value="Ave">Ave</option>
+                <option value="Conejo">Conejo</option>
+                <option value="Otro">Otro</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Raza</label>
+              <input
+                type="text"
+                value={formData.raza}
+                onChange={(e) => setFormData({ ...formData, raza: e.target.value })}
+                className="w-full rounded-xl border border-gray-200 px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Fecha de Nacimiento</label>
+              <input
+                type="date"
+                value={formData.fechaNacimiento}
+                onChange={(e) => setFormData({ ...formData, fechaNacimiento: e.target.value })}
+                className="w-full rounded-xl border border-gray-200 px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Sexo</label>
+              <select
+                value={formData.sexo}
+                onChange={(e) => setFormData({ ...formData, sexo: e.target.value })}
+                className="w-full rounded-xl border border-gray-200 px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+              >
+                <option value="">Seleccionar</option>
+                <option value="Macho">Macho</option>
+                <option value="Hembra">Hembra</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Peso (kg)</label>
+              <input
+                type="number"
+                step="0.1"
+                value={formData.peso}
+                onChange={(e) => setFormData({ ...formData, peso: e.target.value })}
+                className="w-full rounded-xl border border-gray-200 px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Estado de Salud</label>
+              <select
+                value={formData.estadoSalud}
+                onChange={(e) => setFormData({ ...formData, estadoSalud: e.target.value })}
+                className="w-full rounded-xl border border-gray-200 px-4 py-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+              >
+                <option value="">Seleccionar</option>
+                <option value="Saludable">Saludable</option>
+                <option value="En tratamiento">En tratamiento</option>
+                <option value="Crítico">Crítico</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="rounded-xl border border-gray-200 px-6 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={createMutation.isPending}
+              className="rounded-xl bg-primary px-6 py-2 text-sm font-semibold text-white hover:bg-primary-dark transition-colors disabled:opacity-50"
+            >
+              {createMutation.isPending ? "Creando..." : "Crear Paciente"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 };
 

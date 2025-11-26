@@ -15,12 +15,17 @@ import com.tuorg.veterinaria.prestacioneservicios.dto.CitaResponse;
 import com.tuorg.veterinaria.prestacioneservicios.dto.CitaReprogramarRequest;
 import com.tuorg.veterinaria.prestacioneservicios.model.Cita;
 import com.tuorg.veterinaria.prestacioneservicios.repository.CitaRepository;
+import com.tuorg.veterinaria.notificaciones.service.NotificacionService;
+import com.tuorg.veterinaria.notificaciones.dto.NotificacionEnviarRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 /**
  * Servicio para la gestión de citas.
  *
@@ -34,14 +39,17 @@ public class CitaService {
     private final CitaRepository citaRepository;
     private final PacienteRepository pacienteRepository;
     private final UsuarioRepository usuarioRepository;
+    private final NotificacionService notificacionService;
 
     @Autowired
     public CitaService(CitaRepository citaRepository,
                        PacienteRepository pacienteRepository,
-                       UsuarioRepository usuarioRepository) {
+                       UsuarioRepository usuarioRepository,
+                       NotificacionService notificacionService) {
         this.citaRepository = citaRepository;
         this.pacienteRepository = pacienteRepository;
         this.usuarioRepository = usuarioRepository;
+        this.notificacionService = notificacionService;
     }
 
     /**
@@ -79,6 +87,10 @@ public class CitaService {
         cita.setEstado(AppConstants.ESTADO_CITA_PROGRAMADA);
 
         Cita guardada = citaRepository.save(cita);
+        
+        // Enviar notificación por email al cliente
+        enviarNotificacionCitaCreada(guardada);
+        
         return mapToResponse(guardada);
     }
 
@@ -107,6 +119,10 @@ public class CitaService {
 
         cita.setFechaHora(nuevaFechaHora);
         Cita actualizada = citaRepository.save(cita);
+        
+        // Enviar notificación de reprogramación al cliente
+        enviarNotificacionCitaReprogramada(actualizada, fechaHoraActual);
+        
         return mapToResponse(actualizada);
     }
 
@@ -271,6 +287,128 @@ public class CitaService {
                         .especialidad(veterinario.getEspecialidad())
                         .build() : null)
                 .build();
+    }
+    
+    /**
+     * Envía notificación por email al cliente cuando se programa una cita.
+     * 
+     * @param cita La cita que se acaba de crear
+     */
+    private void enviarNotificacionCitaCreada(Cita cita) {
+        try {
+            Paciente paciente = cita.getPaciente();
+            Cliente cliente = paciente != null ? paciente.getCliente() : null;
+            
+            if (cliente == null || cliente.getCorreo() == null || cliente.getCorreo().isEmpty()) {
+                return; // No enviar si no hay cliente o email
+            }
+            
+            UsuarioVeterinario veterinario = cita.getVeterinario();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            String fechaFormateada = cita.getFechaHora().format(formatter);
+            
+            String mensaje = String.format(
+                "🐾 *Confirmación de Cita - Clínica Veterinaria Humboldt*\n\n" +
+                "Estimado/a %s %s,\n\n" +
+                "Su cita ha sido programada exitosamente:\n\n" +
+                "📅 *Fecha y Hora:* %s\n" +
+                "🐕 *Paciente:* %s (%s)\n" +
+                "👨‍⚕️ *Veterinario:* Dr. %s %s\n" +
+                "🏥 *Tipo de Servicio:* %s\n" +
+                "%s\n\n" +
+                "Por favor, llegue 10 minutos antes de su cita.\n\n" +
+                "Si necesita cancelar o reprogramar, contáctenos con al menos 24 horas de anticipación.\n\n" +
+                "Saludos cordiales,\n" +
+                "Clínica Veterinaria Humboldt",
+                cliente.getNombre(),
+                cliente.getApellido(),
+                fechaFormateada,
+                paciente.getNombre(),
+                paciente.getEspecie(),
+                veterinario.getNombre(),
+                veterinario.getApellido(),
+                cita.getTipoServicio() != null ? cita.getTipoServicio() : "Consulta General",
+                cita.getMotivo() != null ? "*Motivo:* " + cita.getMotivo() : ""
+            );
+            
+            Map<String, Object> datos = new HashMap<>();
+            datos.put("destinatario", cliente.getCorreo());
+            datos.put("nombreCliente", cliente.getNombre() + " " + cliente.getApellido());
+            datos.put("nombrePaciente", paciente.getNombre());
+            datos.put("fechaCita", fechaFormateada);
+            
+            NotificacionEnviarRequest notifRequest = new NotificacionEnviarRequest();
+            notifRequest.setTipo("CITA_PROGRAMADA");
+            notifRequest.setMensaje(mensaje);
+            notifRequest.setCanalId(1L); // ID del canal EMAIL (debe existir en la BD)
+            notifRequest.setDatos(datos);
+            
+            notificacionService.enviarAhora(notifRequest);
+            
+        } catch (Exception e) {
+            // Log del error pero no falla la creación de la cita
+            System.err.println("⚠️ Error al enviar notificación de cita: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Envía notificación por email al cliente cuando se reprograma una cita.
+     * 
+     * @param cita La cita que se acaba de reprogramar
+     * @param fechaAnterior La fecha anterior de la cita
+     */
+    private void enviarNotificacionCitaReprogramada(Cita cita, LocalDateTime fechaAnterior) {
+        try {
+            Paciente paciente = cita.getPaciente();
+            Cliente cliente = paciente != null ? paciente.getCliente() : null;
+            
+            if (cliente == null || cliente.getCorreo() == null || cliente.getCorreo().isEmpty()) {
+                return;
+            }
+            
+            UsuarioVeterinario veterinario = cita.getVeterinario();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+            String fechaNueva = cita.getFechaHora().format(formatter);
+            String fechaVieja = fechaAnterior.format(formatter);
+            
+            String mensaje = String.format(
+                "🔄 *Cita Reprogramada - Clínica Veterinaria Humboldt*\n\n" +
+                "Estimado/a %s %s,\n\n" +
+                "Su cita ha sido reprogramada:\n\n" +
+                "❌ *Fecha Anterior:* %s\n" +
+                "✅ *Nueva Fecha:* %s\n\n" +
+                "🐕 *Paciente:* %s (%s)\n" +
+                "👨‍⚕️ *Veterinario:* Dr. %s %s\n\n" +
+                "Por favor, tome nota del nuevo horario.\n\n" +
+                "Saludos cordiales,\n" +
+                "Clínica Veterinaria Humboldt",
+                cliente.getNombre(),
+                cliente.getApellido(),
+                fechaVieja,
+                fechaNueva,
+                paciente.getNombre(),
+                paciente.getEspecie(),
+                veterinario.getNombre(),
+                veterinario.getApellido()
+            );
+            
+            Map<String, Object> datos = new HashMap<>();
+            datos.put("destinatario", cliente.getCorreo());
+            datos.put("nombreCliente", cliente.getNombre() + " " + cliente.getApellido());
+            datos.put("fechaNueva", fechaNueva);
+            datos.put("fechaAnterior", fechaVieja);
+            
+            NotificacionEnviarRequest notifRequest = new NotificacionEnviarRequest();
+            notifRequest.setTipo("CITA_REPROGRAMADA");
+            notifRequest.setMensaje(mensaje);
+            notifRequest.setCanalId(1L);
+            notifRequest.setDatos(datos);
+            
+            notificacionService.enviarAhora(notifRequest);
+            
+        } catch (Exception e) {
+            System.err.println("⚠️ Error al enviar notificación de reprogramación: " + e.getMessage());
+        }
     }
 }
 

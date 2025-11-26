@@ -2,7 +2,7 @@ import { getApiClient } from "../../../shared/api/ApiClient";
 import { unwrapResponse } from "../../../shared/api/ApiResponseAdapter";
 import type { ApiResponse } from "../../../shared/api/types";
 
-const BASE_PATH = "/api/configuracion";
+const BASE_PATH = "/configuracion";
 
 export const ConfiguracionRepository = {
   obtenerParametro: async (clave: string): Promise<string> => {

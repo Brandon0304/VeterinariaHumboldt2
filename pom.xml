@@ -162,7 +162,6 @@
             <version>${testcontainers.version}</version>
             <scope>test</scope>
         </dependency>
-    </dependencies>
 
         <!-- PDF generation -->
         <dependency>
@@ -170,6 +169,7 @@
             <artifactId>pdfbox</artifactId>
             <version>2.0.29</version>
         </dependency>
+    </dependencies>
 
     <build>
         <plugins>

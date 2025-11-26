@@ -4,7 +4,7 @@ import type { ApiResponse } from "../../../shared/api/types";
 
 import type { ApiNotificacionResponse } from "../../shared/types/backend";
 
-const BASE_PATH = "/api/notificaciones";
+const BASE_PATH = "/notificaciones";
 
 export interface NotificacionEnviarRequest {
   readonly tipo: string;

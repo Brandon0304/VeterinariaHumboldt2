@@ -4,7 +4,7 @@ import type { ApiResponse } from "../../../shared/api/types";
 
 import type { ApiMovimientoInventarioResponse } from "../../shared/types/backend";
 
-const BASE_PATH = "/api/movimientos-inventario";
+const BASE_PATH = "/movimientos-inventario";
 
 export interface MovimientoEntradaRequest {
   readonly productoId: number;
