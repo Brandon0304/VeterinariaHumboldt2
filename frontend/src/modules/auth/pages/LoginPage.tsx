@@ -1,5 +1,6 @@
-// Página de inicio de sesión basada en el prototipo de Figma.
-// Implementa tabs para seleccionar el rol y un formulario validado con React Hook Form.
+// Página de inicio de sesión con validación de credenciales.
+// El sistema determina automáticamente el rol del usuario según las credenciales proporcionadas.
+// Se eliminó la selección manual de roles para mejorar la seguridad y UX.
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -9,33 +10,17 @@ import toast from "react-hot-toast";
 import { AuthService } from "../services/AuthService";
 import { AuthRepository, type RegisterRequest } from "../services/AuthRepository";
 import type { LoginRequestDTO } from "../types";
-// import { LogoCircular } from "../../../shared/components/LogoCircular";
 import { ForgotPasswordModal } from "../components/ForgotPasswordModal";
 import { ResetPasswordModal } from "../components/ResetPasswordModal";
 
-type LoginRole = "VETERINARIO" | "ADMINISTRADOR" | "CLIENTE" | "SECRETARIO";
-
+// Interfaz para los valores del formulario de login
 interface LoginFormValues {
   readonly username: string;
   readonly password: string;
 }
 
-const roleLabels: Record<LoginRole, string> = {
-  VETERINARIO: "Veterinario",
-  ADMINISTRADOR: "Administrador",
-  CLIENTE: "Cliente",
-  SECRETARIO: "Secretario",
-};
-
-const roleDescriptions: Record<LoginRole, string> = {
-  VETERINARIO: "Acceso a agenda, pacientes y seguimientos clínicos.",
-  ADMINISTRADOR: "Control de inventario, reportes y gestión de usuarios.",
-  CLIENTE: "Consulta de citas, historial y recordatorios de vacunas.",
-  SECRETARIO: "Gestión de citas, pacientes e inventario.",
-};
-
 export const LoginPage = () => {
-  const [selectedRole, setSelectedRole] = useState<LoginRole>("VETERINARIO");
+  // Estado para controlar si estamos en modo registro o login
   const [isRegisterMode, setIsRegisterMode] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -64,33 +49,38 @@ export const LoginPage = () => {
   const [isResetPasswordModalOpen, setIsResetPasswordModalOpen] = useState(false);
   const [resetToken, setResetToken] = useState<string | undefined>(undefined);
 
+  // Función para manejar el envío del formulario de login
+  // El backend determina automáticamente el rol del usuario basado en las credenciales
   const onSubmit = handleSubmit(async (values) => {
     try {
-      // El backend espera `username`; si en el futuro se habilita login por correo, se debe ajustar aquí.
-      // Asegurar que los valores no estén vacíos
+      // Validación de campos vacíos
       if (!values.username?.trim() || !values.password?.trim()) {
         toast.error("Por favor, completa todos los campos");
         return;
       }
 
+      // Llamada al servicio de autenticación
+      // El backend retorna el token JWT y el rol del usuario
       await AuthService.login({
         username: values.username.trim(),
         password: values.password.trim(),
       } satisfies LoginRequestDTO);
+      
       toast.success("Sesión iniciada correctamente");
 
-      // La redirección se maneja automáticamente por RootRedirect según el rol del usuario
-      // Si hay una ruta previa, redirigir a ella, sino el RootRedirect se encargará
+      // La redirección se maneja automáticamente según el rol que retornó el backend
+      // Si hay una ruta previa guardada (ej: usuario intentó acceder a una página protegida),
+      // redirigimos a esa ruta, sino el sistema redirige según el rol
       const redirectTo = (location.state as { from?: Location })?.from?.pathname;
       if (redirectTo) {
         navigate(redirectTo, { replace: true });
       } else {
-        // El RootRedirect manejará la redirección según el rol
+        // El RootRedirect en las rutas manejará la redirección según el rol del usuario
         navigate("/", { replace: true });
       }
     } catch (error: any) {
       console.error("Fallo de autenticación:", error);
-      // Mostrar mensaje de error más específico si está disponible
+      // Mostrar mensaje de error específico del backend o mensaje genérico
       const errorMessage = error.response?.data?.message || error.message || "Credenciales inválidas o error al iniciar sesión";
       toast.error(errorMessage);
     }
@@ -198,37 +188,22 @@ export const LoginPage = () => {
             </div>
           </div>
           
+          {/* Encabezado del formulario - Texto actualizado para no mencionar roles */}
           <div className="space-y-2 text-center">
             <h2 className="text-5xl font-black text-gray-900 tracking-tight">
               {isRegisterMode ? "Registrarse" : "Iniciar Sesión"}
             </h2>
             <p className="text-sm text-gray-500 font-normal">
-              {isRegisterMode ? "Crea una cuenta para acceder al sistema" : roleDescriptions[selectedRole]}
+              {isRegisterMode 
+                ? "Crea una cuenta para acceder al sistema" 
+                : "Acceso a agenda, pacientes y seguimientos clínicos."}
             </p>
           </div>
 
-          {!isRegisterMode && (
-            <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
-              {(Object.keys(roleLabels) as LoginRole[]).map((role) => {
-                const isActive = selectedRole === role;
-                return (
-                  <button
-                    key={role}
-                    type="button"
-                    className={`rounded-lg border-2 px-3 py-2.5 text-xs font-semibold transition-all duration-200 h-10 flex items-center justify-center leading-none ${
-                      isActive
-                        ? "border-primary bg-primary text-white shadow-md"
-                        : "border-gray-200 bg-white text-gray-600 hover:border-primary/50 hover:text-primary hover:shadow-sm"
-                    }`}
-                    onClick={() => setSelectedRole(role)}
-                  >
-                    {roleLabels[role]}
-                  </button>
-                );
-              })}
-            </div>
-          )}
+          {/* Se eliminaron los botones de selección de rol.
+              El sistema ahora determina automáticamente el rol según las credenciales */}
 
+          {/* Formulario de registro con validación */}
           {isRegisterMode ? (
             <form className="space-y-6" noValidate onSubmit={handleRegister}>
               <div className="grid grid-cols-2 gap-4">
@@ -236,6 +211,7 @@ export const LoginPage = () => {
                   <label className="text-sm font-medium text-gray-700">Nombre *</label>
                   <input
                     type="text"
+                    placeholder="Juan"
                     value={registerData.nombre}
                     onChange={(e) => setRegisterData({ ...registerData, nombre: e.target.value })}
                     required
@@ -246,6 +222,7 @@ export const LoginPage = () => {
                   <label className="text-sm font-medium text-gray-700">Apellido *</label>
                   <input
                     type="text"
+                    placeholder="Pérez"
                     value={registerData.apellido}
                     onChange={(e) => setRegisterData({ ...registerData, apellido: e.target.value })}
                     required
@@ -257,6 +234,7 @@ export const LoginPage = () => {
                 <label className="text-sm font-medium text-gray-700">Correo Electrónico *</label>
                 <input
                   type="email"
+                  placeholder="ejemplo@cue.edu.co"
                   value={registerData.email}
                   onChange={(e) => setRegisterData({ ...registerData, email: e.target.value })}
                   required
@@ -267,6 +245,7 @@ export const LoginPage = () => {
                 <label className="text-sm font-medium text-gray-700">Nombre de Usuario *</label>
                 <input
                   type="text"
+                  placeholder="juanperez"
                   value={registerData.username}
                   onChange={(e) => setRegisterData({ ...registerData, username: e.target.value })}
                   required
@@ -277,6 +256,7 @@ export const LoginPage = () => {
                 <label className="text-sm font-medium text-gray-700">Contraseña *</label>
                 <input
                   type="password"
+                  placeholder="********"
                   value={registerData.password}
                   onChange={(e) => setRegisterData({ ...registerData, password: e.target.value })}
                   required
