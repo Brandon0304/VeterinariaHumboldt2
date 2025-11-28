@@ -32,10 +32,13 @@ const navigationItems: NavigationItem[] = [
   // Navegación compartida
   { label: "Reportes", to: "/reportes", icon: "chart", roles: ["VETERINARIO", "SECRETARIO"] },
   { label: "Notificaciones", to: "/notificaciones", icon: "bell", roles: ["VETERINARIO", "SECRETARIO"] },
-  // Solo administradores
+  // Solo administradores - Orden: Dashboard, Usuarios, Inventario, Pacientes, Finanzas, Reportes, Configuración
   { label: "Dashboard", to: "/admin/dashboard", icon: "dashboard", roles: ["ADMIN"] },
-  { label: "Configuración", to: "/configuracion", icon: "settings", roles: ["ADMIN"] },
   { label: "Usuarios", to: "/usuarios", icon: "user", roles: ["ADMIN"] },
+  { label: "Inventario", to: "/admin/inventario", icon: "box", roles: ["ADMIN"] },
+  { label: "Finanzas", to: "/admin/finanzas", icon: "receipt", roles: ["ADMIN"] },
+  { label: "Reportes", to: "/reportes", icon: "chart", roles: ["ADMIN"] },
+  { label: "Configuración", to: "/configuracion", icon: "settings", roles: ["ADMIN"] },
 ];
 
 const getIcon = (icon?: string) => {
