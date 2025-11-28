@@ -1,0 +1,102 @@
+/* Hoja de estilos global que inicializa Tailwind CSS y estilos base del proyecto. */
+
+/* Directivas de Tailwind para inyectar estilos base, componentes y utilidades. */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Normalización de tipografía y colores de fondo según el prototipo. */
+html,
+body,
+#root {
+  /* Garantiza que la aplicación ocupe toda la altura de la ventana. */
+  min-height: 100%;
+}
+
+body {
+  /* Aplica la fuente principal en todo el sitio. */
+  font-family: "Poppins", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  /* Color de fondo suave acorde al diseño general. */
+  @apply bg-gray-50 text-gray-900 antialiased;
+}
+
+/* Componentes reutilizables */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition-all duration-200 ease-out-curve focus-visible:ring-2 focus-visible:ring-primary/30 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-primary text-white shadow-md hover:shadow-lg hover:opacity-90;
+  }
+  .btn-outline {
+    @apply btn border border-gray-200 bg-white text-secondary hover:border-primary hover:text-primary;
+  }
+  .btn-danger {
+    @apply btn bg-danger text-white hover:bg-red-500;
+  }
+  .input {
+    @apply w-full rounded-xl border-2 border-gray-200 bg-white px-4 py-3 text-sm transition-all duration-200 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20;
+  }
+  .select {
+    @apply input pr-8;
+  }
+  .textarea {
+    @apply input min-h-[120px];
+  }
+  .card {
+    @apply rounded-3xl border border-gray-100 bg-white shadow-soft;
+  }
+  .badge {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold;
+  }
+}
+
+/* Selección de texto con color de marca */
+::selection {
+  background: rgba(26, 188, 188, 0.25);
+}
+
+/* Estados de enfoque accesibles y consistentes */
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(26, 188, 188, 0.35);
+  border-radius: 10px;
+}
+
+/* Clase utilitaria para transiciones suaves en elementos interactivos. */
+.transition-base {
+  @apply transition-all duration-200 ease-in-out;
+}
+
+/* Ocultar scrollbar pero mantener funcionalidad de scroll */
+.scrollbar-hide {
+  -ms-overflow-style: none; /* IE y Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Chrome, Safari y Opera */
+}
+
+/* Skeleton loader base */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: #e5e7eb; /* gray-200 */
+  border-radius: 12px;
+}
+.skeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background-image: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  animation: shimmer 1.2s infinite;
+}
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
