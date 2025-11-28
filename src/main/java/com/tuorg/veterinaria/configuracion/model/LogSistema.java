@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 
@@ -67,7 +65,6 @@ public class LogSistema {
      * Puede incluir información contextual del evento.
      */
     @Column(name = "metadata", columnDefinition = "JSONB")
-    @JdbcTypeCode(SqlTypes.JSON)
     private String metadata;
 }
 

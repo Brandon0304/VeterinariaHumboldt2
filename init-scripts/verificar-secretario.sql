@@ -26,4 +26,3 @@ FROM roles r
 JOIN rol_permisos rp ON rp.rol_id = r.id_rol
 JOIN permisos p ON p.id_permiso = rp.permiso_id
 WHERE r.nombre_rol = 'SECRETARIO';
-

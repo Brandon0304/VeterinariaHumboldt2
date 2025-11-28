@@ -1,23 +1,17 @@
 package com.tuorg.veterinaria.gestionpacientes.service;
 
-import com.tuorg.veterinaria.common.exception.BusinessException;
 import com.tuorg.veterinaria.common.exception.ResourceNotFoundException;
-import com.tuorg.veterinaria.gestionpacientes.dto.ProgramarProximaDosisRequest;
-import com.tuorg.veterinaria.gestionpacientes.dto.VacunacionRequest;
-import com.tuorg.veterinaria.gestionpacientes.dto.VacunacionResponse;
 import com.tuorg.veterinaria.gestionpacientes.model.Paciente;
 import com.tuorg.veterinaria.gestionpacientes.model.Vacunacion;
 import com.tuorg.veterinaria.gestionpacientes.repository.PacienteRepository;
 import com.tuorg.veterinaria.gestionpacientes.repository.VacunacionRepository;
-import com.tuorg.veterinaria.gestionusuarios.model.Usuario;
-import com.tuorg.veterinaria.gestionusuarios.model.UsuarioVeterinario;
-import com.tuorg.veterinaria.gestionusuarios.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+
 /**
  * Servicio para la gestión de vacunaciones.
  * 
@@ -39,7 +33,6 @@ public class VacunacionService {
      * Repositorio de pacientes.
      */
     private final PacienteRepository pacienteRepository;
-    private final UsuarioRepository usuarioRepository;
 
     /**
      * Constructor con inyección de dependencias.
@@ -49,11 +42,9 @@ public class VacunacionService {
      */
     @Autowired
     public VacunacionService(VacunacionRepository vacunacionRepository,
-                             PacienteRepository pacienteRepository,
-                             UsuarioRepository usuarioRepository) {
+                             PacienteRepository pacienteRepository) {
         this.vacunacionRepository = vacunacionRepository;
         this.pacienteRepository = pacienteRepository;
-        this.usuarioRepository = usuarioRepository;
     }
 
     /**
@@ -63,33 +54,18 @@ public class VacunacionService {
      * @return Vacunación creada
      */
     @Transactional
-    public VacunacionResponse registrarVacuna(VacunacionRequest request) {
-        Paciente paciente = pacienteRepository.findById(request.getPacienteId())
-                .orElseThrow(() -> new ResourceNotFoundException("Paciente", "id", request.getPacienteId()));
+    public Vacunacion registrarVacuna(Vacunacion vacunacion) {
+        // Validar que el paciente exista
+        Paciente paciente = pacienteRepository.findById(vacunacion.getPaciente().getIdPaciente())
+                .orElseThrow(() -> new ResourceNotFoundException("Paciente", "id", 
+                        vacunacion.getPaciente().getIdPaciente()));
 
-        if (request.getFechaAplicacion().isAfter(LocalDate.now())) {
-            throw new BusinessException("La fecha de aplicación no puede ser futura");
+        // Validar fecha de aplicación
+        if (vacunacion.getFechaAplicacion().isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("La fecha de aplicación no puede ser futura");
         }
 
-        UsuarioVeterinario veterinario = null;
-        if (request.getVeterinarioId() != null) {
-            Usuario usuario = usuarioRepository.findById(request.getVeterinarioId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Usuario", "id", request.getVeterinarioId()));
-            if (!(usuario instanceof UsuarioVeterinario)) {
-                throw new BusinessException("El usuario indicado no corresponde a un veterinario");
-            }
-            veterinario = (UsuarioVeterinario) usuario;
-        }
-
-        Vacunacion vacunacion = new Vacunacion();
-        vacunacion.setPaciente(paciente);
-        vacunacion.setTipoVacuna(request.getTipoVacuna());
-        vacunacion.setFechaAplicacion(request.getFechaAplicacion());
-        vacunacion.setProximaDosis(request.getProximaDosis());
-        vacunacion.setVeterinario(veterinario);
-
-        Vacunacion guardada = vacunacionRepository.save(vacunacion);
-        return mapToResponse(guardada);
+        return vacunacionRepository.save(vacunacion);
     }
 
     /**
@@ -100,18 +76,16 @@ public class VacunacionService {
      * @return Vacunación actualizada
      */
     @Transactional
-    public VacunacionResponse programarProximaDosis(Long vacunacionId, ProgramarProximaDosisRequest request) {
+    public Vacunacion programarProximaDosis(Long vacunacionId, LocalDate proximaDosis) {
         Vacunacion vacunacion = vacunacionRepository.findById(vacunacionId)
                 .orElseThrow(() -> new ResourceNotFoundException("Vacunacion", "id", vacunacionId));
 
-        LocalDate proximaDosis = request.getProximaDosis();
         if (proximaDosis.isBefore(LocalDate.now())) {
-            throw new BusinessException("La fecha de próxima dosis no puede ser pasada");
+            throw new IllegalArgumentException("La fecha de próxima dosis no puede ser pasada");
         }
 
         vacunacion.setProximaDosis(proximaDosis);
-        Vacunacion actualizada = vacunacionRepository.save(vacunacion);
-        return mapToResponse(actualizada);
+        return vacunacionRepository.save(vacunacion);
     }
 
     /**
@@ -121,11 +95,8 @@ public class VacunacionService {
      * @return Lista de vacunaciones
      */
     @Transactional(readOnly = true)
-    public List<VacunacionResponse> obtenerPorPaciente(Long pacienteId) {
-        return vacunacionRepository.findByPacienteId(pacienteId)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+    public List<Vacunacion> obtenerPorPaciente(Long pacienteId) {
+        return vacunacionRepository.findByPacienteId(pacienteId);
     }
 
     /**
@@ -135,41 +106,8 @@ public class VacunacionService {
      * @return Lista de vacunaciones pendientes
      */
     @Transactional(readOnly = true)
-    public List<VacunacionResponse> obtenerVacunacionesPendientes(int dias) {
+    public List<Vacunacion> obtenerVacunacionesPendientes(int dias) {
         LocalDate fechaLimite = LocalDate.now().plusDays(dias);
-        return vacunacionRepository.findVacunacionesPendientes(fechaLimite)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
-    }
-
-    private VacunacionResponse mapToResponse(Vacunacion vacunacion) {
-        Paciente paciente = vacunacion.getPaciente();
-        VacunacionResponse.PacienteSummary pacienteSummary = new VacunacionResponse.PacienteSummary(
-                paciente.getIdPaciente(),
-                paciente.getNombre()
-        );
-
-        VacunacionResponse.VeterinarioSummary veterinarioSummary = null;
-        if (vacunacion.getVeterinario() != null) {
-            UsuarioVeterinario vet = vacunacion.getVeterinario();
-            veterinarioSummary = new VacunacionResponse.VeterinarioSummary(
-                    vet.getIdUsuario(),
-                    vet.getNombre(),
-                    vet.getApellido(),
-                    vet.getEspecialidad()
-            );
-        }
-
-        return new VacunacionResponse(
-                vacunacion.getIdVacunacion(),
-                pacienteSummary,
-                vacunacion.getTipoVacuna(),
-                vacunacion.getFechaAplicacion(),
-                vacunacion.getProximaDosis(),
-                veterinarioSummary
-        );
+        return vacunacionRepository.findVacunacionesPendientes(fechaLimite);
     }
 }
-
-

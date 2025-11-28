@@ -18,7 +18,7 @@ public class LoginResponse {
     private String token;
 
     @Schema(description = "Tipo de token devuelto", example = "Bearer")
-    private String tokenType;
+    private String type;
 
     @Schema(description = "Información del usuario autenticado")
     private UsuarioLoginResponse usuario;
@@ -31,9 +31,6 @@ public class LoginResponse {
 
         @Schema(description = "Identificador del usuario", example = "5")
         private Long idUsuario;
-
-        @Schema(description = "Nombre de usuario", example = "diego.martinez")
-        private String username;
 
         @Schema(description = "Nombre del usuario", example = "Diego")
         private String nombre;

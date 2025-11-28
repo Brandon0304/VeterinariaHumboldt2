@@ -24,8 +24,6 @@ public class UsuarioDemoInitializer implements CommandLineRunner {
     private static final String VET_DEMO_PASSWORD = "Vet1234!";
     private static final String SECRETARIO_DEMO_USERNAME = "secretario_demo";
     private static final String SECRETARIO_DEMO_PASSWORD = "Secret1234!";
-    private static final String ADMIN_USERNAME = "admin";
-    private static final String ADMIN_PASSWORD = "Admin123!";
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
@@ -41,7 +39,6 @@ public class UsuarioDemoInitializer implements CommandLineRunner {
     public void run(String... args) {
         actualizarHashUsuario(VET_DEMO_USERNAME, VET_DEMO_PASSWORD);
         actualizarHashUsuario(SECRETARIO_DEMO_USERNAME, SECRETARIO_DEMO_PASSWORD);
-        actualizarHashUsuario(ADMIN_USERNAME, ADMIN_PASSWORD);
     }
 
     private void actualizarHashUsuario(String username, String password) {
@@ -67,4 +64,3 @@ public class UsuarioDemoInitializer implements CommandLineRunner {
         }
     }
 }
-

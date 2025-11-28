@@ -144,4 +144,3 @@ public class SecurityConfig {
         return authenticationManagerBuilder.build();
     }
 }
-

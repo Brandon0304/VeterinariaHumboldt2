@@ -29,4 +29,3 @@ public interface RegistroMedicoRepository extends JpaRepository<RegistroMedico, 
     @Query("SELECT rm FROM RegistroMedico rm WHERE rm.historia.idHistoria = :historiaId")
     List<RegistroMedico> findByHistoriaId(@Param("historiaId") Long historiaId);
 }
-

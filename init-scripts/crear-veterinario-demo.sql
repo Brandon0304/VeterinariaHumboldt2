@@ -40,4 +40,3 @@ FROM nuevo_usuario u;
 
 -- Credenciales: usuario=vet_demo, contraseña=Vet1234!
 -- El hash se actualizará automáticamente al reiniciar el backend
-

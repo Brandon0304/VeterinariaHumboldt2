@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * @version 1.0.0
  */
 @RestController
-@RequestMapping("/reportes")  // Sin /api porque el context-path ya lo incluye
+@RequestMapping("/api/reportes")
 public class ReporteController {
 
     /**

@@ -2,8 +2,6 @@ package com.tuorg.veterinaria.gestionusuarios.repository;
 
 import com.tuorg.veterinaria.gestionusuarios.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -27,15 +25,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
      * @return Optional con el usuario si existe, vacío en caso contrario
      */
     Optional<Usuario> findByUsername(String username);
-
-    /**
-     * Busca un usuario por su nombre de usuario cargando el rol (fetch join).
-     * 
-     * @param username Nombre de usuario
-     * @return Optional con el usuario si existe, vacío en caso contrario
-     */
-    @Query("SELECT DISTINCT u FROM Usuario u LEFT JOIN FETCH u.rol WHERE u.username = :username")
-    Optional<Usuario> findByUsernameWithRol(@Param("username") String username);
 
     /**
      * Verifica si existe un usuario con el nombre de usuario especificado.

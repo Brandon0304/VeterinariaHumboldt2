@@ -80,8 +80,7 @@ public class Notificacion {
      * Datos adicionales en formato JSON.
      * Puede incluir información contextual para el renderizado de plantillas.
      */
-    @Column(name = "datos", columnDefinition = "jsonb")
-    @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
+    @Column(name = "datos", columnDefinition = "JSONB")
     private String datos;
 }
 

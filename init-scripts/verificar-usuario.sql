@@ -17,4 +17,3 @@ FROM usuarios u
 LEFT JOIN roles r ON r.id_rol = u.rol_id
 LEFT JOIN usuarios_veterinarios uv ON uv.id_usuario = u.id_usuario
 WHERE u.username = 'vet_demo';
-

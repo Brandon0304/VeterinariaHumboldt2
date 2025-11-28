@@ -1,5 +1,6 @@
 package com.tuorg.veterinaria.gestionpacientes.model;
 
+import com.tuorg.veterinaria.common.constants.AppConstants;
 import com.tuorg.veterinaria.gestionusuarios.model.Cliente;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -96,4 +97,3 @@ public class Paciente {
     @Column(name = "identificador_externo")
     private UUID identificadorExterno;
 }
-

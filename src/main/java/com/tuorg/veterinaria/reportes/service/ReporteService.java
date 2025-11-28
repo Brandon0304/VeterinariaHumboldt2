@@ -1,18 +1,15 @@
 package com.tuorg.veterinaria.reportes.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuorg.veterinaria.common.exception.BusinessException;
 import com.tuorg.veterinaria.reportes.dto.EstadisticaResponse;
 import com.tuorg.veterinaria.reportes.dto.ReporteRequest;
 import com.tuorg.veterinaria.reportes.dto.ReporteResponse;
-import com.tuorg.veterinaria.common.event.ReporteGeneradoEvent;
 import com.tuorg.veterinaria.reportes.model.Estadistica;
 import com.tuorg.veterinaria.reportes.model.Reporte;
 import com.tuorg.veterinaria.reportes.repository.ReporteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +17,8 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 /**
  * Servicio para la gestión de reportes (Facade pattern).
  *
@@ -31,17 +30,14 @@ public class ReporteService {
     private final ReporteRepository reporteRepository;
     private final EstadisticaService estadisticaService;
     private final ObjectMapper objectMapper;
-    private final ApplicationEventPublisher eventPublisher;
 
     @Autowired
     public ReporteService(ReporteRepository reporteRepository,
                           EstadisticaService estadisticaService,
-                          ObjectMapper objectMapper,
-                          ApplicationEventPublisher eventPublisher) {
+                          ObjectMapper objectMapper) {
         this.reporteRepository = reporteRepository;
         this.estadisticaService = estadisticaService;
         this.objectMapper = objectMapper;
-        this.eventPublisher = eventPublisher;
     }
 
     /**
@@ -62,10 +58,6 @@ public class ReporteService {
         );
 
         Reporte guardado = reporteRepository.save(reporte);
-        
-        // Publicar evento (Observer pattern)
-        eventPublisher.publishEvent(new ReporteGeneradoEvent(this, guardado, request.getTipo()));
-        
         return mapToResponse(guardado, estadisticas);
     }
 
@@ -76,8 +68,7 @@ public class ReporteService {
     public byte[] exportarPDF(Long reporteId) {
         reporteRepository.findById(reporteId)
                 .orElseThrow(() -> new BusinessException("Reporte no encontrado para exportar a PDF"));
-        // Nota: La generación real de PDF se implementará con iText o JasperReports
-        // cuando se requiera la funcionalidad completa de exportación
+        // TODO: Implementar generación real de PDF con iText o JasperReports
         return new byte[0];
     }
 
@@ -88,8 +79,7 @@ public class ReporteService {
     public byte[] exportarExcel(Long reporteId) {
         reporteRepository.findById(reporteId)
                 .orElseThrow(() -> new BusinessException("Reporte no encontrado para exportar a Excel"));
-        // Nota: La generación real de Excel se implementará con Apache POI
-        // cuando se requiera la funcionalidad completa de exportación
+        // TODO: Implementar generación real de Excel con Apache POI
         return new byte[0];
     }
 
@@ -103,7 +93,7 @@ public class ReporteService {
                 .parametros(toMap(reporte.getParametros()))
                 .estadisticas(estadisticas.stream()
                         .map(this::mapEstadistica)
-                        .toList())
+                        .collect(Collectors.toList()))
                 .build();
     }
 
@@ -133,11 +123,10 @@ public class ReporteService {
             return Collections.emptyMap();
         }
         try {
-            return objectMapper.readValue(parametrosJson, new TypeReference<Map<String, Object>>() {});
+            return objectMapper.readValue(parametrosJson, Map.class);
         } catch (JsonProcessingException e) {
             return Collections.emptyMap();
         }
     }
 }
-
 

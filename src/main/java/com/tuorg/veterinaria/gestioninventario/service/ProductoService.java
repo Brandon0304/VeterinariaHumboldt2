@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
 /**
  * Servicio para la gestión de productos del inventario.
  * 
@@ -96,7 +98,7 @@ public class ProductoService {
         return productoRepository.findAll()
                 .stream()
                 .map(this::mapToResponse)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     /**
@@ -185,7 +187,7 @@ public class ProductoService {
         return productoRepository.findProductosConStockBajo(nivelStock)
                 .stream()
                 .map(this::mapToResponse)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
@@ -209,5 +211,4 @@ public class ProductoService {
         );
     }
 }
-
 

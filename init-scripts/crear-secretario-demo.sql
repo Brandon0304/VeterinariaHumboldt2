@@ -38,4 +38,3 @@ FROM nuevo_usuario u;
 
 -- Credenciales: usuario=secretario_demo, contraseña=Secret1234!
 -- El hash se actualizará automáticamente al reiniciar el backend
-

@@ -1,11 +1,9 @@
 package com.tuorg.veterinaria.gestionpacientes.controller;
 
 import com.tuorg.veterinaria.common.dto.ApiResponse;
-import com.tuorg.veterinaria.gestionpacientes.dto.HistoriaClinicaResponse;
-import com.tuorg.veterinaria.gestionpacientes.dto.RegistroMedicoRequest;
-import com.tuorg.veterinaria.gestionpacientes.dto.RegistroMedicoResponse;
+import com.tuorg.veterinaria.gestionpacientes.model.HistoriaClinica;
+import com.tuorg.veterinaria.gestionpacientes.model.RegistroMedico;
 import com.tuorg.veterinaria.gestionpacientes.service.HistoriaClinicaService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +20,7 @@ import java.util.List;
  * @version 1.0.0
  */
 @RestController
-@RequestMapping("/historias-clinicas")
+@RequestMapping("/api/historias-clinicas")
 public class HistoriaClinicaController {
 
     /**
@@ -47,8 +45,8 @@ public class HistoriaClinicaController {
      * @return Respuesta con la historia clínica
      */
     @GetMapping("/paciente/{pacienteId}")
-    public ResponseEntity<ApiResponse<HistoriaClinicaResponse>> obtenerPorPaciente(@PathVariable Long pacienteId) {
-        HistoriaClinicaResponse historia = historiaClinicaService.obtenerPorPaciente(pacienteId);
+    public ResponseEntity<ApiResponse<HistoriaClinica>> obtenerPorPaciente(@PathVariable Long pacienteId) {
+        HistoriaClinica historia = historiaClinicaService.obtenerPorPaciente(pacienteId);
         return ResponseEntity.ok(ApiResponse.success("Historia clínica obtenida exitosamente", historia));
     }
 
@@ -60,10 +58,10 @@ public class HistoriaClinicaController {
      * @return Respuesta con el registro médico creado
      */
     @PostMapping("/{historiaId}/registros")
-    public ResponseEntity<ApiResponse<RegistroMedicoResponse>> agregarRegistro(
+    public ResponseEntity<ApiResponse<RegistroMedico>> agregarRegistro(
             @PathVariable Long historiaId,
-            @Valid @RequestBody RegistroMedicoRequest request) {
-        RegistroMedicoResponse registroCreado = historiaClinicaService.agregarRegistro(historiaId, request);
+            @RequestBody RegistroMedico registro) {
+        RegistroMedico registroCreado = historiaClinicaService.agregarRegistro(historiaId, registro);
         return ResponseEntity.ok(ApiResponse.success("Registro médico agregado exitosamente", registroCreado));
     }
 
@@ -74,8 +72,8 @@ public class HistoriaClinicaController {
      * @return Respuesta con la lista de registros médicos
      */
     @GetMapping("/{historiaId}/registros")
-    public ResponseEntity<ApiResponse<List<RegistroMedicoResponse>>> obtenerRegistros(@PathVariable Long historiaId) {
-        List<RegistroMedicoResponse> registros = historiaClinicaService.obtenerRegistros(historiaId);
+    public ResponseEntity<ApiResponse<List<RegistroMedico>>> obtenerRegistros(@PathVariable Long historiaId) {
+        List<RegistroMedico> registros = historiaClinicaService.obtenerRegistros(historiaId);
         return ResponseEntity.ok(ApiResponse.success("Registros médicos obtenidos exitosamente", registros));
     }
 
@@ -94,4 +92,3 @@ public class HistoriaClinicaController {
                 .body(pdf);
     }
 }
-

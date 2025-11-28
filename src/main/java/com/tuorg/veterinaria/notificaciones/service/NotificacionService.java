@@ -1,7 +1,6 @@
 package com.tuorg.veterinaria.notificaciones.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tuorg.veterinaria.common.constants.AppConstants;
 import com.tuorg.veterinaria.common.exception.BusinessException;
@@ -9,15 +8,11 @@ import com.tuorg.veterinaria.common.exception.ResourceNotFoundException;
 import com.tuorg.veterinaria.notificaciones.dto.NotificacionEnviarRequest;
 import com.tuorg.veterinaria.notificaciones.dto.NotificacionProgramarRequest;
 import com.tuorg.veterinaria.notificaciones.dto.NotificacionResponse;
-import com.tuorg.veterinaria.notificaciones.model.CanalEmail;
 import com.tuorg.veterinaria.notificaciones.model.CanalEnvio;
 import com.tuorg.veterinaria.notificaciones.model.Notificacion;
-import com.tuorg.veterinaria.common.event.NotificacionEvent;
 import com.tuorg.veterinaria.notificaciones.repository.CanalEnvioRepository;
 import com.tuorg.veterinaria.notificaciones.repository.NotificacionRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Servicio para la gestión de notificaciones.
@@ -38,20 +34,14 @@ public class NotificacionService {
     private final NotificacionRepository notificacionRepository;
     private final CanalEnvioRepository canalEnvioRepository;
     private final ObjectMapper objectMapper;
-    private final ApplicationEventPublisher eventPublisher;
-    private final JavaMailSender mailSender;
 
     @Autowired
     public NotificacionService(NotificacionRepository notificacionRepository,
                                CanalEnvioRepository canalEnvioRepository,
-                               ObjectMapper objectMapper,
-                               ApplicationEventPublisher eventPublisher,
-                               JavaMailSender mailSender) {
+                               ObjectMapper objectMapper) {
         this.notificacionRepository = notificacionRepository;
         this.canalEnvioRepository = canalEnvioRepository;
         this.objectMapper = objectMapper;
-        this.eventPublisher = eventPublisher;
-        this.mailSender = mailSender;
     }
 
     /**
@@ -67,10 +57,6 @@ public class NotificacionService {
         notificacion.setDatos(toJson(request.getDatos()));
 
         Notificacion guardada = notificacionRepository.save(notificacion);
-        
-        // Publicar evento (Observer pattern)
-        eventPublisher.publishEvent(new NotificacionEvent(this, guardada, "PROGRAMADA"));
-        
         return mapToResponse(guardada);
     }
 
@@ -88,11 +74,6 @@ public class NotificacionService {
         CanalEnvio canal = canalEnvioRepository.findById(request.getCanalId())
                 .orElseThrow(() -> new ResourceNotFoundException("CanalEnvio", "id", request.getCanalId()));
 
-        // 🔧 CRÍTICO: Inyectar JavaMailSender en CanalEmail recuperado de BD
-        if (canal instanceof CanalEmail canalEmail) {
-            canalEmail.setMailSender(mailSender);
-        }
-
         boolean enviado = canal.enviar(notificacion);
 
         notificacion.setFechaEnvioReal(LocalDateTime.now());
@@ -101,11 +82,6 @@ public class NotificacionService {
                 : AppConstants.ESTADO_NOTIFICACION_FALLIDA);
 
         Notificacion guardada = notificacionRepository.save(notificacion);
-        
-        // Publicar evento (Observer pattern)
-        String tipoEvento = enviado ? "ENVIADA" : "FALLIDA";
-        eventPublisher.publishEvent(new NotificacionEvent(this, guardada, tipoEvento));
-        
         return mapToResponse(guardada);
     }
 
@@ -117,7 +93,7 @@ public class NotificacionService {
         return notificacionRepository.findNotificacionesPendientes(LocalDateTime.now())
                 .stream()
                 .map(this::mapToResponse)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     /**
@@ -128,7 +104,7 @@ public class NotificacionService {
         return notificacionRepository.findAll()
                 .stream()
                 .map(this::mapToResponse)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     private NotificacionResponse mapToResponse(Notificacion notificacion) {
@@ -159,11 +135,10 @@ public class NotificacionService {
             return Collections.emptyMap();
         }
         try {
-            return objectMapper.readValue(datosJson, new TypeReference<Map<String, Object>>() {});
+            return objectMapper.readValue(datosJson, Map.class);
         } catch (JsonProcessingException e) {
             return Collections.emptyMap();
         }
     }
 }
-
 

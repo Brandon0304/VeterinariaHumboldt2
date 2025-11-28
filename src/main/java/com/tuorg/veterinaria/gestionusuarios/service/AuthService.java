@@ -24,7 +24,6 @@ import com.tuorg.veterinaria.gestionusuarios.dto.LoginResponse;
 import com.tuorg.veterinaria.common.util.ValidationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.LoggerFactory;
 
 /**
  * Servicio de autenticación.
@@ -97,73 +96,39 @@ public class AuthService {
     @Transactional
     public LoginResponse login(String username, String password) {
         try {
-            logger.info("Iniciando login para usuario: {}", username);
-            
             // Verificar que el usuario existe antes de intentar autenticar
             Usuario usuario = usuarioRepository.findByUsername(username)
                     .orElseThrow(() -> new BusinessException("Usuario no encontrado: " + username));
-            
-            logger.info("Usuario encontrado: {}", usuario.getUsername());
             
             if (!usuario.getActivo()) {
                 throw new BusinessException("Usuario inactivo: " + username);
             }
             
-            // Obtener el nombre del rol de forma segura
-            String nombreRol = "SIN_ROL";
-            try {
-                Rol rol = usuario.getRol();
-                if (rol != null && rol.getNombreRol() != null) {
-                    nombreRol = rol.getNombreRol();
-                }
-            } catch (Exception e) {
-                logger.warn("No se pudo obtener el nombre del rol para usuario {}: {}", username, e.getMessage());
-            }
-            
-            logger.info("Rol obtenido: {}", nombreRol);
-            
             // Autenticar usuario (si falla, lanza AuthenticationException)
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password));
-
-            logger.info("Autenticación exitosa para usuario: {}", username);
 
             // Obtener detalles del usuario autenticado
             UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
             // Generar token JWT
             String token = tokenProvider.generateToken(userDetails);
-            
-            logger.info("Token generado para usuario: {}", username);
 
             // Actualizar último acceso
             usuario.setUltimoAcceso(LocalDateTime.now());
             usuarioRepository.save(usuario);
-            usuarioRepository.flush();
-
-            // Obtener ID de forma segura
-            Long idUsuario = usuario.getIdUsuario();
-            if (idUsuario == null) {
-                idUsuario = usuario.getIdPersona();
-            }
 
             LoginResponse.UsuarioLoginResponse usuarioResponse = new LoginResponse.UsuarioLoginResponse(
-                    idUsuario,
-                    usuario.getUsername() != null ? usuario.getUsername() : "",
-                    usuario.getNombre() != null ? usuario.getNombre() : "",
-                    usuario.getApellido() != null ? usuario.getApellido() : "",
-                    usuario.getCorreo() != null ? usuario.getCorreo() : "",
-                    nombreRol
+                    usuario.getIdUsuario(),
+                    usuario.getNombre(),
+                    usuario.getApellido(),
+                    usuario.getCorreo(),
+                    usuario.getRol().getNombreRol()
             );
 
-            logger.info("Login exitoso para usuario: {}", username);
             return new LoginResponse(token, "Bearer", usuarioResponse);
         } catch (org.springframework.security.core.AuthenticationException e) {
-            logger.error("Error de autenticación para usuario {}: {}", username, e.getMessage());
             throw new BusinessException("Credenciales inválidas: " + e.getMessage());
-        } catch (Exception e) {
-            logger.error("Error inesperado en login para usuario {}: {}", username, e.getMessage(), e);
-            throw new BusinessException("Error al procesar el login: " + e.getMessage());
         }
     }
 

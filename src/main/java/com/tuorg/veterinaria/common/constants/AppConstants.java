@@ -2,10 +2,10 @@ package com.tuorg.veterinaria.common.constants;
 
 /**
  * Clase de constantes de la aplicación.
- * 
+ *
  * Esta clase centraliza todas las constantes utilizadas en la aplicación,
  * incluyendo mensajes, códigos de error, valores por defecto, etc.
- * 
+ *
  * @author Equipo de Desarrollo
  * @version 1.0.0
  */

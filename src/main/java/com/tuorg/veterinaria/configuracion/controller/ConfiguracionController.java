@@ -18,7 +18,7 @@ import java.util.Map;
  * @version 1.0.0
  */
 @RestController
-@RequestMapping("/configuracion")  // Sin /api porque el context-path ya lo incluye
+@RequestMapping("/api/configuracion")
 public class ConfiguracionController {
 
     /**

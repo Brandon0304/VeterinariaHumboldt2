@@ -4,16 +4,11 @@ import com.tuorg.veterinaria.common.constants.AppConstants;
 import com.tuorg.veterinaria.common.exception.BusinessException;
 import com.tuorg.veterinaria.common.exception.ResourceNotFoundException;
 import com.tuorg.veterinaria.common.util.ValidationUtil;
-import com.tuorg.veterinaria.gestionpacientes.dto.PacienteOwnerResponse;
-import com.tuorg.veterinaria.gestionpacientes.dto.PacienteRequest;
-import com.tuorg.veterinaria.gestionpacientes.dto.PacienteResponse;
-import com.tuorg.veterinaria.gestionpacientes.dto.PacienteUpdateRequest;
 import com.tuorg.veterinaria.gestionpacientes.model.HistoriaClinica;
 import com.tuorg.veterinaria.gestionpacientes.model.Paciente;
 import com.tuorg.veterinaria.gestionpacientes.repository.HistoriaClinicaRepository;
 import com.tuorg.veterinaria.gestionpacientes.repository.PacienteRepository;
 import com.tuorg.veterinaria.gestionusuarios.model.Cliente;
-import com.tuorg.veterinaria.gestionusuarios.model.Usuario;
 import com.tuorg.veterinaria.gestionusuarios.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -21,10 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
+
 /**
  * Servicio para la gestión de pacientes.
  * 
@@ -75,46 +69,38 @@ public class PacienteService {
      * Esta operación es transaccional: si falla la creación de la historia
      * clínica, se revierte la creación del paciente.
      * 
-     * @param request Datos del paciente a registrar
+     * @param paciente Paciente a registrar
      * @return Paciente creado con su historia clínica
      */
     @Transactional
-    public PacienteResponse registrarPaciente(PacienteRequest request) {
+    public Paciente registrarPaciente(Paciente paciente) {
         // Validar especie
-        if (!AppConstants.ESPECIE_PERRO.equalsIgnoreCase(request.getEspecie()) &&
-            !AppConstants.ESPECIE_GATO.equalsIgnoreCase(request.getEspecie())) {
+        if (!AppConstants.ESPECIE_PERRO.equalsIgnoreCase(paciente.getEspecie()) &&
+            !AppConstants.ESPECIE_GATO.equalsIgnoreCase(paciente.getEspecie())) {
             throw new BusinessException("La especie debe ser 'perro' o 'gato'");
         }
 
         // Validar fecha de nacimiento
-        if (request.getFechaNacimiento() != null &&
-            request.getFechaNacimiento().isAfter(LocalDate.now())) {
+        if (paciente.getFechaNacimiento() != null &&
+            paciente.getFechaNacimiento().isAfter(LocalDate.now())) {
             throw new BusinessException("La fecha de nacimiento no puede ser futura");
         }
 
         // Validar peso
-        if (request.getPesoKg() != null) {
+        if (paciente.getPesoKg() != null) {
             ValidationUtil.validatePositiveNumber(
-                    request.getPesoKg().doubleValue(), "peso_kg");
+                    paciente.getPesoKg().doubleValue(), "peso_kg");
         }
 
         // Validar que el cliente exista
-        Cliente cliente = obtenerCliente(request.getClienteId());
-
-        Paciente paciente = new Paciente();
-        paciente.setNombre(request.getNombre());
-        // Normalizar especie a minúsculas para cumplir CHECK constraint de BD
-        paciente.setEspecie(request.getEspecie() != null ? request.getEspecie().toLowerCase() : null);
-        paciente.setRaza(request.getRaza());
-        paciente.setFechaNacimiento(request.getFechaNacimiento());
-        paciente.setSexo(request.getSexo());
-        paciente.setPesoKg(request.getPesoKg());
-        paciente.setEstadoSalud(request.getEstadoSalud());
-        paciente.setCliente(cliente);
+        Cliente cliente = (Cliente) usuarioRepository.findById(paciente.getCliente().getIdUsuario())
+                .orElseThrow(() -> new ResourceNotFoundException("Cliente", "id", 
+                        paciente.getCliente().getIdUsuario()));
 
         // Generar identificador externo si no existe
-        paciente.setIdentificadorExterno(
-                request.getIdentificadorExterno() != null ? request.getIdentificadorExterno() : UUID.randomUUID());
+        if (paciente.getIdentificadorExterno() == null) {
+            paciente.setIdentificadorExterno(UUID.randomUUID());
+        }
 
         // Guardar paciente
         Paciente pacienteGuardado = pacienteRepository.save(paciente);
@@ -124,14 +110,9 @@ public class PacienteService {
         historiaClinica.setPaciente(pacienteGuardado);
         historiaClinica.setFechaApertura(LocalDateTime.now());
         historiaClinica.setResumen("Historia clínica creada automáticamente al registrar el paciente");
-        Map<String, Object> metadata = new HashMap<>();
-        metadata.put("origen", "registro automático");
-        metadata.put("creadoPor", "sistema");
-        historiaClinica.setMetadatos(metadata);
-
         historiaClinicaRepository.save(historiaClinica);
 
-        return mapToResponse(pacienteGuardado);
+        return pacienteGuardado;
     }
 
     /**
@@ -141,9 +122,9 @@ public class PacienteService {
      * @return Paciente encontrado
      */
     @Transactional(readOnly = true)
-    public PacienteResponse obtener(Long id) {
-        Paciente paciente = obtenerPacienteEntidad(id);
-        return mapToResponse(paciente);
+    public Paciente obtener(Long id) {
+        return pacienteRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Paciente", "id", id));
     }
 
     /**
@@ -152,11 +133,8 @@ public class PacienteService {
      * @return Lista de pacientes
      */
     @Transactional(readOnly = true)
-    public List<PacienteResponse> obtenerTodos() {
-        return pacienteRepository.findAll()
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+    public List<Paciente> obtenerTodos() {
+        return pacienteRepository.findAll();
     }
 
     /**
@@ -166,66 +144,47 @@ public class PacienteService {
      * @return Lista de pacientes del cliente
      */
     @Transactional(readOnly = true)
-    public List<PacienteResponse> obtenerPorCliente(Long clienteId) {
-        obtenerCliente(clienteId);
-        return pacienteRepository.findByClienteId(clienteId)
-                .stream()
-                .map(this::mapToResponse)
-                .toList();
+    public List<Paciente> obtenerPorCliente(Long clienteId) {
+        return pacienteRepository.findByClienteId(clienteId);
     }
 
     /**
      * Actualiza los datos de un paciente.
      * 
      * @param id ID del paciente
-     * @param request Datos actualizados del paciente
+     * @param paciente Datos actualizados del paciente
      * @return Paciente actualizado
      */
     @Transactional
-    public PacienteResponse actualizarDatos(Long id, PacienteUpdateRequest request) {
-        Paciente pacienteExistente = obtenerPacienteEntidad(id);
+    public Paciente actualizarDatos(Long id, Paciente paciente) {
+        Paciente pacienteExistente = obtener(id);
 
         // Actualizar campos permitidos
-        if (request.getNombre() != null) {
-            pacienteExistente.setNombre(request.getNombre());
+        if (paciente.getNombre() != null) {
+            pacienteExistente.setNombre(paciente.getNombre());
         }
-        if (request.getEspecie() != null) {
-            if (!AppConstants.ESPECIE_PERRO.equalsIgnoreCase(request.getEspecie()) &&
-                !AppConstants.ESPECIE_GATO.equalsIgnoreCase(request.getEspecie())) {
-                throw new BusinessException("La especie debe ser 'perro' o 'gato'");
-            }
-            pacienteExistente.setEspecie(request.getEspecie());
+        if (paciente.getRaza() != null) {
+            pacienteExistente.setRaza(paciente.getRaza());
         }
-        if (request.getRaza() != null) {
-            pacienteExistente.setRaza(request.getRaza());
-        }
-        if (request.getFechaNacimiento() != null) {
-            if (request.getFechaNacimiento().isAfter(LocalDate.now())) {
+        if (paciente.getFechaNacimiento() != null) {
+            if (paciente.getFechaNacimiento().isAfter(LocalDate.now())) {
                 throw new BusinessException("La fecha de nacimiento no puede ser futura");
             }
-            pacienteExistente.setFechaNacimiento(request.getFechaNacimiento());
+            pacienteExistente.setFechaNacimiento(paciente.getFechaNacimiento());
         }
-        if (request.getSexo() != null) {
-            pacienteExistente.setSexo(request.getSexo());
+        if (paciente.getSexo() != null) {
+            pacienteExistente.setSexo(paciente.getSexo());
         }
-        if (request.getPesoKg() != null) {
+        if (paciente.getPesoKg() != null) {
             ValidationUtil.validatePositiveNumber(
-                    request.getPesoKg().doubleValue(), "peso_kg");
-            pacienteExistente.setPesoKg(request.getPesoKg());
+                    paciente.getPesoKg().doubleValue(), "peso_kg");
+            pacienteExistente.setPesoKg(paciente.getPesoKg());
         }
-        if (request.getEstadoSalud() != null) {
-            pacienteExistente.setEstadoSalud(request.getEstadoSalud());
-        }
-        if (request.getClienteId() != null) {
-            Cliente nuevoCliente = obtenerCliente(request.getClienteId());
-            pacienteExistente.setCliente(nuevoCliente);
-        }
-        if (request.getIdentificadorExterno() != null) {
-            pacienteExistente.setIdentificadorExterno(request.getIdentificadorExterno());
+        if (paciente.getEstadoSalud() != null) {
+            pacienteExistente.setEstadoSalud(paciente.getEstadoSalud());
         }
 
-        Paciente actualizado = pacienteRepository.save(pacienteExistente);
-        return mapToResponse(actualizado);
+        return pacienteRepository.save(pacienteExistente);
     }
 
     /**
@@ -236,7 +195,7 @@ public class PacienteService {
      */
     @Transactional(readOnly = true)
     public String generarResumenClinico(Long id) {
-        Paciente paciente = obtenerPacienteEntidad(id);
+        Paciente paciente = obtener(id);
         HistoriaClinica historia = historiaClinicaRepository.findByPacienteId(id)
                 .orElseThrow(() -> new ResourceNotFoundException("HistoriaClinica", "paciente_id", id));
 
@@ -252,45 +211,4 @@ public class PacienteService {
 
         return resumen.toString();
     }
-
-    private Cliente obtenerCliente(Long clienteId) {
-        Usuario usuario = usuarioRepository.findById(clienteId)
-                .orElseThrow(() -> new ResourceNotFoundException("Cliente", "id", clienteId));
-
-        if (!(usuario instanceof Cliente)) {
-            throw new BusinessException("El usuario con id " + clienteId + " no corresponde a un cliente");
-        }
-
-        return (Cliente) usuario;
-    }
-
-    private Paciente obtenerPacienteEntidad(Long id) {
-        return pacienteRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Paciente", "id", id));
-    }
-
-    private PacienteResponse mapToResponse(Paciente paciente) {
-        Cliente cliente = paciente.getCliente();
-        PacienteOwnerResponse owner = new PacienteOwnerResponse(
-                cliente.getIdUsuario(),
-                cliente.getNombre(),
-                cliente.getApellido(),
-                cliente.getCorreo()
-        );
-
-        return new PacienteResponse(
-                paciente.getIdPaciente(),
-                paciente.getNombre(),
-                paciente.getEspecie(),
-                paciente.getRaza(),
-                paciente.getFechaNacimiento(),
-                paciente.getSexo(),
-                paciente.getPesoKg(),
-                paciente.getEstadoSalud(),
-                owner,
-                paciente.getIdentificadorExterno()
-        );
-    }
 }
-
-

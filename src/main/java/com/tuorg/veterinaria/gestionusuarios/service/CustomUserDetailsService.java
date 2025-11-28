@@ -80,22 +80,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     private Collection<? extends GrantedAuthority> getAuthorities(Usuario usuario) {
         List<GrantedAuthority> authorities = new ArrayList<>();
         
-        // Agregar el rol del usuario como autoridad de forma segura
-        try {
-            if (usuario.getRol() != null) {
-                String roleName = usuario.getRol().getNombreRol();
-                if (roleName != null && !roleName.trim().isEmpty()) {
-                    authorities.add(new SimpleGrantedAuthority("ROLE_" + roleName.toUpperCase()));
-                }
-            }
-        } catch (Exception e) {
-            // Si hay problema accediendo al rol, usar un rol por defecto
-            authorities.add(new SimpleGrantedAuthority("ROLE_CLIENTE"));
-        }
-        
-        // Si no hay autoridades, agregar CLIENTE por defecto
-        if (authorities.isEmpty()) {
-            authorities.add(new SimpleGrantedAuthority("ROLE_CLIENTE"));
+        // Agregar el rol del usuario como autoridad
+        if (usuario.getRol() != null && usuario.getRol().getNombreRol() != null) {
+            String roleName = usuario.getRol().getNombreRol().toUpperCase();
+            authorities.add(new SimpleGrantedAuthority("ROLE_" + roleName));
         }
         
         return authorities;

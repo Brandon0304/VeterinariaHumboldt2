@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 /**
  * Servicio para la gestión de proveedores.
  * 
@@ -78,7 +80,7 @@ public class ProveedorService {
         return proveedorRepository.findAll()
                 .stream()
                 .map(this::mapToResponse)
-                .toList();
+                .collect(Collectors.toList());
     }
 
     /**
@@ -140,5 +142,4 @@ public class ProveedorService {
                 .build();
     }
 }
-
 

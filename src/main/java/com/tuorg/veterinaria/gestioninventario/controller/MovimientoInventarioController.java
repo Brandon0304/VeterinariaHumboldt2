@@ -24,7 +24,7 @@ import java.util.List;
  * @version 1.0.0
  */
 @RestController
-@RequestMapping("/movimientos-inventario")  // Sin /api porque el context-path ya lo incluye
+@RequestMapping("/api/movimientos-inventario")
 public class MovimientoInventarioController {
 
     /**
@@ -99,22 +99,6 @@ public class MovimientoInventarioController {
                 LocalDateTime.parse(fechaFin)
         );
         return ResponseEntity.ok(ApiResponse.success("Movimientos obtenidos exitosamente", movimientos));
-    }
-
-    /**
-     * Revierte un movimiento de inventario (patrón Command con reversión).
-     * 
-     * @param movimientoId ID del movimiento a revertir
-     * @param usuarioId ID del usuario que realiza la reversión
-     * @return Respuesta con el movimiento de reversión creado
-     */
-    @PostMapping("/{movimientoId}/revertir")
-    public ResponseEntity<ApiResponse<MovimientoInventarioResponse>> revertirMovimiento(
-            @PathVariable Long movimientoId,
-            @RequestParam Long usuarioId) {
-        MovimientoInventarioResponse movimientoReversion = movimientoInventarioService.revertirMovimiento(movimientoId, usuarioId);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success("Movimiento revertido exitosamente", movimientoReversion));
     }
 }
 

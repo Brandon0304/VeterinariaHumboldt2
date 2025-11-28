@@ -49,8 +49,8 @@ public class EstadisticaService {
      */
     @Transactional
     public Estadistica calcular(String nombre, LocalDate periodoInicio, LocalDate periodoFin) {
-        // Nota: El cálculo real de estadísticas según el nombre
-        // se implementará cuando se requiera la funcionalidad completa de análisis
+        // TODO: Implementar cálculo real de estadísticas según el nombre
+        // Por ahora retornamos una estadística con valor 0
         Estadistica estadistica = new Estadistica();
         estadistica.setNombre(nombre);
         estadistica.setValor(BigDecimal.ZERO);
@@ -71,8 +71,8 @@ public class EstadisticaService {
     public List<Estadistica> calcularEstadisticasParaReporte(String tipoReporte, Map<String, Object> parametros) {
         List<Estadistica> estadisticas = new ArrayList<>();
         
-        // Nota: Los cálculos reales según el tipo de reporte
-        // se implementarán cuando se requiera la funcionalidad completa de análisis
+        // TODO: Implementar cálculos reales según el tipo de reporte
+        // Por ahora retornamos una lista vacía
         return estadisticas;
     }
 
@@ -102,5 +102,4 @@ public class EstadisticaService {
         return estadisticaRepository.findAll();
     }
 }
-
 

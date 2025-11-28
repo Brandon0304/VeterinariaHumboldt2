@@ -23,7 +23,7 @@ import java.util.List;
  * @version 1.0.0
  */
 @RestController
-@RequestMapping("/notificaciones")  // Sin /api porque el context-path ya lo incluye
+@RequestMapping("/api/notificaciones")
 public class NotificacionController {
 
     /**

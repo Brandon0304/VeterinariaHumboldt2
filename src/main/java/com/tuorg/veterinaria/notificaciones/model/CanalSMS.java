@@ -38,8 +38,8 @@ public class CanalSMS extends CanalEnvio {
      */
     @Override
     public boolean enviar(Notificacion notificacion) {
-        // Nota: El envío real de SMS usando API del proveedor
-        // se implementará cuando se requiera la funcionalidad completa de notificaciones
+        // TODO: Implementar envío real de SMS usando API del proveedor
+        // Por ahora retornamos true como simulación
         System.out.println("Enviando SMS a través de " + proveedorApi + ": " + notificacion.getMensaje());
         return true;
     }

@@ -1,11 +1,8 @@
 package com.tuorg.veterinaria.gestionpacientes.controller;
 
 import com.tuorg.veterinaria.common.dto.ApiResponse;
-import com.tuorg.veterinaria.gestionpacientes.dto.PacienteRequest;
-import com.tuorg.veterinaria.gestionpacientes.dto.PacienteResponse;
-import com.tuorg.veterinaria.gestionpacientes.dto.PacienteUpdateRequest;
+import com.tuorg.veterinaria.gestionpacientes.model.Paciente;
 import com.tuorg.veterinaria.gestionpacientes.service.PacienteService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +20,7 @@ import java.util.List;
  * @version 1.0.0
  */
 @RestController
-@RequestMapping("/pacientes")
+@RequestMapping("/api/pacientes")
 public class PacienteController {
 
     /**
@@ -48,8 +45,8 @@ public class PacienteController {
      * @return Respuesta con el paciente creado
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<PacienteResponse>> registrar(@Valid @RequestBody PacienteRequest request) {
-        PacienteResponse pacienteCreado = pacienteService.registrarPaciente(request);
+    public ResponseEntity<ApiResponse<Paciente>> registrar(@RequestBody Paciente paciente) {
+        Paciente pacienteCreado = pacienteService.registrarPaciente(paciente);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Paciente registrado exitosamente", pacienteCreado));
     }
@@ -61,8 +58,8 @@ public class PacienteController {
      * @return Respuesta con el paciente
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<PacienteResponse>> obtener(@PathVariable Long id) {
-        PacienteResponse paciente = pacienteService.obtener(id);
+    public ResponseEntity<ApiResponse<Paciente>> obtener(@PathVariable Long id) {
+        Paciente paciente = pacienteService.obtener(id);
         return ResponseEntity.ok(ApiResponse.success("Paciente obtenido exitosamente", paciente));
     }
 
@@ -72,8 +69,8 @@ public class PacienteController {
      * @return Respuesta con la lista de pacientes
      */
     @GetMapping
-    public ResponseEntity<ApiResponse<List<PacienteResponse>>> obtenerTodos() {
-        List<PacienteResponse> pacientes = pacienteService.obtenerTodos();
+    public ResponseEntity<ApiResponse<List<Paciente>>> obtenerTodos() {
+        List<Paciente> pacientes = pacienteService.obtenerTodos();
         return ResponseEntity.ok(ApiResponse.success("Pacientes obtenidos exitosamente", pacientes));
     }
 
@@ -84,8 +81,8 @@ public class PacienteController {
      * @return Respuesta con la lista de pacientes del cliente
      */
     @GetMapping("/cliente/{clienteId}")
-    public ResponseEntity<ApiResponse<List<PacienteResponse>>> obtenerPorCliente(@PathVariable Long clienteId) {
-        List<PacienteResponse> pacientes = pacienteService.obtenerPorCliente(clienteId);
+    public ResponseEntity<ApiResponse<List<Paciente>>> obtenerPorCliente(@PathVariable Long clienteId) {
+        List<Paciente> pacientes = pacienteService.obtenerPorCliente(clienteId);
         return ResponseEntity.ok(ApiResponse.success("Pacientes obtenidos exitosamente", pacientes));
     }
 
@@ -97,10 +94,10 @@ public class PacienteController {
      * @return Respuesta con el paciente actualizado
      */
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<PacienteResponse>> actualizar(
+    public ResponseEntity<ApiResponse<Paciente>> actualizar(
             @PathVariable Long id,
-            @Valid @RequestBody PacienteUpdateRequest request) {
-        PacienteResponse pacienteActualizado = pacienteService.actualizarDatos(id, request);
+            @RequestBody Paciente paciente) {
+        Paciente pacienteActualizado = pacienteService.actualizarDatos(id, paciente);
         return ResponseEntity.ok(ApiResponse.success("Paciente actualizado exitosamente", pacienteActualizado));
     }
 
@@ -116,4 +113,3 @@ public class PacienteController {
         return ResponseEntity.ok(ApiResponse.success("Resumen clínico generado exitosamente", resumen));
     }
 }
-
