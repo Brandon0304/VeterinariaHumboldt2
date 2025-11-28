@@ -81,6 +81,13 @@ const SecretaryInventarioPage = lazy(() =>
   })),
 );
 
+// Página de inventario para administrador (reutiliza la del secretario)
+const AdminInventarioPage = lazy(() =>
+  import("../../modules/secretario/pages/SecretaryInventarioPage").then((module) => ({
+    default: module.SecretaryInventarioPage,
+  })),
+);
+
 const FacturasPage = lazy(() =>
   import("../../modules/facturas/pages/FacturasPage").then((module) => ({
     default: module.FacturasPage,
@@ -320,11 +327,11 @@ export const AppRoutes = ({ renderDashboard }: AppRoutesProps) => {
           }
         />
         
-        {/* Rutas compartidas (Veterinario y Secretario) */}
+        {/* Rutas compartidas (Veterinario, Secretario y Administrador) */}
         <Route
           path="/reportes"
           element={
-            <RoleGuard allowedRoles={["VETERINARIO", "SECRETARIO"]}>
+            <RoleGuard allowedRoles={["VETERINARIO", "SECRETARIO", "ADMIN"]}>
               <ReportesPage />
             </RoleGuard>
           }
@@ -360,6 +367,23 @@ export const AppRoutes = ({ renderDashboard }: AppRoutesProps) => {
                 element={
                   <RoleGuard allowedRoles={["ADMIN"]}>
                     <UsuariosPage />
+                  </RoleGuard>
+                }
+              />
+              <Route
+                path="/admin/inventario"
+                element={
+                  <RoleGuard allowedRoles={["ADMIN"]}>
+                    <AdminInventarioPage />
+                  </RoleGuard>
+                }
+              />
+              {/* Ruta de Finanzas para administrador - Gestión de facturas e ingresos */}
+              <Route
+                path="/admin/finanzas"
+                element={
+                  <RoleGuard allowedRoles={["ADMIN"]}>
+                    <FacturasPage />
                   </RoleGuard>
                 }
               />
