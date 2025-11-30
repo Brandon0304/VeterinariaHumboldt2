@@ -5,18 +5,25 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * Implementación concreta de CanalEnvio para envío por SMS.
+ * Implementación básica del canal SMS (stub).
  * 
- * Esta clase extiende CanalEnvio e implementa la estrategia de envío
- * por mensaje de texto SMS (Strategy pattern).
+ * Esta clase es un placeholder que simula el envío de SMS
+ * escribiendo en los logs. No realiza envíos reales.
+ * 
+ * Para implementar envíos reales de SMS, se requeriría:
+ * - Integración con proveedor SMS (Twilio, AWS SNS, etc.) - REQUIERE PAGO
+ * - Configuración de credenciales de API
+ * - Gestión de costos por mensaje
  * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
  */
+@Slf4j
 @Entity
-@Table(name = "canales_sms", schema = "public")
+@Table(name = "canales_app", schema = "public")
 @PrimaryKeyJoinColumn(name = "id_canal")
 @Getter
 @Setter
@@ -25,22 +32,33 @@ import lombok.Setter;
 public class CanalSMS extends CanalEnvio {
 
     /**
-     * Proveedor de API para envío de SMS.
+     * Tipo de dispositivo (iOS, Android, Web)
      */
-    @Column(name = "proveedor_api", length = 150)
-    private String proveedorApi;
+    @Column(name = "tipo_dispositivo", length = 50)
+    private String tipoDispositivo;
 
     /**
-     * Implementación del método enviar para SMS.
+     * Token del dispositivo para push notifications
+     */
+    @Column(name = "token_dispositivo", length = 500)
+    private String tokenDispositivo;
+
+    /**
+     * Implementación stub que simula el envío de SMS.
      * 
      * @param notificacion Notificación a enviar
-     * @return true si el envío fue exitoso, false en caso contrario
+     * @return true (siempre simula éxito)
      */
     @Override
     public boolean enviar(Notificacion notificacion) {
-        // TODO: Implementar envío real de SMS usando API del proveedor
-        // Por ahora retornamos true como simulación
-        System.out.println("Enviando SMS a través de " + proveedorApi + ": " + notificacion.getMensaje());
+        log.info("📱 [SIMULACIÓN] Enviando SMS:");
+        log.info("   Destinatario: {}", notificacion.getUsuarioReceptor() != null ? 
+            notificacion.getUsuarioReceptor().getEmail() : "Sin usuario");
+        log.info("   Mensaje: {}", notificacion.getMensaje());
+        log.info("   Tipo: {}", notificacion.getTipo());
+        log.info("   ⚠️ Nota: Envío real de SMS requiere integración con proveedor de pago");
+        
+        // Simular éxito
         return true;
     }
 }
