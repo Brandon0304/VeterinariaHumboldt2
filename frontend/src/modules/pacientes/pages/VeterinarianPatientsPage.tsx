@@ -5,6 +5,7 @@ import "dayjs/locale/es";
 import toast from "react-hot-toast";
 
 import { FullscreenLoader } from "../../../app/components/feedback/FullscreenLoader";
+import { PerroIcon, GatoIcon, ViewIcon, HistoriaIcon, ExcelIcon, PDFIcon } from "../../../shared/components/icons/Icons";
 import { PacientesRepository } from "../services/PacientesRepository";
 import { CreatePacienteModal } from "../components/CreatePacienteModal";
 import { PacienteDetailModal } from "../components/PacienteDetailModal";
@@ -155,8 +156,8 @@ export const VeterinarianPatientsPage = () => {
 
       <section className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard title="Total Pacientes" value={stats.total.toString()} description="Bajo tu cuidado" />
-        <StatCard title="🐕 Perros" value={stats.perros.toString()} description="Registrados" tone="primary" />
-        <StatCard title="🐱 Gatos" value={stats.gatos.toString()} description="Registrados" tone="secondary" />
+        <StatCard title={<><PerroIcon size={16} className="inline mr-1" /> Perros</>} value={stats.perros.toString()} description="Registrados" tone="primary" />
+        <StatCard title={<><GatoIcon size={16} className="inline mr-1" /> Gatos</>} value={stats.gatos.toString()} description="Registrados" tone="secondary" />
         <StatCard title="Nuevos (semana)" value={stats.nuevosSemana.toString()} description="Últimos 7 días" tone="accent" />
       </section>
 
@@ -176,8 +177,8 @@ export const VeterinarianPatientsPage = () => {
             onChange={(event) => setSpeciesFilter(event.target.value as SpeciesFilter)}
           >
             <option value="TODOS">Todos</option>
-            <option value="perro">🐕 Perros</option>
-            <option value="gato">🐱 Gatos</option>
+            <option value="perro">Perros</option>
+            <option value="gato">Gatos</option>
           </select>
 
           <select
@@ -235,7 +236,7 @@ const buildStats = (pacientes: ApiPacienteResponse[]) => {
 };
 
 interface StatCardProps {
-  readonly title: string;
+  readonly title: React.ReactNode;
   readonly value: string;
   readonly description: string;
   readonly tone?: "default" | "primary" | "secondary" | "accent";
@@ -267,8 +268,8 @@ const PatientCard = ({ paciente, onViewDetail }: PatientCardProps) => {
   const species = normalizeSpecies(paciente.especie);
   
   const speciesConfig = {
-    perro: { icon: "🐕", bgColor: "bg-blue-50", textColor: "text-blue-700", borderColor: "border-blue-200" },
-    gato: { icon: "🐱", bgColor: "bg-purple-50", textColor: "text-purple-700", borderColor: "border-purple-200" },
+    perro: { Icon: PerroIcon, bgColor: "bg-blue-50", textColor: "text-blue-700", borderColor: "border-blue-200" },
+    gato: { Icon: GatoIcon, bgColor: "bg-purple-50", textColor: "text-purple-700", borderColor: "border-purple-200" },
   };
 
   const config = speciesConfig[species];
@@ -294,7 +295,7 @@ const PatientCard = ({ paciente, onViewDetail }: PatientCardProps) => {
       <div className="flex items-start gap-3">
         <div className="relative">
           <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${config.bgColor} ${config.textColor} border-2 ${config.borderColor} text-xl font-bold shadow-sm`}>
-            {config.icon}
+            <config.Icon size={28} className={config.textColor} />
           </div>
           {edadNumero < 1 && (
             <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-yellow-400 text-[10px] font-bold text-white">
@@ -338,19 +339,19 @@ const PatientCard = ({ paciente, onViewDetail }: PatientCardProps) => {
       {/* Botones de acción mejorados */}
       <div className="mt-auto flex gap-2 pt-2 border-t border-gray-200/50">
         <button
-          className="flex-1 rounded-xl border-2 border-gray-300 bg-white px-3 py-2 text-xs font-bold text-gray-700 transition-all hover:border-primary hover:bg-primary hover:text-white hover:shadow-md"
+          className="flex-1 rounded-xl border-2 border-gray-300 bg-white px-3 py-2 text-xs font-bold text-gray-700 transition-all hover:border-primary hover:bg-primary hover:text-white hover:shadow-md flex items-center justify-center gap-1"
           onClick={onViewDetail}
         >
-          👁️ Perfil
+          <ViewIcon size={14} /> Perfil
         </button>
         <button
-          className="flex-1 rounded-xl border-2 border-primary bg-primary px-3 py-2 text-xs font-bold text-white transition-all hover:bg-primary-dark hover:shadow-md"
+          className="flex-1 rounded-xl border-2 border-primary bg-primary px-3 py-2 text-xs font-bold text-white transition-all hover:bg-primary-dark hover:shadow-md flex items-center justify-center gap-1"
           onClick={() => {
             // Navegar a historia clínica
             window.location.href = `/veterinario/historias?pacienteId=${paciente.id}`;
           }}
         >
-          📋 Historia
+          <HistoriaIcon size={14} /> Historia
         </button>
       </div>
     </article>
@@ -545,15 +546,15 @@ const ExportarListaButton = ({ pacientes }: ExportarListaButtonProps) => {
           <div className="absolute right-0 top-full z-50 mt-2 w-48 rounded-2xl border border-gray-200 bg-white shadow-soft">
             <button
               onClick={exportarCSV}
-              className="w-full rounded-t-2xl px-4 py-3 text-left text-sm font-medium text-gray-700 transition-base hover:bg-gray-50"
+              className="w-full rounded-t-2xl px-4 py-3 text-left text-sm font-medium text-gray-700 transition-base hover:bg-gray-50 flex items-center gap-2"
             >
-              📊 Exportar CSV
+              <ExcelIcon size={18} /> Exportar CSV
             </button>
             <button
               onClick={exportarPDF}
-              className="w-full rounded-b-2xl px-4 py-3 text-left text-sm font-medium text-gray-700 transition-base hover:bg-gray-50"
+              className="w-full rounded-b-2xl px-4 py-3 text-left text-sm font-medium text-gray-700 transition-base hover:bg-gray-50 flex items-center gap-2"
             >
-              📄 Exportar PDF
+              <PDFIcon size={18} /> Exportar PDF
             </button>
           </div>
         </>

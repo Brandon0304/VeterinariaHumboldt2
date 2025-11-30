@@ -1,6 +1,5 @@
 package com.tuorg.veterinaria.configuracion.model;
 
-import com.tuorg.veterinaria.common.audit.Auditable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,12 +21,12 @@ import java.time.LocalTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class HorarioAtencion extends Auditable {
+public class HorarioAtencion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_horario")
-    private Long idHorario;
+    @Column(name = "id")
+    private Long id;
 
     /**
      * Día de la semana.
@@ -56,11 +55,31 @@ public class HorarioAtencion extends Auditable {
     private Boolean cerrado = false;
 
     /**
+     * Indica si este horario está activo.
+     */
+    @Column(name = "activo", nullable = false)
+    private Boolean activo = true;
+
+    /**
      * Notas adicionales sobre el horario.
      * Ejemplo: "Horario reducido por festivo"
      */
     @Column(name = "notas", length = 200)
     private String notas;
+
+    /**
+     * Getter para saber si está activo.
+     */
+    public Boolean getActivo() {
+        return activo;
+    }
+
+    /**
+     * Setter para activo.
+     */
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
 
     /**
      * Enum para los días de la semana.

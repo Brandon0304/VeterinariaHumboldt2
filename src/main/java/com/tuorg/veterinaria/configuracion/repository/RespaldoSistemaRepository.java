@@ -74,4 +74,35 @@ public interface RespaldoSistemaRepository extends JpaRepository<RespaldoSistema
      * @return Número de respaldos con ese estado
      */
     long countByEstado(EstadoRespaldo estado);
+
+    /**
+     * Busca respaldos con filtros opcionales.
+     * 
+     * @param tipo Tipo de respaldo (opcional)
+     * @param estado Estado del respaldo (opcional)
+     * @param fechaDesde Fecha inicio (opcional)
+     * @param fechaHasta Fecha fin (opcional)
+     * @param pageable Configuración de paginación
+     * @return Página de respaldos que coinciden con los filtros
+     */
+    @Query("SELECT rs FROM RespaldoSistema rs WHERE " +
+           "(:tipo IS NULL OR rs.tipoRespaldo = :tipo) AND " +
+           "(:estado IS NULL OR rs.estado = :estado) AND " +
+           "(:fechaDesde IS NULL OR rs.fechaRespaldo >= :fechaDesde) AND " +
+           "(:fechaHasta IS NULL OR rs.fechaRespaldo <= :fechaHasta) " +
+           "ORDER BY rs.fechaRespaldo DESC")
+    Page<RespaldoSistema> findByFiltros(
+        @Param("tipo") TipoRespaldo tipo,
+        @Param("estado") EstadoRespaldo estado,
+        @Param("fechaDesde") LocalDateTime fechaDesde,
+        @Param("fechaHasta") LocalDateTime fechaHasta,
+        Pageable pageable
+    );
+
+    /**
+     * Elimina respaldos anteriores a una fecha límite.
+     * 
+     * @param fechaLimite Fecha límite
+     */
+    void deleteByFechaRespaldoBefore(LocalDateTime fechaLimite);
 }

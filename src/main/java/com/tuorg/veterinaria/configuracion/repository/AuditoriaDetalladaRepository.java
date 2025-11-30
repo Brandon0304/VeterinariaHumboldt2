@@ -20,81 +20,80 @@ import java.util.List;
 public interface AuditoriaDetalladaRepository extends JpaRepository<AuditoriaDetallada, Long> {
 
     /**
-     * Obtiene auditorías de un usuario específico (paginado).
+     * Busca auditorías con filtros avanzados.
+     * 
+     * @param entidad Nombre de la entidad (opcional)
+     * @param entidadId ID del registro (opcional)
+     * @param modulo Módulo del sistema (opcional)
+     * @param usuarioId ID del usuario (opcional)
+     * @param fechaDesde Fecha desde (opcional)
+     * @param fechaHasta Fecha hasta (opcional)
+     * @param pageable Configuración de paginación
+     * @return Página de auditorías que cumplen los criterios
+     */
+    @Query("SELECT ad FROM AuditoriaDetallada ad WHERE " +
+           "(:entidad IS NULL OR ad.entidad = :entidad) AND " +
+           "(:entidadId IS NULL OR ad.entidadId = :entidadId) AND " +
+           "(:modulo IS NULL OR ad.modulo = :modulo) AND " +
+           "(:usuarioId IS NULL OR ad.usuario.id = :usuarioId) AND " +
+           "(:fechaDesde IS NULL OR ad.fechaAccion >= :fechaDesde) AND " +
+           "(:fechaHasta IS NULL OR ad.fechaAccion <= :fechaHasta) " +
+           "ORDER BY ad.fechaAccion DESC")
+    Page<AuditoriaDetallada> findByFiltros(
+        @Param("entidad") String entidad,
+        @Param("entidadId") Long entidadId,
+        @Param("modulo") String modulo,
+        @Param("usuarioId") Long usuarioId,
+        @Param("fechaDesde") LocalDateTime fechaDesde,
+        @Param("fechaHasta") LocalDateTime fechaHasta,
+        Pageable pageable
+    );
+
+    /**
+     * Obtiene historial de una entidad ordenado por fecha.
+     * 
+     * @param entidad Nombre de la entidad
+     * @param entidadId ID del registro
+     * @return Lista de auditorías ordenadas por fecha descendente
+     */
+    @Query("SELECT ad FROM AuditoriaDetallada ad WHERE ad.entidad = :entidad AND ad.entidadId = :entidadId ORDER BY ad.fechaAccion DESC")
+    List<AuditoriaDetallada> findByEntidadAndEntidadIdOrderByFechaAccionDesc(
+        @Param("entidad") String entidad,
+        @Param("entidadId") Long entidadId
+    );
+
+    /**
+     * Obtiene auditorías de un usuario ordenadas por fecha.
      * 
      * @param usuarioId ID del usuario
      * @param pageable Configuración de paginación
      * @return Página de auditorías del usuario
      */
-    @Query("SELECT ad FROM AuditoriaDetallada ad WHERE ad.usuario.idUsuario = :usuarioId ORDER BY ad.createdAt DESC")
-    Page<AuditoriaDetallada> findByUsuarioId(@Param("usuarioId") Long usuarioId, Pageable pageable);
-
-    /**
-     * Obtiene auditorías de una entidad específica.
-     * 
-     * @param entidad Nombre de la entidad
-     * @param entidadId ID del registro
-     * @return Lista de auditorías de ese registro
-     */
-    @Query("SELECT ad FROM AuditoriaDetallada ad WHERE ad.entidad = :entidad AND ad.entidadId = :entidadId ORDER BY ad.createdAt DESC")
-    List<AuditoriaDetallada> findByEntidadAndEntidadId(
-        @Param("entidad") String entidad, 
-        @Param("entidadId") Long entidadId
-    );
-
-    /**
-     * Obtiene auditorías por tipo de acción en un rango de fechas.
-     * 
-     * @param tipoAccion Tipo de acción (CREAR, EDITAR, ELIMINAR, etc.)
-     * @param fechaInicio Fecha de inicio
-     * @param fechaFin Fecha de fin
-     * @param pageable Configuración de paginación
-     * @return Página de auditorías
-     */
-    @Query("SELECT ad FROM AuditoriaDetallada ad WHERE ad.tipoAccion = :tipoAccion AND ad.createdAt BETWEEN :fechaInicio AND :fechaFin ORDER BY ad.createdAt DESC")
-    Page<AuditoriaDetallada> findByTipoAccionAndFechaBetween(
-        @Param("tipoAccion") String tipoAccion,
-        @Param("fechaInicio") LocalDateTime fechaInicio,
-        @Param("fechaFin") LocalDateTime fechaFin,
+    @Query("SELECT ad FROM AuditoriaDetallada ad WHERE ad.usuario.id = :usuarioId ORDER BY ad.fechaAccion DESC")
+    Page<AuditoriaDetallada> findByUsuarioIdOrderByFechaAccionDesc(
+        @Param("usuarioId") Long usuarioId,
         Pageable pageable
     );
 
     /**
-     * Obtiene auditorías por entidad y tipo de acción.
+     * Obtiene las N auditorías más recientes.
      * 
-     * @param entidad Nombre de la entidad
-     * @param tipoAccion Tipo de acción
-     * @param pageable Configuración de paginación
-     * @return Página de auditorías
+     * @param limite Número máximo de registros
+     * @return Lista de auditorías recientes
      */
-    @Query("SELECT ad FROM AuditoriaDetallada ad WHERE ad.entidad = :entidad AND ad.tipoAccion = :tipoAccion ORDER BY ad.createdAt DESC")
-    Page<AuditoriaDetallada> findByEntidadAndTipoAccion(
-        @Param("entidad") String entidad,
-        @Param("tipoAccion") String tipoAccion,
-        Pageable pageable
-    );
+    @Query(value = "SELECT * FROM auditoria_detallada ORDER BY fecha_accion DESC LIMIT :limite", nativeQuery = true)
+    List<AuditoriaDetallada> findRecientes(@Param("limite") int limite);
 
     /**
-     * Cuenta auditorías por usuario en un rango de fechas.
+     * Cuenta auditorías en un rango de fechas.
      * 
-     * @param usuarioId ID del usuario
-     * @param fechaInicio Fecha de inicio
-     * @param fechaFin Fecha de fin
+     * @param fechaDesde Fecha desde
+     * @param fechaHasta Fecha hasta
      * @return Número de auditorías
      */
-    @Query("SELECT COUNT(ad) FROM AuditoriaDetallada ad WHERE ad.usuario.idUsuario = :usuarioId AND ad.createdAt BETWEEN :fechaInicio AND :fechaFin")
-    long countByUsuarioIdAndFechaBetween(
-        @Param("usuarioId") Long usuarioId,
-        @Param("fechaInicio") LocalDateTime fechaInicio,
-        @Param("fechaFin") LocalDateTime fechaFin
+    @Query("SELECT COUNT(ad) FROM AuditoriaDetallada ad WHERE ad.fechaAccion BETWEEN :fechaDesde AND :fechaHasta")
+    long countByFechaAccionBetween(
+        @Param("fechaDesde") LocalDateTime fechaDesde,
+        @Param("fechaHasta") LocalDateTime fechaHasta
     );
-
-    /**
-     * Obtiene las últimas N auditorías del sistema.
-     * 
-     * @param pageable Configuración de paginación
-     * @return Página de auditorías recientes
-     */
-    @Query("SELECT ad FROM AuditoriaDetallada ad ORDER BY ad.createdAt DESC")
-    Page<AuditoriaDetallada> findRecentAudits(Pageable pageable);
 }

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { authStore } from "../../../shared/state/authStore";
+import { CalendarioIcon, AuditoriaIcon, PerroIcon } from "../../../shared/components/icons/Icons";
 import { getApiClient } from "../../../shared/api/ApiClient";
 import { unwrapResponse } from "../../../shared/api/ApiResponseAdapter";
 import type { ApiResponse } from "../../../shared/api/types";
@@ -98,8 +99,8 @@ export const ClienteDashboardPage = () => {
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center space-x-4">
             <div className="flex-shrink-0">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center text-2xl">
-                📅
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <CalendarioIcon size={24} className="text-blue-600" />
               </div>
             </div>
             <div className="flex-1">
@@ -126,8 +127,8 @@ export const ClienteDashboardPage = () => {
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center space-x-4">
             <div className="flex-shrink-0">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center text-2xl">
-                🐾
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <PerroIcon size={24} className="text-green-600" />
               </div>
             </div>
             <div>
@@ -140,8 +141,8 @@ export const ClienteDashboardPage = () => {
         <div className="bg-white rounded-lg shadow-sm p-6">
           <div className="flex items-center space-x-4">
             <div className="flex-shrink-0">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center text-2xl">
-                📋
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <AuditoriaIcon size={24} className="text-purple-600" />
               </div>
             </div>
             <div>
@@ -159,7 +160,7 @@ export const ClienteDashboardPage = () => {
             <button
               onClick={() => setActiveTab("citas")}
               className={`
-                whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
+                whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-1.5
                 ${
                   activeTab === "citas"
                     ? "border-blue-500 text-blue-600"
@@ -167,12 +168,12 @@ export const ClienteDashboardPage = () => {
                 }
               `}
             >
-              📅 Mis Citas
+              <CalendarioIcon size={16} /> Mis Citas
             </button>
             <button
               onClick={() => setActiveTab("mascotas")}
               className={`
-                whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm
+                whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm flex items-center gap-1.5
                 ${
                   activeTab === "mascotas"
                     ? "border-blue-500 text-blue-600"
@@ -180,7 +181,7 @@ export const ClienteDashboardPage = () => {
                 }
               `}
             >
-              🐾 Mis Mascotas
+              <PerroIcon size={16} /> Mis Mascotas
             </button>
           </nav>
         </div>

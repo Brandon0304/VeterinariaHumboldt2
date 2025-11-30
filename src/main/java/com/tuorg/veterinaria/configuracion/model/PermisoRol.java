@@ -1,6 +1,5 @@
 package com.tuorg.veterinaria.configuracion.model;
 
-import com.tuorg.veterinaria.common.audit.Auditable;
 import com.tuorg.veterinaria.gestionusuarios.model.Rol;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -23,12 +22,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PermisoRol extends Auditable {
+public class PermisoRol {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_permiso")
-    private Long idPermiso;
+    @Column(name = "id")
+    private Long id;
 
     /**
      * Rol al que se le asigna el permiso.

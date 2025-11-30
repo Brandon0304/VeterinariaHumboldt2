@@ -2,6 +2,8 @@ package com.tuorg.veterinaria.configuracion.repository;
 
 import com.tuorg.veterinaria.configuracion.model.ConfiguracionAvanzada;
 import com.tuorg.veterinaria.configuracion.model.ConfiguracionAvanzada.TipoDato;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -71,4 +73,32 @@ public interface ConfiguracionAvanzadaRepository extends JpaRepository<Configura
      * @return true si existe
      */
     boolean existsByClave(String clave);
+
+    /**
+     * Obtiene todas las configuraciones activas.
+     * 
+     * @return Lista de configuraciones activas
+     */
+    List<ConfiguracionAvanzada> findByActivoTrue();
+
+    /**
+     * Busca configuraciones con filtros y paginación.
+     * 
+     * @param clave Clave (opcional)
+     * @param tipoDato Tipo de dato (opcional)
+     * @param editable Si es editable (opcional)
+     * @param pageable Configuración de paginación
+     * @return Página de configuraciones
+     */
+    @Query("SELECT ca FROM ConfiguracionAvanzada ca WHERE " +
+           "(:clave IS NULL OR ca.clave LIKE %:clave%) AND " +
+           "(:tipoDato IS NULL OR ca.tipoDato = :tipoDato) AND " +
+           "(:editable IS NULL OR ca.editable = :editable) AND " +
+           "ca.activo = true ORDER BY ca.categoria, ca.clave")
+    Page<ConfiguracionAvanzada> findByFiltros(
+        @Param("clave") String clave,
+        @Param("tipoDato") TipoDato tipoDato,
+        @Param("editable") Boolean editable,
+        Pageable pageable
+    );
 }

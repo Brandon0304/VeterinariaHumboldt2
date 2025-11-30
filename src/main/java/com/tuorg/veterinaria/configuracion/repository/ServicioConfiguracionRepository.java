@@ -1,11 +1,14 @@
 package com.tuorg.veterinaria.configuracion.repository;
 
 import com.tuorg.veterinaria.configuracion.model.ServicioConfiguracion;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 /**
@@ -47,4 +50,25 @@ public interface ServicioConfiguracionRepository extends JpaRepository<ServicioC
      */
     @Query("SELECT DISTINCT sc.categoria FROM ServicioConfiguracion sc WHERE sc.activo = true AND sc.categoria IS NOT NULL ORDER BY sc.categoria")
     List<String> findDistinctCategorias();
+
+    /**
+     * Busca servicios por nombre con paginación.
+     */
+    @Query("SELECT sc FROM ServicioConfiguracion sc WHERE LOWER(sc.nombreServicio) LIKE LOWER(CONCAT('%', :nombre, '%')) AND sc.activo = true")
+    Page<ServicioConfiguracion> searchByNombre(@Param("nombre") String nombre, Pageable pageable);
+
+    /**
+     * Obtiene todos los servicios activos.
+     */
+    List<ServicioConfiguracion> findByActivoTrue();
+
+    /**
+     * Cuenta servicios activos.
+     */
+    long countByActivoTrue();
+
+    /**
+     * Obtiene servicios por rango de precio.
+     */
+    List<ServicioConfiguracion> findByPrecioBetweenAndActivoTrue(BigDecimal precioMin, BigDecimal precioMax);
 }

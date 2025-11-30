@@ -1,8 +1,9 @@
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 import { FullscreenLoader } from "../../../app/components/feedback/FullscreenLoader";
+import { PhoneIcon, LocationIcon, DeleteIcon } from "../../../shared/components/icons/Icons";
 import { ClientesRepository, type ClienteRequest, type ClienteUpdateRequest } from "../services/ClientesRepository";
 import type { ApiClienteResponse } from "../../shared/types/backend";
 import { CreateClienteModal } from "../components/CreateClienteModal";
@@ -209,12 +210,12 @@ const ClienteCard = ({ cliente, onView, onEdit, onDelete }: ClienteCardProps) =>
         <div className="space-y-1.5 text-xs text-gray-500">
           {cliente.telefono && (
             <p className="flex items-center gap-1.5">
-              <span>📞</span> {cliente.telefono}
+              <PhoneIcon size={14} className="text-primary" /> {cliente.telefono}
             </p>
           )}
           {cliente.direccion && (
             <p className="flex items-center gap-1.5">
-              <span>📍</span> {cliente.direccion}
+              <LocationIcon size={14} className="text-primary" /> {cliente.direccion}
             </p>
           )}
           {cliente.identificacion && (
@@ -239,9 +240,10 @@ const ClienteCard = ({ cliente, onView, onEdit, onDelete }: ClienteCardProps) =>
         </button>
         <button
           onClick={onDelete}
-          className="rounded-xl border border-red-300 bg-white px-3 py-2 text-xs font-semibold text-red-600 transition-all hover:bg-red-50"
+          title="Eliminar cliente"
+          className="rounded-xl border border-red-300 bg-white px-3 py-2 text-xs font-semibold text-red-600 transition-all hover:bg-red-50 flex items-center justify-center"
         >
-          🗑️
+          <DeleteIcon size={16} />
         </button>
       </div>
     </article>

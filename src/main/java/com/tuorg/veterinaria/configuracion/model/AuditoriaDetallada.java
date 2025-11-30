@@ -1,12 +1,13 @@
 package com.tuorg.veterinaria.configuracion.model;
 
-import com.tuorg.veterinaria.common.audit.Auditable;
 import com.tuorg.veterinaria.gestionusuarios.model.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 /**
  * Entidad que representa la auditoría detallada del sistema.
@@ -15,6 +16,8 @@ import lombok.Setter;
  * permitiendo análisis forense y potencial reversión de cambios.
  * 
  * Registra TODAS las operaciones críticas: crear, editar, eliminar, exportar, aprobar.
+ * 
+ * NOTA: Esta entidad NO extiende Auditable para evitar auditoría circular.
  */
 @Entity
 @Table(name = "auditoria_detallada", schema = "public",
@@ -27,12 +30,18 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class AuditoriaDetallada extends Auditable {
+public class AuditoriaDetallada {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_auditoria")
-    private Long idAuditoria;
+    @Column(name = "id")
+    private Long id;
+
+    /**
+     * Referencia al historial de acciones.
+     */
+    @Column(name = "historial_accion_id")
+    private Long historialAccionId;
 
     /**
      * Usuario que realizó la acción.
@@ -42,17 +51,22 @@ public class AuditoriaDetallada extends Auditable {
     private Usuario usuario;
 
     /**
-     * Tipo de acción realizada.
-     * Valores: CREAR, EDITAR, ELIMINAR, EXPORTAR, APROBAR, LOGIN, LOGOUT, etc.
+     * Nombre del rol del usuario para búsqueda rápida.
      */
-    @Column(name = "tipo_accion", nullable = false, length = 50)
-    private String tipoAccion;
+    @Column(name = "rol_nombre", nullable = false, length = 50)
+    private String rolNombre;
+
+    /**
+     * Módulo del sistema afectado.
+     */
+    @Column(name = "modulo", nullable = false, length = 100)
+    private String modulo;
 
     /**
      * Nombre de la entidad afectada.
      * Ejemplos: Usuario, Paciente, Cita, HistoriaClinica, Factura
      */
-    @Column(name = "entidad", nullable = false, length = 100)
+    @Column(name = "entidad", length = 100)
     private String entidad;
 
     /**
@@ -65,30 +79,44 @@ public class AuditoriaDetallada extends Auditable {
      * Estado anterior del registro en formato JSON (patrón Memento).
      * Permite reversión de cambios y auditoría forense.
      */
-    @Column(name = "datos_antes", columnDefinition = "JSONB")
-    private String datosAntes;
+    @Column(name = "datos_anteriores", columnDefinition = "JSONB")
+    private String datosAnteriores;
 
     /**
      * Estado posterior del registro en formato JSON.
      */
-    @Column(name = "datos_despues", columnDefinition = "JSONB")
-    private String datosDespues;
+    @Column(name = "datos_nuevos", columnDefinition = "JSONB")
+    private String datosNuevos;
+
+    /**
+     * Nivel de relevancia de la acción.
+     * Valores: ALTA, NORMAL, BAJA
+     */
+    @Column(name = "relevancia", length = 20)
+    private String relevancia;
+
+    /**
+     * Indica si la acción requiere revisión manual.
+     */
+    @Column(name = "requiere_revision")
+    private Boolean requiereRevision;
 
     /**
      * Dirección IP desde donde se realizó la acción.
      */
-    @Column(name = "ip_origen", length = 45)
-    private String ipOrigen;
+    @Column(name = "ip_address", length = 45)
+    private String ipAddress;
 
     /**
      * User agent del navegador.
      */
-    @Column(name = "user_agent", length = 500)
+    @Column(name = "user_agent", columnDefinition = "TEXT")
     private String userAgent;
 
     /**
-     * Descripción adicional de la acción.
+     * Fecha en que se realizó la acción.
      */
-    @Column(name = "descripcion", columnDefinition = "TEXT")
-    private String descripcion;
+    @Column(name = "fecha_accion")
+    private LocalDateTime fechaAccion;
+
 }

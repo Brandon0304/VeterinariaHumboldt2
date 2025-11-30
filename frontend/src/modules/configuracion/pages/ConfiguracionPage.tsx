@@ -1,9 +1,73 @@
-import { useState } from "react";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
+import { useState } from 'react';
+import InformacionClinicaTab from '../components/tabs/InformacionClinicaTab';
+import PermisosTab from '../components/tabs/PermisosTab';
+import ServiciosTab from '../components/tabs/ServiciosTab';
+import HorariosTab from '../components/tabs/HorariosTab';
+import AuditoriaTab from '../components/tabs/AuditoriaTab';
+import RespaldosConfigTab from '../components/tabs/RespaldosConfigTab';
 
-import { FullscreenLoader } from "../../../app/components/feedback/FullscreenLoader";
-import { ConfiguracionRepository } from "../services/ConfiguracionRepository";
+type Tab = 'clinica' | 'permisos' | 'servicios' | 'horarios' | 'auditoria' | 'respaldos';
+
+const TABS: { id: Tab; label: string; icon: string }[] = [
+  { id: 'clinica', label: 'Información Clínica', icon: '🏥' },
+  { id: 'permisos', label: 'Permisos y Roles', icon: '🔐' },
+  { id: 'servicios', label: 'Servicios', icon: '💉' },
+  { id: 'horarios', label: 'Horarios', icon: '🕐' },
+  { id: 'auditoria', label: 'Auditoría', icon: '📋' },
+  { id: 'respaldos', label: 'Respaldos y Config', icon: '💾' }
+];
+
+export default function ConfiguracionPage() {
+  const [activeTab, setActiveTab] = useState<Tab>('clinica');
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold text-gray-900">Configuración del Sistema</h1>
+        <p className="mt-2 text-gray-600">
+          Gestiona la configuración completa de la clínica veterinaria
+        </p>
+      </div>
+
+      {/* Tabs Navigation */}
+      <div className="bg-white rounded-lg shadow-md mb-6">
+        <div className="border-b border-gray-200">
+          <nav className="flex -mb-px overflow-x-auto" aria-label="Tabs">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`
+                  whitespace-nowrap py-4 px-6 border-b-2 font-medium text-sm flex items-center gap-2
+                  transition-colors duration-150
+                  ${
+                    activeTab === tab.id
+                      ? 'border-blue-600 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }
+                `}
+              >
+                <span className="text-lg">{tab.icon}</span>
+                <span>{tab.label}</span>
+              </button>
+            ))}
+          </nav>
+        </div>
+      </div>
+
+      {/* Tab Content */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        {activeTab === 'clinica' && <InformacionClinicaTab />}
+        {activeTab === 'permisos' && <PermisosTab />}
+        {activeTab === 'servicios' && <ServiciosTab />}
+        {activeTab === 'horarios' && <HorariosTab />}
+        {activeTab === 'auditoria' && <AuditoriaTab />}
+        {activeTab === 'respaldos' && <RespaldosConfigTab />}
+      </div>
+    </div>
+  );
+}
 
 interface StatCardProps {
   readonly title: string;

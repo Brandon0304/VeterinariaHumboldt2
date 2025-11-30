@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import dayjs from "dayjs";
 
 import { FullscreenLoader } from "../../../app/components/feedback/FullscreenLoader";
+import { PDFIcon, ExcelIcon } from "../../../shared/components/icons/Icons";
 import { ReportesRepository } from "../services/ReportesRepository";
 import type { ApiReporteResponse } from "../../shared/types/backend";
 
@@ -141,15 +142,15 @@ export const ReportesPage = () => {
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleExportarPDF(reporte.id)}
-                    className="rounded-xl border border-primary bg-primary/10 px-3 py-2 text-xs font-semibold text-primary transition-base hover:bg-primary hover:text-white"
+                    className="rounded-xl border border-primary bg-primary/10 px-3 py-2 text-xs font-semibold text-primary transition-base hover:bg-primary hover:text-white flex items-center gap-1.5"
                   >
-                    📄 PDF
+                    <PDFIcon size={16} /> PDF
                   </button>
                   <button
                     onClick={() => handleExportarExcel(reporte.id)}
-                    className="rounded-xl border border-success bg-success/10 px-3 py-2 text-xs font-semibold text-success transition-base hover:bg-success hover:text-white"
+                    className="rounded-xl border border-success bg-success/10 px-3 py-2 text-xs font-semibold text-success transition-base hover:bg-success hover:text-white flex items-center gap-1.5"
                   >
-                    📊 Excel
+                    <ExcelIcon size={16} /> Excel
                   </button>
                 </div>
               </div>

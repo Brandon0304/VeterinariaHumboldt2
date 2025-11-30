@@ -5,6 +5,7 @@ import toast from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 
 import { FullscreenLoader } from "../../../app/components/feedback/FullscreenLoader";
+import { EditIcon, HistoriaIcon } from "../../../shared/components/icons/Icons";
 import { useCitasVeterinario } from "../../citas/hooks/useCitasVeterinario";
 import { VacunacionesRepository } from "../../vacunaciones/services/VacunacionesRepository";
 import { CreateVacunacionModal } from "../../vacunaciones/components/CreateVacunacionModal";
@@ -233,16 +234,16 @@ const SeguimientoCard = ({ seguimiento }: SeguimientoCardProps) => {
       </div>
       <div className="mt-4 flex gap-2">
         <button
-          className="flex-1 rounded-2xl border border-primary px-4 py-2 text-xs font-semibold text-primary transition-base hover:bg-primary hover:text-white"
-          onClick={() => toast("Actualización de seguimiento en construcción", { icon: "📝" })}
+          className="flex-1 rounded-2xl border border-primary px-4 py-2 text-xs font-semibold text-primary transition-base hover:bg-primary hover:text-white flex items-center justify-center gap-1.5"
+          onClick={() => toast("Actualización de seguimiento en construcción")}
         >
-          Actualizar
+          <EditIcon size={16} /> Actualizar
         </button>
         <button
-          className="flex-1 rounded-2xl border border-gray-200 px-4 py-2 text-xs font-semibold text-secondary transition-base hover:border-primary hover:text-primary"
-          onClick={() => toast("Accediendo a la historia clínica...", { icon: "📁" })}
+          className="flex-1 rounded-2xl border border-gray-200 px-4 py-2 text-xs font-semibold text-secondary transition-base hover:border-primary hover:text-primary flex items-center justify-center gap-1.5"
+          onClick={() => toast("Accediendo a la historia clínica...")}
         >
-          Ver historia
+          <HistoriaIcon size={16} /> Ver historia
         </button>
       </div>
     </article>

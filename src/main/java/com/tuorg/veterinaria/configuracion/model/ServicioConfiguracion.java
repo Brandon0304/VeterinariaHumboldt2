@@ -1,6 +1,5 @@
 package com.tuorg.veterinaria.configuracion.model;
 
-import com.tuorg.veterinaria.common.audit.Auditable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -21,12 +20,12 @@ import java.math.BigDecimal;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ServicioConfiguracion extends Auditable {
+public class ServicioConfiguracion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_servicio_config")
-    private Long idServicioConfig;
+    @Column(name = "id")
+    private Long id;
 
     /**
      * Referencia opcional al servicio ya prestado (si aplica).

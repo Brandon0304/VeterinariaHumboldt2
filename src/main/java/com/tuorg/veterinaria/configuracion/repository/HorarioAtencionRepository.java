@@ -48,4 +48,19 @@ public interface HorarioAtencionRepository extends JpaRepository<HorarioAtencion
      */
     @Query("SELECT COUNT(ha) > 0 FROM HorarioAtencion ha WHERE ha.diaSemana = :diaSemana AND ha.cerrado = false")
     boolean isClinicaAbierta(@Param("diaSemana") DiaSemana diaSemana);
+
+    /**
+     * Obtiene todos los horarios activos.
+     * 
+     * @return Lista de horarios activos
+     */
+    List<HorarioAtencion> findByActivoTrue();
+
+    /**
+     * Obtiene horario por día y activo.
+     * 
+     * @param diaSemana Día de la semana
+     * @return Horario activo del día
+     */
+    Optional<HorarioAtencion> findByDiaSemanaAndActivoTrue(DiaSemana diaSemana);
 }

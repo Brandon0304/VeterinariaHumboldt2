@@ -107,9 +107,7 @@ const NotificacionesPage = lazy(() =>
 );
 
 const ConfiguracionPage = lazy(() =>
-  import("../../modules/configuracion/pages/ConfiguracionPage").then((module) => ({
-    default: module.ConfiguracionPage,
-  })),
+  import("../../modules/configuracion/pages/ConfiguracionPageNew"),
 );
 
 const UsuariosPage = lazy(() =>

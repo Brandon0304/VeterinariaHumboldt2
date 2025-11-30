@@ -94,7 +94,7 @@ export const VeterinarianConsultationsPage = () => {
           />
           <button
             className="rounded-2xl border border-primary px-4 py-2 text-sm font-semibold text-primary transition-base hover:bg-primary hover:text-white"
-            onClick={() => toast("La exportación estará disponible en próximas versiones", { icon: "📊" })}
+            onClick={() => toast("La exportación estará disponible en próximas versiones")}
           >
             Exportar reporte
           </button>

@@ -5,6 +5,7 @@ import classNames from "classnames";
 
 import { useVeterinarianDashboard } from "../hooks/useVeterinarianDashboard";
 import { FullscreenLoader } from "../../../app/components/feedback/FullscreenLoader";
+import { CalendarioIcon, HorariosIcon, VacunaIcon, HistoriaIcon, AuditoriaIcon } from "../../../shared/components/icons/Icons";
 import { CreateCitaModal } from "../../citas/components/CreateCitaModal";
 import { CitaDetailModal } from "../../citas/components/CitaDetailModal";
 import type { ApiCitaResponse } from "../../shared/types/backend";
@@ -66,7 +67,7 @@ export const VeterinarianDashboardPage = () => {
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 sm:h-10 sm:w-10 sm:rounded-xl">
-                  <span className="text-base sm:text-xl">📅</span>
+                  <CalendarioIcon size={20} className="text-primary" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <h2 className="text-base font-bold text-secondary sm:text-xl">Citas de hoy</h2>
@@ -90,7 +91,7 @@ export const VeterinarianDashboardPage = () => {
           {citasDelDia.length === 0 ? (
             <div className="rounded-xl border-2 border-dashed border-gray-200 bg-gradient-to-br from-gray-50 to-white p-8 text-center sm:rounded-2xl sm:p-16">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 shadow-inner sm:mb-6 sm:h-20 sm:w-20 sm:rounded-2xl">
-                <span className="text-2xl sm:text-4xl">📅</span>
+                <CalendarioIcon size={40} className="text-primary" />
               </div>
               <p className="text-base font-bold text-gray-700 sm:text-lg">No hay citas programadas</p>
               <p className="mt-2 text-xs font-medium text-gray-500 sm:text-sm">No hay citas programadas para el día de hoy.</p>
@@ -184,11 +185,11 @@ const SummaryCard = ({ title, value, subtitle, tone = "default" }: SummaryCardPr
       ? "bg-gradient-to-br from-amber-50 to-amber-100/50 text-amber-700 border-amber-200/60"
       : "bg-gradient-to-br from-blue-50 to-primary/5 text-blue-700 border-blue-200/60";
 
-  const iconMap: Record<string, string> = {
-    "Citas Hoy": "📅",
-    "Pacientes": "👥",
-    "Pendientes": "⏰",
-    "Próxima cita": "🕐",
+  const iconMap: Record<string, React.ReactNode> = {
+    "Citas Hoy": <CalendarioIcon size={24} className="text-primary" />,
+    "Pacientes": <CalendarioIcon size={24} className="text-primary" />,
+    "Pendientes": <HorariosIcon size={24} className="text-warning" />,
+    "Próxima cita": <HorariosIcon size={24} className="text-primary" />,
   };
 
   return (
@@ -197,7 +198,7 @@ const SummaryCard = ({ title, value, subtitle, tone = "default" }: SummaryCardPr
       <div className="relative">
         <div className="mb-3 flex items-center justify-between">
           <p className="text-xs font-bold uppercase tracking-wider text-gray-500">{title}</p>
-          <span className="text-xl opacity-60">{iconMap[title] || "📊"}</span>
+          <span className="opacity-70">{iconMap[title] || <AuditoriaIcon size={24} className="text-gray-400" />}</span>
         </div>
         <p className="mb-4 text-4xl font-bold text-secondary">{value}</p>
         <div>
@@ -217,14 +218,14 @@ interface ShortcutCardProps {
 }
 
 const ShortcutCard = ({ title, description, value }: ShortcutCardProps) => {
-  const iconMap: Record<string, { icon: string; gradient: string }> = {
-    "Seguimientos activos": { icon: "📋", gradient: "from-purple-50 to-purple-100/30" },
-    "Vacunas pendientes": { icon: "💉", gradient: "from-green-50 to-green-100/30" },
-    "Historias clínicas": { icon: "📁", gradient: "from-blue-50 to-blue-100/30" },
-    "Pacientes nuevos": { icon: "✨", gradient: "from-orange-50 to-orange-100/30" },
+  const iconMap: Record<string, { Icon: React.ComponentType<any>; gradient: string }> = {
+    "Seguimientos activos": { Icon: AuditoriaIcon, gradient: "from-purple-50 to-purple-100/30" },
+    "Vacunas pendientes": { Icon: VacunaIcon, gradient: "from-green-50 to-green-100/30" },
+    "Historias clínicas": { Icon: HistoriaIcon, gradient: "from-blue-50 to-blue-100/30" },
+    "Pacientes nuevos": { Icon: CalendarioIcon, gradient: "from-orange-50 to-orange-100/30" },
   };
 
-  const cardConfig = iconMap[title] || { icon: "📊", gradient: "from-gray-50 to-gray-100/30" };
+  const cardConfig = iconMap[title] || { Icon: AuditoriaIcon, gradient: "from-gray-50 to-gray-100/30" };
 
   return (
     <article className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-gray-200/80 bg-white p-6 shadow-sm transition-all hover:border-primary/40 hover:shadow-lg">
@@ -232,7 +233,7 @@ const ShortcutCard = ({ title, description, value }: ShortcutCardProps) => {
       <header className="relative z-10">
         <div className="mb-3 flex items-center justify-between">
           <p className="text-xs font-bold uppercase tracking-wider text-primary">{title}</p>
-          <span className="text-2xl">{cardConfig.icon}</span>
+          <cardConfig.Icon size={32} className="text-primary" />
         </div>
         <p className="text-sm font-medium text-gray-600">{description}</p>
       </header>

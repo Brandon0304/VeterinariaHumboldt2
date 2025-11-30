@@ -9,6 +9,7 @@ import { EditPacienteModal } from "./EditPacienteModal";
 import { CreateVacunacionModal } from "../../vacunaciones/components/CreateVacunacionModal";
 import { FullscreenLoader } from "../../../app/components/feedback/FullscreenLoader";
 import { authStore } from "../../../shared/state/authStore";
+import { PerroIcon, GatoIcon, UserIcon, EditIcon, VacunaIcon, PDFIcon, HistoriaIcon, ConsultaIcon, InfoIcon } from "../../../shared/components/icons/Icons";
 
 interface PacienteDetailModalProps {
   readonly isOpen: boolean;
@@ -132,7 +133,7 @@ export const PacienteDetailModal = ({ isOpen, pacienteId, onClose }: PacienteDet
                           ? "bg-gradient-to-br from-purple-500 to-purple-700"
                           : "bg-gradient-to-br from-blue-500 to-blue-700"
                       }`}>
-                        {paciente.especie?.toLowerCase().includes("gato") ? "🐱" : "🐕"}
+                        {paciente.especie?.toLowerCase().includes("gato") ? <GatoIcon size={40} className="text-white" /> : <PerroIcon size={40} className="text-white" />}
                       </div>
                       {/* Indicator de estado */}
                       <div className={`absolute -bottom-1 -right-1 h-6 w-6 rounded-full border-4 border-white ${
@@ -197,33 +198,33 @@ export const PacienteDetailModal = ({ isOpen, pacienteId, onClose }: PacienteDet
                 <nav className="flex space-x-6">
                   <button
                     onClick={() => setActiveTab("info")}
-                    className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                    className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-1.5 ${
                       activeTab === "info"
                         ? "border-primary text-primary"
                         : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                     }`}
                   >
-                    📋 Información
+                    <InfoIcon size={16} /> Información
                   </button>
                   <button
                     onClick={() => setActiveTab("historia")}
-                    className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                    className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-1.5 ${
                       activeTab === "historia"
                         ? "border-primary text-primary"
                         : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                     }`}
                   >
-                    🩺 Historia Clínica
+                    <ConsultaIcon size={16} /> Historia Clínica
                   </button>
                   <button
                     onClick={() => setActiveTab("vacunas")}
-                    className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                    className={`py-4 px-1 border-b-2 font-medium text-sm transition-colors flex items-center gap-1.5 ${
                       activeTab === "vacunas"
                         ? "border-primary text-primary"
                         : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
                     }`}
                   >
-                    💉 Vacunaciones
+                    <VacunaIcon size={16} /> Vacunas
                   </button>
                 </nav>
               </div>
@@ -260,7 +261,7 @@ export const PacienteDetailModal = ({ isOpen, pacienteId, onClose }: PacienteDet
                     {/* Propietario */}
                     {paciente.cliente && (
                       <section className="bg-blue-50 rounded-2xl p-4 space-y-3">
-                        <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wide">👤 Propietario</h4>
+                        <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wide flex items-center gap-2"><UserIcon size={16} className="text-primary" /> Propietario</h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                           <div>
                             <p className="text-xs text-gray-600 font-medium">Nombre Completo</p>
@@ -293,17 +294,17 @@ export const PacienteDetailModal = ({ isOpen, pacienteId, onClose }: PacienteDet
                       {!isVeterinario && (
                         <button
                           onClick={() => setIsEditModalOpen(true)}
-                          className="flex-1 min-w-[140px] rounded-xl border-2 border-gray-300 bg-white px-4 py-2.5 text-sm font-bold text-gray-700 transition-all hover:border-primary hover:bg-primary hover:text-white"
+                          className="flex-1 min-w-[140px] rounded-xl border-2 border-gray-300 bg-white px-4 py-2.5 text-sm font-bold text-gray-700 transition-all hover:border-primary hover:bg-primary hover:text-white flex items-center justify-center gap-1.5"
                         >
-                          ✏️ Editar
+                          <EditIcon size={16} /> Editar
                         </button>
                       )}
                       {!isVeterinario && (
                         <button
                           onClick={() => setIsVacunacionModalOpen(true)}
-                          className="flex-1 min-w-[140px] rounded-xl border-2 border-green-500 bg-green-500 px-4 py-2.5 text-sm font-bold text-white transition-all hover:bg-green-600"
+                          className="flex-1 min-w-[140px] rounded-xl border-2 border-green-500 bg-green-500 px-4 py-2.5 text-sm font-bold text-white transition-all hover:bg-green-600 flex items-center justify-center gap-1.5"
                         >
-                          💉 Vacunar
+                          <VacunaIcon size={16} /> Vacunar
                         </button>
                       )}
                     </div>
@@ -320,16 +321,16 @@ export const PacienteDetailModal = ({ isOpen, pacienteId, onClose }: PacienteDet
                         <button
                           onClick={handleExportarPDF}
                           disabled={!historia}
-                          className="rounded-xl border-2 border-primary bg-white px-4 py-2 text-sm font-bold text-primary transition-all hover:bg-primary hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="rounded-xl border-2 border-primary bg-white px-4 py-2 text-sm font-bold text-primary transition-all hover:bg-primary hover:text-white disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1.5"
                         >
-                          📄 PDF
+                          <PDFIcon size={16} /> PDF
                         </button>
                         <button
                           onClick={handleGenerarResumen}
                           disabled={isGenerandoResumen}
-                          className="rounded-xl border-2 border-blue-500 bg-blue-500 px-4 py-2 text-sm font-bold text-white transition-all hover:bg-blue-600 disabled:opacity-50"
+                          className="rounded-xl border-2 border-blue-500 bg-blue-500 px-4 py-2 text-sm font-bold text-white transition-all hover:bg-blue-600 disabled:opacity-50 flex items-center gap-1.5"
                         >
-                          {isGenerandoResumen ? "⏳" : "📋"} Resumen
+                          {isGenerandoResumen ? "Generando..." : <><HistoriaIcon size={16} /> Resumen</>}
                         </button>
                       </div>
                     </div>

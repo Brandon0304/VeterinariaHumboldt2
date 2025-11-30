@@ -1,6 +1,5 @@
 package com.tuorg.veterinaria.configuracion.model;
 
-import com.tuorg.veterinaria.common.audit.Auditable;
 import com.tuorg.veterinaria.gestionusuarios.model.Usuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -25,12 +24,12 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RespaldoSistema extends Auditable {
+public class RespaldoSistema {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_respaldo")
-    private Long idRespaldo;
+    @Column(name = "id")
+    private Long id;
 
     /**
      * Usuario que generó el respaldo.
@@ -60,10 +59,45 @@ public class RespaldoSistema extends Auditable {
     private String rutaArchivo;
 
     /**
+     * Setter para ruta (alias).
+     */
+    public void setRuta(String ruta) {
+        this.rutaArchivo = ruta;
+    }
+
+    /**
+     * Getter para ruta (alias).
+     */
+    public String getRuta() {
+        return this.rutaArchivo;
+    }
+
+    /**
      * Tamaño del archivo en bytes.
      */
     @Column(name = "tamano_bytes")
     private Long tamanoBytes;
+
+    /**
+     * Setter para tamanioBytes (alias).
+     */
+    public void setTamanioBytes(Long bytes) {
+        this.tamanoBytes = bytes;
+    }
+
+    /**
+     * Setter para tipo (alias).
+     */
+    public void setTipo(TipoRespaldo tipo) {
+        this.tipoRespaldo = tipo;
+    }
+
+    /**
+     * Getter para tipo (alias).
+     */
+    public TipoRespaldo getTipo() {
+        return this.tipoRespaldo;
+    }
 
     /**
      * Hash SHA-256 para verificación de integridad.

@@ -1,6 +1,8 @@
 package com.tuorg.veterinaria.configuracion.repository;
 
 import com.tuorg.veterinaria.configuracion.model.PermisoRol;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -70,4 +72,50 @@ public interface PermisoRolRepository extends JpaRepository<PermisoRol, Long> {
      * @return Lista de todos los permisos activos
      */
     List<PermisoRol> findByActivoTrue();
+
+    /**
+     * Obtiene permisos de un módulo específico (todos los roles).
+     * 
+     * @param modulo Nombre del módulo
+     * @return Lista de permisos activos de ese módulo
+     */
+    List<PermisoRol> findByModuloAndActivoTrue(@Param("modulo") String modulo);
+
+    /**
+     * Busca permisos con filtros opcionales.
+     * 
+     * @param idRol ID del rol (opcional)
+     * @param modulo Nombre del módulo (opcional)
+     * @param accion Nombre de la acción (opcional)
+     * @param pageable Configuración de paginación
+     * @return Página de permisos que coinciden con los filtros
+     */
+    @Query("SELECT pr FROM PermisoRol pr WHERE " +
+           "(:idRol IS NULL OR pr.rol.idRol = :idRol) AND " +
+           "(:modulo IS NULL OR pr.modulo = :modulo) AND " +
+           "(:accion IS NULL OR pr.accion = :accion) AND " +
+           "pr.activo = true " +
+           "ORDER BY pr.rol.idRol, pr.modulo, pr.accion")
+    Page<PermisoRol> findByFiltros(
+        @Param("idRol") Long idRol,
+        @Param("modulo") String modulo,
+        @Param("accion") String accion,
+        Pageable pageable
+    );
+
+    /**
+     * Obtiene todos los nombres de módulos distintos.
+     * 
+     * @return Lista de nombres de módulos únicos
+     */
+    @Query("SELECT DISTINCT pr.modulo FROM PermisoRol pr WHERE pr.activo = true ORDER BY pr.modulo")
+    List<String> findDistinctModulos();
+
+    /**
+     * Obtiene todos los nombres de acciones distintas.
+     * 
+     * @return Lista de nombres de acciones únicas
+     */
+    @Query("SELECT DISTINCT pr.accion FROM PermisoRol pr WHERE pr.activo = true ORDER BY pr.accion")
+    List<String> findDistinctAcciones();
 }

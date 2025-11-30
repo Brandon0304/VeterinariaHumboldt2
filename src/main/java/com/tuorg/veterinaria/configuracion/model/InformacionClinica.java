@@ -1,6 +1,5 @@
 package com.tuorg.veterinaria.configuracion.model;
 
-import com.tuorg.veterinaria.common.audit.Auditable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,12 +21,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class InformacionClinica extends Auditable {
+public class InformacionClinica {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_clinica")
-    private Long idClinica;
+    @Column(name = "id")
+    private Long id;
 
     /**
      * Nombre oficial de la clínica veterinaria.

@@ -260,10 +260,10 @@ const TimelineItem = ({ registro, index, onViewDetail, onEdit }: TimelineItemPro
             Ver detalle
           </button>
           <button
-            className="rounded-2xl border border-green-600 px-3 py-1 font-semibold text-green-600 transition-base hover:bg-green-600 hover:text-white"
+            className="rounded-2xl border border-green-600 px-3 py-1 font-semibold text-green-600 transition-base hover:bg-green-600 hover:text-white flex items-center gap-1.5"
             onClick={onEdit}
           >
-            ✏️ Editar
+            <EditIcon size={16} /> Editar
           </button>
         </div>
       </div>

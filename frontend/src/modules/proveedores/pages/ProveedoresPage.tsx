@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 import { FullscreenLoader } from "../../../app/components/feedback/FullscreenLoader";
+import { PhoneIcon, DeleteIcon, EmailIcon, LocationIcon } from "../../../shared/components/icons/Icons";
 import { ProveedoresRepository, type ProveedorRequest } from "../services/ProveedoresRepository";
 import type { ApiProveedorResponse } from "../../shared/types/backend";
 import { CreateProveedorModal } from "../components/CreateProveedorModal";
@@ -223,17 +224,17 @@ const ProveedorCard = ({ proveedor, onView, onEdit, onDelete }: ProveedorCardPro
         <div className="space-y-1.5 text-xs text-gray-500">
           {proveedor.telefono && (
             <p className="flex items-center gap-1.5">
-              <span>📞</span> {proveedor.telefono}
+              <PhoneIcon size={14} className="text-primary" /> {proveedor.telefono}
             </p>
           )}
           {proveedor.correo && (
             <p className="flex items-center gap-1.5">
-              <span>📧</span> {proveedor.correo}
+              <EmailIcon size={14} className="text-primary" /> {proveedor.correo}
             </p>
           )}
           {proveedor.direccion && (
             <p className="flex items-center gap-1.5">
-              <span>📍</span> {proveedor.direccion}
+              <LocationIcon size={14} className="text-primary" /> {proveedor.direccion}
             </p>
           )}
         </div>
@@ -253,9 +254,10 @@ const ProveedorCard = ({ proveedor, onView, onEdit, onDelete }: ProveedorCardPro
         </button>
         <button
           onClick={onDelete}
-          className="rounded-xl border border-red-300 bg-white px-3 py-2 text-xs font-semibold text-red-600 transition-all hover:bg-red-50"
+          title="Eliminar proveedor"
+          className="rounded-xl border border-red-300 bg-white px-3 py-2 text-xs font-semibold text-red-600 transition-all hover:bg-red-50 flex items-center justify-center"
         >
-          🗑️
+          <DeleteIcon size={16} />
         </button>
       </div>
     </article>

@@ -1,6 +1,5 @@
 package com.tuorg.veterinaria.configuracion.model;
 
-import com.tuorg.veterinaria.common.audit.Auditable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,12 +21,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ConfiguracionAvanzada extends Auditable {
+public class ConfiguracionAvanzada {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_configuracion")
-    private Long idConfiguracion;
+    @Column(name = "id")
+    private Long id;
 
     /**
      * Clave única del parámetro de configuración.
