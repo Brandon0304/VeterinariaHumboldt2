@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.security.SecureRandom;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
@@ -82,9 +83,11 @@ public class FacturaService {
         return mapToResponse(guardada);
     }
 
+    private static final SecureRandom secureRandom = new SecureRandom();
+
     private String generarNumeroFactura() {
         String fecha = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        String secuencia = String.format("%04d", (int) (Math.random() * 10000));
+        String secuencia = String.format("%04d", secureRandom.nextInt(10000));
         return "FACT-" + fecha + "-" + secuencia;
     }
 

@@ -1,5 +1,6 @@
 package com.tuorg.veterinaria.gestionfacturacion.model;
 
+import com.tuorg.veterinaria.common.audit.Auditable;
 import com.tuorg.veterinaria.common.constants.AppConstants;
 import com.tuorg.veterinaria.gestionusuarios.model.Cliente;
 import jakarta.persistence.*;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
  * por los servicios prestados.
  * 
  * Implementa el patrón Factory/Builder para su creación.
+ * Extiende de Auditable para trazabilidad automática.
  * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
@@ -28,7 +30,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Factura {
+public class Factura extends Auditable {
 
     /**
      * Identificador único de la factura (clave primaria).

@@ -138,6 +138,53 @@ public class HistoriaClinicaService {
     }
 
     /**
+     * Actualiza un registro médico existente.
+     * 
+     * @param registroId ID del registro médico
+     * @param request Datos actualizados
+     * @return Registro médico actualizado
+     */
+    @Transactional
+    public RegistroMedicoResponse actualizarRegistro(Long registroId, RegistroMedicoRequest request) {
+        RegistroMedico registro = registroMedicoRepository.findById(registroId)
+                .orElseThrow(() -> new ResourceNotFoundException("RegistroMedico", "id", registroId));
+
+        // Actualizar campos
+        if (request.getFecha() != null) {
+            registro.setFecha(request.getFecha());
+        }
+        if (request.getMotivo() != null) {
+            registro.setMotivo(request.getMotivo());
+        }
+        if (request.getDiagnostico() != null) {
+            registro.setDiagnostico(request.getDiagnostico());
+        }
+        if (request.getSignosVitales() != null) {
+            registro.setSignosVitales(request.getSignosVitales());
+        }
+        if (request.getTratamiento() != null) {
+            registro.setTratamiento(request.getTratamiento());
+        }
+        if (request.getInsumosUsados() != null) {
+            registro.setInsumosUsados(request.getInsumosUsados());
+        }
+        if (request.getArchivos() != null) {
+            registro.setArchivos(request.getArchivos());
+        }
+        if (request.getVeterinarioId() != null) {
+            Usuario usuario = usuarioRepository.findById(request.getVeterinarioId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Usuario", "id", request.getVeterinarioId()));
+            if (!(usuario instanceof UsuarioVeterinario)) {
+                throw new BusinessException("El usuario indicado no corresponde a un veterinario");
+            }
+            registro.setVeterinario((UsuarioVeterinario) usuario);
+        }
+
+        RegistroMedico registroActualizado = registroMedicoRepository.save(registro);
+        return mapRegistro(registroActualizado);
+    }
+
+    /**
      * Exporta la historia clínica como PDF sin dependencias externas (PDF mínimo).
      *
      * Genera un PDF de una página con texto básico usando sintaxis PDF directa.

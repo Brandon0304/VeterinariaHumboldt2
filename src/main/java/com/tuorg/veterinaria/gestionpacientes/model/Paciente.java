@@ -1,5 +1,6 @@
 package com.tuorg.veterinaria.gestionpacientes.model;
 
+import com.tuorg.veterinaria.common.audit.Auditable;
 import com.tuorg.veterinaria.gestionusuarios.model.Cliente;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.UUID;
  * 
  * Esta clase almacena información sobre las mascotas que son atendidas
  * en la clínica veterinaria.
+ * Extiende de Auditable para trazabilidad automática.
  * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
@@ -26,7 +28,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Paciente {
+public class Paciente extends Auditable {
 
     /**
      * Identificador único del paciente (clave primaria).

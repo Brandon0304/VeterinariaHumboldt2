@@ -16,6 +16,8 @@ import com.tuorg.veterinaria.gestionusuarios.model.Cliente;
 import com.tuorg.veterinaria.gestionusuarios.model.Usuario;
 import com.tuorg.veterinaria.gestionusuarios.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -181,6 +183,7 @@ public class PacienteService {
      * @return Paciente actualizado
      */
     @Transactional
+    @CacheEvict(value = "pacientesPorCliente", allEntries = true)
     public PacienteResponse actualizarDatos(Long id, PacienteUpdateRequest request) {
         Paciente pacienteExistente = obtenerPacienteEntidad(id);
 

@@ -1,6 +1,8 @@
 package com.tuorg.veterinaria.prestacioneservicios.repository;
 
 import com.tuorg.veterinaria.prestacioneservicios.model.Cita;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,7 +15,7 @@ import java.util.List;
  * Repositorio para la entidad Cita.
  * 
  * Proporciona métodos de acceso a datos para citas
- * utilizando Spring Data JPA.
+ * utilizando Spring Data JPA con soporte de paginación.
  * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
@@ -31,6 +33,16 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
     List<Cita> findByPacienteId(@Param("pacienteId") Long pacienteId);
 
     /**
+     * Busca citas por paciente con paginación.
+     * 
+     * @param pacienteId ID del paciente
+     * @param pageable Información de paginación
+     * @return Página de citas del paciente
+     */
+    @Query("SELECT c FROM Cita c WHERE c.paciente.idPaciente = :pacienteId")
+    Page<Cita> findByPacienteId(@Param("pacienteId") Long pacienteId, Pageable pageable);
+
+    /**
      * Busca citas por veterinario.
      * 
      * @param veterinarioId ID del veterinario
@@ -38,6 +50,16 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
      */
     @Query("SELECT c FROM Cita c WHERE c.veterinario.idPersona = :veterinarioId")
     List<Cita> findByVeterinarioId(@Param("veterinarioId") Long veterinarioId);
+
+    /**
+     * Busca citas por veterinario con paginación.
+     * 
+     * @param veterinarioId ID del veterinario
+     * @param pageable Información de paginación
+     * @return Página de citas del veterinario
+     */
+    @Query("SELECT c FROM Cita c WHERE c.veterinario.idPersona = :veterinarioId")
+    Page<Cita> findByVeterinarioId(@Param("veterinarioId") Long veterinarioId, Pageable pageable);
 
     /**
      * Busca citas por estado.
@@ -78,5 +100,39 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
                               @Param("fechaHoraInicio") LocalDateTime fechaHoraInicio,
                               @Param("fechaHoraFin") LocalDateTime fechaHoraFin,
                               @Param("estado") String estado);
+<<<<<<< Updated upstream
+=======
+
+    /**
+     * Busca una cita por ID cargando todas las relaciones necesarias para notificaciones.
+     * Realiza JOIN FETCH para evitar LazyInitializationException.
+     * 
+     * @param id ID de la cita
+     * @return Cita con paciente, cliente y veterinario cargados
+     */
+    @Query("SELECT c FROM Cita c " +
+           "LEFT JOIN FETCH c.paciente p " +
+           "LEFT JOIN FETCH p.cliente cl " +
+           "LEFT JOIN FETCH c.veterinario v " +
+           "WHERE c.idCita = :id")
+    java.util.Optional<Cita> findByIdWithDetails(@Param("id") Long id);
+
+    /**
+     * Busca citas de un veterinario en un rango de fechas.
+     * 
+     * @param veterinario Veterinario
+     * @param inicio Fecha y hora de inicio
+     * @param fin Fecha y hora de fin
+     * @return Lista de citas en el rango
+     */
+    @Query("SELECT c FROM Cita c LEFT JOIN FETCH c.paciente p " +
+           "WHERE c.veterinario = :veterinario " +
+           "AND c.fechaHora BETWEEN :inicio AND :fin " +
+           "ORDER BY c.fechaHora ASC")
+    List<Cita> findByVeterinarioAndFechaHoraBetween(
+            @Param("veterinario") com.tuorg.veterinaria.gestionusuarios.model.UsuarioVeterinario veterinario,
+            @Param("inicio") LocalDateTime inicio,
+            @Param("fin") LocalDateTime fin);
+>>>>>>> Stashed changes
 }
 

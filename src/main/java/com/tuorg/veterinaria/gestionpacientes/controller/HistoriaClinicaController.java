@@ -42,11 +42,13 @@ public class HistoriaClinicaController {
 
     /**
      * Obtiene la historia clínica de un paciente.
+     * Accesible por veterinarios, secretarios y el dueño del paciente.
      * 
      * @param pacienteId ID del paciente
      * @return Respuesta con la historia clínica
      */
     @GetMapping("/paciente/{pacienteId}")
+    @org.springframework.security.access.prepost.PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<HistoriaClinicaResponse>> obtenerPorPaciente(@PathVariable Long pacienteId) {
         HistoriaClinicaResponse historia = historiaClinicaService.obtenerPorPaciente(pacienteId);
         return ResponseEntity.ok(ApiResponse.success("Historia clínica obtenida exitosamente", historia));
@@ -69,14 +71,33 @@ public class HistoriaClinicaController {
 
     /**
      * Obtiene todos los registros médicos de una historia clínica.
+     * Accesible por veterinarios, secretarios y el dueño del paciente.
      * 
      * @param historiaId ID de la historia clínica
      * @return Respuesta con la lista de registros médicos
      */
     @GetMapping("/{historiaId}/registros")
+    @org.springframework.security.access.prepost.PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApiResponse<List<RegistroMedicoResponse>>> obtenerRegistros(@PathVariable Long historiaId) {
         List<RegistroMedicoResponse> registros = historiaClinicaService.obtenerRegistros(historiaId);
         return ResponseEntity.ok(ApiResponse.success("Registros médicos obtenidos exitosamente", registros));
+    }
+
+    /**
+     * Actualiza un registro médico existente.
+     * Solo accesible por veterinarios.
+     * 
+     * @param registroId ID del registro médico
+     * @param request Datos actualizados del registro
+     * @return Respuesta con el registro actualizado
+     */
+    @PutMapping("/registros/{registroId}")
+    @org.springframework.security.access.prepost.PreAuthorize("hasAnyRole('VETERINARIO', 'ADMIN')")
+    public ResponseEntity<ApiResponse<RegistroMedicoResponse>> actualizarRegistro(
+            @PathVariable Long registroId,
+            @Valid @RequestBody RegistroMedicoRequest request) {
+        RegistroMedicoResponse registroActualizado = historiaClinicaService.actualizarRegistro(registroId, request);
+        return ResponseEntity.ok(ApiResponse.success("Registro médico actualizado exitosamente", registroActualizado));
     }
 
     /**
@@ -86,6 +107,7 @@ public class HistoriaClinicaController {
      * @return Respuesta con el PDF en bytes
      */
     @GetMapping("/{historiaId}/exportar-pdf")
+    @org.springframework.security.access.prepost.PreAuthorize("isAuthenticated()")
     public ResponseEntity<byte[]> exportarPDF(@PathVariable Long historiaId) {
         byte[] pdf = historiaClinicaService.exportarPDF(historiaId);
         return ResponseEntity.ok()

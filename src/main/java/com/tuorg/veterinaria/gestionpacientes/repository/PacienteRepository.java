@@ -1,6 +1,8 @@
 package com.tuorg.veterinaria.gestionpacientes.repository;
 
 import com.tuorg.veterinaria.gestionpacientes.model.Paciente;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,7 +14,7 @@ import java.util.List;
  * Repositorio para la entidad Paciente.
  * 
  * Proporciona métodos de acceso a datos para pacientes
- * utilizando Spring Data JPA.
+ * utilizando Spring Data JPA con soporte de paginación.
  * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
@@ -30,6 +32,16 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
     List<Paciente> findByClienteId(@Param("clienteId") Long clienteId);
 
     /**
+     * Busca pacientes por cliente con paginación.
+     * 
+     * @param clienteId ID del cliente
+     * @param pageable Información de paginación
+     * @return Página de pacientes del cliente
+     */
+    @Query("SELECT p FROM Paciente p WHERE p.cliente.idPersona = :clienteId")
+    Page<Paciente> findByClienteId(@Param("clienteId") Long clienteId, Pageable pageable);
+
+    /**
      * Busca pacientes por especie.
      * 
      * @param especie Especie del paciente (perro, gato)
@@ -45,5 +57,15 @@ public interface PacienteRepository extends JpaRepository<Paciente, Long> {
      */
     @Query("SELECT p FROM Paciente p WHERE LOWER(p.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))")
     List<Paciente> buscarPorNombre(@Param("nombre") String nombre);
+
+    /**
+     * Busca pacientes por nombre con paginación (búsqueda parcial, case-insensitive).
+     * 
+     * @param nombre Nombre o parte del nombre del paciente
+     * @param pageable Información de paginación
+     * @return Página de pacientes que coinciden con el nombre
+     */
+    @Query("SELECT p FROM Paciente p WHERE LOWER(p.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))")
+    Page<Paciente> buscarPorNombre(@Param("nombre") String nombre, Pageable pageable);
 }
 
