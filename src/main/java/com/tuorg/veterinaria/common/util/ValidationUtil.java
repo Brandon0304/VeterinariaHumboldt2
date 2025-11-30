@@ -7,10 +7,10 @@ import java.util.regex.Pattern;
 
 /**
  * Clase de utilidades para validaciones comunes.
- * 
+ *
  * Esta clase proporciona métodos estáticos para validar diferentes
  * tipos de datos según las reglas de negocio de la aplicación.
- * 
+ *
  * @author Equipo de Desarrollo
  * @version 1.0.0
  */
@@ -37,7 +37,7 @@ public final class ValidationUtil {
 
     /**
      * Valida el formato de un correo electrónico.
-     * 
+     *
      * @param email Correo electrónico a validar
      * @return true si el formato es válido, false en caso contrario
      */
@@ -50,7 +50,7 @@ public final class ValidationUtil {
 
     /**
      * Valida el formato de un correo electrónico y lanza excepción si es inválido.
-     * 
+     *
      * @param email Correo electrónico a validar
      * @throws BusinessException Si el formato del correo es inválido
      */
@@ -62,7 +62,7 @@ public final class ValidationUtil {
 
     /**
      * Valida el formato de un teléfono.
-     * 
+     *
      * @param phone Teléfono a validar
      * @return true si el formato es válido, false en caso contrario
      */
@@ -75,7 +75,7 @@ public final class ValidationUtil {
 
     /**
      * Valida el formato de un teléfono y lanza excepción si es inválido.
-     * 
+     *
      * @param phone Teléfono a validar
      * @throws BusinessException Si el formato del teléfono es inválido
      */
@@ -87,7 +87,7 @@ public final class ValidationUtil {
 
     /**
      * Valida la longitud de un nombre de usuario.
-     * 
+     *
      * @param username Nombre de usuario a validar
      * @throws BusinessException Si el nombre de usuario no cumple con los requisitos
      */
@@ -109,7 +109,7 @@ public final class ValidationUtil {
 
     /**
      * Valida la fortaleza de una contraseña.
-     * 
+     *
      * @param password Contraseña a validar
      * @throws BusinessException Si la contraseña no cumple con los requisitos
      */
@@ -126,7 +126,7 @@ public final class ValidationUtil {
 
     /**
      * Valida que un valor numérico sea positivo.
-     * 
+     *
      * @param value Valor a validar
      * @param fieldName Nombre del campo (para el mensaje de error)
      * @throws BusinessException Si el valor no es positivo
@@ -140,7 +140,7 @@ public final class ValidationUtil {
 
     /**
      * Valida que un valor numérico sea no negativo (>= 0).
-     * 
+     *
      * @param value Valor a validar
      * @param fieldName Nombre del campo (para el mensaje de error)
      * @throws BusinessException Si el valor es negativo
