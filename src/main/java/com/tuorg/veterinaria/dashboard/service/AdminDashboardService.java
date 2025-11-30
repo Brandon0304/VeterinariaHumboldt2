@@ -1,5 +1,6 @@
 package com.tuorg.veterinaria.dashboard.service;
 
+import com.tuorg.veterinaria.common.exception.BusinessException;
 import com.tuorg.veterinaria.dashboard.dto.AdminDashboardResponse;
 import com.tuorg.veterinaria.dashboard.dto.AdminDashboardResponse.*;
 import com.tuorg.veterinaria.gestionfacturacion.repository.FacturaRepository;
@@ -100,7 +101,7 @@ public class AdminDashboardService {
                     .build();
         } catch (Exception e) {
             logger.error("❌ Error al construir dashboard: {}", e.getMessage(), e);
-            throw new RuntimeException("Error al construir el dashboard: " + e.getMessage(), e);
+            throw new BusinessException("Error al construir el dashboard: " + e.getMessage(), e);
         }
     }
 

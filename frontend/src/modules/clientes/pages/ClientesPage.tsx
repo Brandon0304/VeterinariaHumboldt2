@@ -62,21 +62,21 @@ export const ClientesPage = () => {
   }
 
   return (
-    <div className="w-full space-y-6">
-      <header className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-semibold text-secondary">Gestión de Clientes</h2>
-          <p className="text-sm text-gray-500">Administra la información de los clientes del sistema</p>
+    <div className="w-full space-y-4 sm:space-y-6">
+      <header className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4">
+        <div className="min-w-0 flex-1">
+          <h2 className="text-xl font-semibold text-secondary sm:text-2xl">Gestión de Clientes</h2>
+          <p className="mt-1 text-xs text-gray-500 sm:text-sm">Administra la información de los clientes del sistema</p>
         </div>
         <button
           onClick={() => setIsCreateModalOpen(true)}
-          className="rounded-2xl bg-primary px-4 py-2 text-sm font-semibold text-white shadow-soft transition-base hover:bg-primary-dark"
+          className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition-base hover:bg-primary-dark sm:w-auto sm:rounded-2xl"
         >
           ➕ Nuevo Cliente
         </button>
       </header>
 
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <section className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <StatCard title="Total Clientes" value={stats.total.toString()} description="Registrados" tone="primary" />
         <StatCard
           title="Con Teléfono"
@@ -92,26 +92,26 @@ export const ClientesPage = () => {
         />
       </section>
 
-      <section className="rounded-3xl bg-white p-6 shadow-soft">
-        <div className="mb-6 flex flex-wrap items-center gap-4">
-          <h3 className="text-lg font-semibold text-secondary">Listado de Clientes</h3>
+      <section className="rounded-2xl bg-white p-4 shadow-soft sm:rounded-3xl sm:p-6">
+        <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+          <h3 className="text-base font-semibold text-secondary sm:text-lg">Listado de Clientes</h3>
           <input
             type="text"
-            placeholder="Buscar por nombre, correo, teléfono o identificación..."
+            placeholder="Buscar cliente..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="flex-1 min-w-[200px] rounded-2xl border border-gray-200 bg-gray-50 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="flex-1 min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 sm:min-w-[200px] sm:rounded-2xl sm:px-4 sm:text-sm"
           />
         </div>
 
         {filteredClientes.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-gray-200 bg-gray-50 p-10 text-center text-sm text-gray-500">
+          <div className="rounded-xl border border-dashed border-gray-200 bg-gray-50 p-8 text-center text-xs text-gray-500 sm:rounded-2xl sm:p-10 sm:text-sm">
             {search.length > 0
               ? "No se encontraron clientes con los criterios de búsqueda."
               : "No hay clientes registrados. Crea el primero haciendo clic en 'Nuevo Cliente'."}
           </div>
         ) : (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filteredClientes.map((cliente) => (
               <ClienteCard
                 key={cliente.id}

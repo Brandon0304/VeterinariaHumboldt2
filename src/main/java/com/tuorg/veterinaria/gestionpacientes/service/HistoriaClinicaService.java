@@ -1,15 +1,26 @@
 package com.tuorg.veterinaria.gestionpacientes.service;
 
+import com.tuorg.veterinaria.common.exception.BusinessException;
 import com.tuorg.veterinaria.common.exception.ResourceNotFoundException;
+import com.tuorg.veterinaria.gestionpacientes.dto.HistoriaClinicaResponse;
+import com.tuorg.veterinaria.gestionpacientes.dto.RegistroMedicoRequest;
+import com.tuorg.veterinaria.gestionpacientes.dto.RegistroMedicoResponse;
+import com.tuorg.veterinaria.gestionpacientes.dto.VacunacionResponse;
 import com.tuorg.veterinaria.gestionpacientes.model.HistoriaClinica;
 import com.tuorg.veterinaria.gestionpacientes.model.RegistroMedico;
 import com.tuorg.veterinaria.gestionpacientes.repository.HistoriaClinicaRepository;
 import com.tuorg.veterinaria.gestionpacientes.repository.RegistroMedicoRepository;
+import com.tuorg.veterinaria.gestionusuarios.model.Usuario;
+import com.tuorg.veterinaria.gestionusuarios.model.UsuarioVeterinario;
+import com.tuorg.veterinaria.gestionusuarios.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.text.Normalizer;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Servicio para la gestión de historias clínicas.
@@ -23,6 +34,11 @@ import java.util.List;
 @Service
 public class HistoriaClinicaService {
 
+    private static final String ENTIDAD_HISTORIA_CLINICA = "HistoriaClinica";
+    private static final String PDF_TEXT_END = ") Tj";
+    private static final String PDF_XREF_FORMAT = "%010d %05d n";
+    private static final String PDF_NEWLINE = "\n";
+
     /**
      * Repositorio de historias clínicas.
      */
@@ -32,6 +48,7 @@ public class HistoriaClinicaService {
      * Repositorio de registros médicos.
      */
     private final RegistroMedicoRepository registroMedicoRepository;
+    private final UsuarioRepository usuarioRepository;
 
     /**
      * Constructor con inyección de dependencias.
@@ -41,9 +58,11 @@ public class HistoriaClinicaService {
      */
     @Autowired
     public HistoriaClinicaService(HistoriaClinicaRepository historiaClinicaRepository,
-                                  RegistroMedicoRepository registroMedicoRepository) {
+                                  RegistroMedicoRepository registroMedicoRepository,
+                                  UsuarioRepository usuarioRepository) {
         this.historiaClinicaRepository = historiaClinicaRepository;
         this.registroMedicoRepository = registroMedicoRepository;
+        this.usuarioRepository = usuarioRepository;
     }
 
     /**
@@ -53,9 +72,10 @@ public class HistoriaClinicaService {
      * @return Historia clínica del paciente
      */
     @Transactional(readOnly = true)
-    public HistoriaClinica obtenerPorPaciente(Long pacienteId) {
-        return historiaClinicaRepository.findByPacienteId(pacienteId)
-                .orElseThrow(() -> new ResourceNotFoundException("HistoriaClinica", "paciente_id", pacienteId));
+    public HistoriaClinicaResponse obtenerPorPaciente(Long pacienteId) {
+        HistoriaClinica historia = historiaClinicaRepository.findByPacienteId(pacienteId)
+                .orElseThrow(() -> new ResourceNotFoundException(ENTIDAD_HISTORIA_CLINICA, "paciente_id", pacienteId));
+        return mapHistoria(historia);
     }
 
     /**
@@ -69,17 +89,35 @@ public class HistoriaClinicaService {
      * @return Registro médico creado
      */
     @Transactional
-    public RegistroMedico agregarRegistro(Long historiaId, RegistroMedico registro) {
+    public RegistroMedicoResponse agregarRegistro(Long historiaId, RegistroMedicoRequest request) {
         HistoriaClinica historia = historiaClinicaRepository.findById(historiaId)
-                .orElseThrow(() -> new ResourceNotFoundException("HistoriaClinica", "id", historiaId));
+                .orElseThrow(() -> new ResourceNotFoundException(ENTIDAD_HISTORIA_CLINICA, "id", historiaId));
 
+        RegistroMedico registro = new RegistroMedico();
         registro.setHistoria(historia);
+        registro.setFecha(request.getFecha());
+        registro.setMotivo(request.getMotivo());
+        registro.setDiagnostico(request.getDiagnostico());
+        registro.setSignosVitales(request.getSignosVitales());
+        registro.setTratamiento(request.getTratamiento());
+        registro.setInsumosUsados(request.getInsumosUsados());
+        registro.setArchivos(request.getArchivos());
+
+        if (request.getVeterinarioId() != null) {
+            Usuario usuario = usuarioRepository.findById(request.getVeterinarioId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Usuario", "id", request.getVeterinarioId()));
+            if (!(usuario instanceof UsuarioVeterinario)) {
+                throw new BusinessException("El usuario indicado no corresponde a un veterinario");
+            }
+            registro.setVeterinario((UsuarioVeterinario) usuario);
+        }
+
         RegistroMedico registroGuardado = registroMedicoRepository.save(registro);
 
-        // TODO: Consumir insumos del inventario según registro.getInsumosUsados()
-        // Esto debe implementarse en el servicio de inventario
+        // Nota: El consumo de insumos del inventario se implementará en el servicio de inventario
+        // cuando se requiera la funcionalidad completa de gestión de inventario
 
-        return registroGuardado;
+        return mapRegistro(registroGuardado);
     }
 
     /**
@@ -89,27 +127,186 @@ public class HistoriaClinicaService {
      * @return Lista de registros médicos
      */
     @Transactional(readOnly = true)
-    public List<RegistroMedico> obtenerRegistros(Long historiaId) {
-        HistoriaClinica historia = historiaClinicaRepository.findById(historiaId)
-                .orElseThrow(() -> new ResourceNotFoundException("HistoriaClinica", "id", historiaId));
-        return registroMedicoRepository.findByHistoriaId(historiaId);
+    public List<RegistroMedicoResponse> obtenerRegistros(Long historiaId) {
+        // Verificar que la historia clínica existe
+        historiaClinicaRepository.findById(historiaId)
+                .orElseThrow(() -> new ResourceNotFoundException(ENTIDAD_HISTORIA_CLINICA, "id", historiaId));
+        return registroMedicoRepository.findByHistoriaId(historiaId)
+                .stream()
+                .map(this::mapRegistro)
+                .toList();
     }
 
     /**
-     * Exporta la historia clínica como PDF (simplificado).
+     * Actualiza un registro médico existente.
      * 
-     * En una implementación completa, esto generaría un PDF real.
-     * 
-     * @param historiaId ID de la historia clínica
-     * @return Array de bytes representando el PDF
+     * @param registroId ID del registro médico
+     * @param request Datos actualizados
+     * @return Registro médico actualizado
+     */
+    @Transactional
+    public RegistroMedicoResponse actualizarRegistro(Long registroId, RegistroMedicoRequest request) {
+        RegistroMedico registro = registroMedicoRepository.findById(registroId)
+                .orElseThrow(() -> new ResourceNotFoundException("RegistroMedico", "id", registroId));
+
+        // Actualizar campos
+        if (request.getFecha() != null) {
+            registro.setFecha(request.getFecha());
+        }
+        if (request.getMotivo() != null) {
+            registro.setMotivo(request.getMotivo());
+        }
+        if (request.getDiagnostico() != null) {
+            registro.setDiagnostico(request.getDiagnostico());
+        }
+        if (request.getSignosVitales() != null) {
+            registro.setSignosVitales(request.getSignosVitales());
+        }
+        if (request.getTratamiento() != null) {
+            registro.setTratamiento(request.getTratamiento());
+        }
+        if (request.getInsumosUsados() != null) {
+            registro.setInsumosUsados(request.getInsumosUsados());
+        }
+        if (request.getArchivos() != null) {
+            registro.setArchivos(request.getArchivos());
+        }
+        if (request.getVeterinarioId() != null) {
+            Usuario usuario = usuarioRepository.findById(request.getVeterinarioId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Usuario", "id", request.getVeterinarioId()));
+            if (!(usuario instanceof UsuarioVeterinario)) {
+                throw new BusinessException("El usuario indicado no corresponde a un veterinario");
+            }
+            registro.setVeterinario((UsuarioVeterinario) usuario);
+        }
+
+        RegistroMedico registroActualizado = registroMedicoRepository.save(registro);
+        return mapRegistro(registroActualizado);
+    }
+
+    /**
+     * Exporta la historia clínica como PDF sin dependencias externas (PDF mínimo).
+     *
+     * Genera un PDF de una página con texto básico usando sintaxis PDF directa.
      */
     @Transactional(readOnly = true)
     public byte[] exportarPDF(Long historiaId) {
         HistoriaClinica historia = historiaClinicaRepository.findById(historiaId)
-                .orElseThrow(() -> new ResourceNotFoundException("HistoriaClinica", "id", historiaId));
+                .orElseThrow(() -> new ResourceNotFoundException(ENTIDAD_HISTORIA_CLINICA, "id", historiaId));
 
-        // TODO: Implementar generación real de PDF con iText o JasperReports
-        // Por ahora retornamos un array vacío
-        return new byte[0];
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+        String titulo = "Historia Clinica";
+        String linea1 = "ID Historia: " + historia.getIdHistoria();
+        String linea2 = "Paciente: " + normalize(historia.getPaciente().getNombre()) + " (ID " + historia.getPaciente().getIdPaciente() + ")";
+        String linea3 = "Apertura: " + (historia.getFechaApertura() != null ? historia.getFechaApertura().format(formatter) : "N/D");
+        String resumenTitulo = "Resumen:";
+        String resumen = historia.getResumen() != null ? normalize(historia.getResumen()) : "Sin resumen registrado.";
+
+        // Contenido del stream (texto)
+        StringBuilder content = new StringBuilder();
+        content.append("BT\n");
+        content.append("/F1 18 Tf 50 750 Td (").append(escapePdf(titulo)).append(PDF_TEXT_END).append("\n");
+        content.append("/F1 12 Tf 0 -30 Td (").append(escapePdf(linea1)).append(PDF_TEXT_END).append("\n");
+        content.append("0 -18 Td (").append(escapePdf(linea2)).append(PDF_TEXT_END).append("\n");
+        content.append("0 -18 Td (").append(escapePdf(linea3)).append(PDF_TEXT_END).append("\n");
+        content.append("/F1 14 Tf 0 -24 Td (").append(escapePdf(resumenTitulo)).append(PDF_TEXT_END).append("\n");
+        // Resumen en líneas simples de 90 chars
+        int wrap = 90;
+        int idx = 0;
+        while (idx < resumen.length()) {
+            int end = Math.min(idx + wrap, resumen.length());
+            String slice = resumen.substring(idx, end);
+            content.append("/F1 12 Tf 0 -16 Td (").append(escapePdf(slice)).append(PDF_TEXT_END).append("\n");
+            idx = end;
+        }
+        content.append("ET\n");
+
+        byte[] streamBytes = content.toString().getBytes(StandardCharsets.US_ASCII);
+        StringBuilder pdf = new StringBuilder();
+        pdf.append("%PDF-1.4\n");
+
+        // Objetos y offsets
+        int xref1 = pdf.length();
+        pdf.append("1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
+        int xref2 = pdf.length();
+        pdf.append("2 0 obj\n<< /Type /Pages /Kids [3 0 R] /Count 1 >>\nendobj\n");
+        int xref3 = pdf.length();
+        pdf.append("3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\nendobj\n");
+        int xref4 = pdf.length();
+        pdf.append("4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n");
+        int xref5 = pdf.length();
+        pdf.append("5 0 obj\n<< /Length ").append(streamBytes.length).append(" >>\nstream\n");
+        pdf.append(content);
+        pdf.append("endstream\nendobj\n");
+
+        // xref table
+        int xrefStart = pdf.length();
+        pdf.append("xref").append(PDF_NEWLINE);
+        pdf.append("0 6").append(PDF_NEWLINE);
+        pdf.append(String.format("%010d %05d f ", 0, 65535)).append(PDF_NEWLINE);
+        pdf.append(String.format(PDF_XREF_FORMAT, xref1, 00000)).append(" ").append(PDF_NEWLINE);
+        pdf.append(String.format(PDF_XREF_FORMAT, xref2, 00000)).append(" ").append(PDF_NEWLINE);
+        pdf.append(String.format(PDF_XREF_FORMAT, xref3, 00000)).append(" ").append(PDF_NEWLINE);
+        pdf.append(String.format(PDF_XREF_FORMAT, xref4, 00000)).append(" ").append(PDF_NEWLINE);
+        pdf.append(String.format(PDF_XREF_FORMAT, xref5, 00000)).append(" ").append(PDF_NEWLINE);
+
+        pdf.append("trailer\n<< /Size 6 /Root 1 0 R >>\n");
+        pdf.append("startxref\n").append(xrefStart).append("\n%%EOF");
+
+        return pdf.toString().getBytes(StandardCharsets.US_ASCII);
+    }
+
+    private String escapePdf(String text) {
+        return text.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)").replace("\r", " ").replace("\n", " ");
+    }
+
+    private String normalize(String text) {
+        if (text == null) return "";
+        // Remover acentos para evitar caracteres no representables en el PDF mínimo
+        String normalized = Normalizer.normalize(text, Normalizer.Form.NFD).replaceAll("\\p{M}", "");
+        // Reemplazos comunes adicionales
+        normalized = normalized.replace("ñ", "n").replace("Ñ", "N");
+        return normalized;
+    }
+
+    private HistoriaClinicaResponse mapHistoria(HistoriaClinica historia) {
+        return new HistoriaClinicaResponse(
+                historia.getIdHistoria(),
+                new VacunacionResponse.PacienteSummary(
+                        historia.getPaciente().getIdPaciente(),
+                        historia.getPaciente().getNombre()
+                ),
+                historia.getFechaApertura(),
+                historia.getResumen(),
+                historia.getMetadatos()
+        );
+    }
+
+    private RegistroMedicoResponse mapRegistro(RegistroMedico registro) {
+        VacunacionResponse.VeterinarioSummary veterinarioSummary = null;
+        if (registro.getVeterinario() != null) {
+            UsuarioVeterinario vet = registro.getVeterinario();
+            veterinarioSummary = new VacunacionResponse.VeterinarioSummary(
+                    vet.getIdUsuario(),
+                    vet.getNombre(),
+                    vet.getApellido(),
+                    vet.getEspecialidad()
+            );
+        }
+
+        return new RegistroMedicoResponse(
+                registro.getIdRegistro(),
+                registro.getHistoria().getIdHistoria(),
+                registro.getFecha(),
+                registro.getMotivo(),
+                registro.getDiagnostico(),
+                registro.getSignosVitales(),
+                registro.getTratamiento(),
+                veterinarioSummary,
+                registro.getInsumosUsados(),
+                registro.getArchivos()
+        );
     }
 }
+
+

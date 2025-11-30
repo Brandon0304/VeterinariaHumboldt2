@@ -13,7 +13,7 @@ import { authStore } from "../../../shared/state/authStore";
 
 dayjs.locale("es");
 
-type SpeciesFilter = "TODOS" | "perro" | "gato" | "otros";
+type SpeciesFilter = "TODOS" | "perro" | "gato";
 type OrderOption = "nombre-asc" | "nombre-desc";
 
 const calculateAge = (birthDate?: string | null): string => {
@@ -29,12 +29,11 @@ const formatWeight = (weight?: string | null): string => {
   return `${numeric.toFixed(1)} kg`;
 };
 
-const normalizeSpecies = (species?: string | null): SpeciesFilter => {
-  if (!species) return "otros";
+const normalizeSpecies = (species?: string | null): "perro" | "gato" => {
+  if (!species) return "perro";
   const normalized = species.trim().toLowerCase();
-  if (normalized.includes("perro")) return "perro";
   if (normalized.includes("gato")) return "gato";
-  return "otros";
+  return "perro";
 };
 
 export const VeterinarianPatientsPage = () => {
@@ -132,15 +131,15 @@ export const VeterinarianPatientsPage = () => {
   }
 
   return (
-    <div className="space-y-6">
-      <header className="flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h2 className="text-2xl font-semibold text-secondary">Mis Pacientes</h2>
-          <p className="text-sm text-gray-500">
+    <div className="space-y-4 sm:space-y-6">
+      <header className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4">
+        <div className="min-w-0 flex-1">
+          <h2 className="text-xl font-semibold text-secondary sm:text-2xl">Mis Pacientes</h2>
+          <p className="mt-1 text-xs text-gray-500 sm:text-sm">
             Consulta la información de tus pacientes y filtra por especie, propietario o estado.
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-2 sm:gap-3">
           <ExportarListaButton pacientes={filteredPatients} />
           {/* Oculto para rol VETERINARIO: no puede crear pacientes */}
           {!isVeterinario && (
@@ -154,36 +153,35 @@ export const VeterinarianPatientsPage = () => {
         </div>
       </header>
 
-      <section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <section className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatCard title="Total Pacientes" value={stats.total.toString()} description="Bajo tu cuidado" />
-        <StatCard title="Perros" value={stats.perros.toString()} description="Registrados" tone="primary" />
-        <StatCard title="Gatos" value={stats.gatos.toString()} description="Registrados" tone="secondary" />
+        <StatCard title="🐕 Perros" value={stats.perros.toString()} description="Registrados" tone="primary" />
+        <StatCard title="🐱 Gatos" value={stats.gatos.toString()} description="Registrados" tone="secondary" />
         <StatCard title="Nuevos (semana)" value={stats.nuevosSemana.toString()} description="Últimos 7 días" tone="accent" />
       </section>
 
-      <section className="rounded-3xl bg-white p-6 shadow-soft">
-        <div className="flex flex-wrap items-center gap-4">
+      <section className="rounded-2xl bg-white p-4 shadow-soft sm:rounded-3xl sm:p-6">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
           <input
             type="search"
-            placeholder="Buscar por nombre del paciente o propietario..."
-            className="flex-1 min-w-[200px] rounded-2xl border border-gray-200 bg-gray-50 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+            placeholder="Buscar paciente o propietario..."
+            className="flex-1 min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 sm:rounded-2xl sm:px-4 sm:text-sm"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
           />
 
           <select
-            className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 sm:w-auto sm:rounded-2xl sm:px-4 sm:text-sm"
             value={speciesFilter}
             onChange={(event) => setSpeciesFilter(event.target.value as SpeciesFilter)}
           >
-            <option value="TODOS">Todas las especies</option>
-            <option value="perro">Perros</option>
-            <option value="gato">Gatos</option>
-            <option value="otros">Otras especies</option>
+            <option value="TODOS">Todos</option>
+            <option value="perro">🐕 Perros</option>
+            <option value="gato">🐱 Gatos</option>
           </select>
 
           <select
-            className="rounded-2xl border border-gray-200 bg-gray-50 px-4 py-2 text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+            className="w-full rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-xs focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 sm:w-auto sm:rounded-2xl sm:px-4 sm:text-sm"
             value={order}
             onChange={(event) => setOrder(event.target.value as OrderOption)}
           >
@@ -192,7 +190,7 @@ export const VeterinarianPatientsPage = () => {
           </select>
         </div>
 
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        <div className="mt-4 grid gap-3 sm:mt-6 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {filteredPatients.length === 0 ? (
             <div className="col-span-full rounded-3xl border border-dashed border-gray-200 bg-gray-50 p-10 text-center text-sm text-gray-500">
               No se encontraron pacientes con los criterios seleccionados.
@@ -266,58 +264,93 @@ interface PatientCardProps {
 const PatientCard = ({ paciente, onViewDetail }: PatientCardProps) => {
   const initials = `${paciente.nombre.charAt(0)}`;
   const ownerFullName = paciente.cliente ? `${paciente.cliente.nombre} ${paciente.cliente.apellido}` : "Sin asignar";
-  const speciesBadge =
-    normalizeSpecies(paciente.especie) === "perro"
-      ? "bg-primary/10 text-primary"
-      : normalizeSpecies(paciente.especie) === "gato"
-        ? "bg-secondary/10 text-secondary"
-        : "bg-gray-200 text-secondary";
+  const species = normalizeSpecies(paciente.especie);
+  
+  const speciesConfig = {
+    perro: { icon: "🐕", bgColor: "bg-blue-50", textColor: "text-blue-700", borderColor: "border-blue-200" },
+    gato: { icon: "🐱", bgColor: "bg-purple-50", textColor: "text-purple-700", borderColor: "border-purple-200" },
+  };
+
+  const config = speciesConfig[species];
+  const edad = calculateAge(paciente.fechaNacimiento);
+  const edadNumero = paciente.fechaNacimiento ? dayjs().diff(dayjs(paciente.fechaNacimiento), "year") : 0;
+  
+  // Estado de salud con color
+  const estadoSaludColor = 
+    paciente.estadoSalud?.toLowerCase().includes("sano") || paciente.estadoSalud?.toLowerCase().includes("bueno")
+      ? "text-green-600 bg-green-50"
+      : paciente.estadoSalud?.toLowerCase().includes("enfermo") || paciente.estadoSalud?.toLowerCase().includes("crítico")
+      ? "text-red-600 bg-red-50"
+      : "text-gray-600 bg-gray-50";
 
   return (
-    <article className="flex h-full flex-col gap-3 rounded-3xl border border-gray-100 bg-gray-50 p-6 shadow-sm transition-base hover:border-primary/40 hover:bg-white">
-      <div className="flex items-center gap-4">
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-lg font-semibold text-primary">
-          {initials}
-        </span>
-        <div>
-          <p className="text-sm font-semibold text-secondary">{paciente.nombre}</p>
-          <span className={`inline-flex rounded-full px-2 py-1 text-xs font-medium capitalize ${speciesBadge}`}>
-            {paciente.especie ?? "Sin especie"}
-          </span>
+    <article className={`group relative flex h-full flex-col gap-4 rounded-3xl border-2 ${config.borderColor} ${config.bgColor} p-5 shadow-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02]`}>
+      {/* Indicator de estado en esquina */}
+      <div className="absolute right-3 top-3">
+        <div className={`h-2.5 w-2.5 rounded-full ${paciente.estadoSalud?.toLowerCase().includes("sano") || paciente.estadoSalud?.toLowerCase().includes("bueno") ? 'bg-green-400' : paciente.estadoSalud?.toLowerCase().includes("enfermo") ? 'bg-red-400' : 'bg-gray-400'} animate-pulse`} />
+      </div>
+
+      {/* Header con avatar y especie */}
+      <div className="flex items-start gap-3">
+        <div className="relative">
+          <div className={`flex h-14 w-14 items-center justify-center rounded-2xl ${config.bgColor} ${config.textColor} border-2 ${config.borderColor} text-xl font-bold shadow-sm`}>
+            {config.icon}
+          </div>
+          {edadNumero < 1 && (
+            <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-yellow-400 text-[10px] font-bold text-white">
+              ⭐
+            </span>
+          )}
+        </div>
+        <div className="flex-1 min-w-0">
+          <h3 className="text-base font-bold text-gray-900 truncate">{paciente.nombre}</h3>
+          <p className={`text-xs font-semibold ${config.textColor} capitalize truncate`}>
+            {paciente.especie ?? "Sin especie"} {paciente.raza && `• ${paciente.raza}`}
+          </p>
         </div>
       </div>
 
-      <dl className="grid grid-cols-2 gap-2 text-xs text-gray-500">
-        <div>
-          <dt className="font-semibold text-secondary">Edad</dt>
-          <dd>{calculateAge(paciente.fechaNacimiento)}</dd>
+      {/* Información en grid mejorado */}
+      <dl className="grid grid-cols-2 gap-3">
+        <div className="space-y-1">
+          <dt className="text-[10px] font-semibold uppercase tracking-wide text-gray-500">Edad</dt>
+          <dd className="text-sm font-bold text-gray-900">{edad}</dd>
         </div>
-        <div>
-          <dt className="font-semibold text-secondary">Peso</dt>
-          <dd>{formatWeight(paciente.pesoKg)}</dd>
+        <div className="space-y-1">
+          <dt className="text-[10px] font-semibold uppercase tracking-wide text-gray-500">Peso</dt>
+          <dd className="text-sm font-bold text-gray-900">{formatWeight(paciente.pesoKg)}</dd>
         </div>
-        <div>
-          <dt className="font-semibold text-secondary">Propietario</dt>
-          <dd>{ownerFullName}</dd>
-        </div>
-        <div>
-          <dt className="font-semibold text-secondary">Estado</dt>
-          <dd>{paciente.estadoSalud ?? "Sin registrar"}</dd>
+        <div className="col-span-2 space-y-1">
+          <dt className="text-[10px] font-semibold uppercase tracking-wide text-gray-500">Propietario</dt>
+          <dd className="text-sm font-semibold text-gray-700 truncate">{ownerFullName}</dd>
         </div>
       </dl>
 
-      <div className="mt-auto flex gap-2">
+      {/* Badge de estado de salud */}
+      {paciente.estadoSalud && (
+        <div className="flex items-center gap-2">
+          <span className={`flex-1 rounded-full px-3 py-1.5 text-center text-xs font-semibold ${estadoSaludColor}`}>
+            {paciente.estadoSalud}
+          </span>
+        </div>
+      )}
+
+      {/* Botones de acción mejorados */}
+      <div className="mt-auto flex gap-2 pt-2 border-t border-gray-200/50">
         <button
-          className="flex-1 rounded-2xl border border-gray-200 px-4 py-2 text-xs font-semibold text-secondary transition-base hover:border-primary hover:text-primary"
+          className="flex-1 rounded-xl border-2 border-gray-300 bg-white px-3 py-2 text-xs font-bold text-gray-700 transition-all hover:border-primary hover:bg-primary hover:text-white hover:shadow-md"
           onClick={onViewDetail}
         >
-          Ver perfil
+          👁️ Perfil
         </button>
         <button
-          className="flex-1 rounded-2xl bg-primary px-4 py-2 text-xs font-semibold text-white transition-base hover:bg-primary-dark"
-          onClick={() => toast("Enlazando con la historia clínica...", { icon: "📄" })}
+          className="flex-1 rounded-xl border-2 border-primary bg-primary px-3 py-2 text-xs font-bold text-white transition-all hover:bg-primary-dark hover:shadow-md"
+          onClick={() => {
+            // Navegar a historia clínica
+            window.location.href = `/veterinario/historias?pacienteId=${paciente.id}`;
+          }}
         >
-          Historia
+          📋 Historia
         </button>
       </div>
     </article>

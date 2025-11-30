@@ -69,3 +69,4 @@ public class Vacunacion {
     @JoinColumn(name = "veterinario_id")
     private UsuarioVeterinario veterinario;
 }
+

@@ -36,6 +36,12 @@ export const HistoriasRepository = {
     return unwrapResponse(data);
   },
 
+  actualizarRegistro: async (registroId: number, request: Partial<RegistroMedicoRequest>): Promise<ApiRegistroMedicoResponse> => {
+    const client = getApiClient();
+    const { data } = await client.put<ApiResponse<ApiRegistroMedicoResponse>>(`${BASE_PATH}/registros/${registroId}`, request);
+    return unwrapResponse(data);
+  },
+
   exportarPDF: async (historiaId: number): Promise<Blob> => {
     const client = getApiClient();
     const response = await client.get(`${BASE_PATH}/${historiaId}/exportar-pdf`, {

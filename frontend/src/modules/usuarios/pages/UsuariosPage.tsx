@@ -68,8 +68,8 @@ export const UsuariosPage = () => {
   const stats = {
     total: usuarios?.length || 0,
     activos: usuarios?.filter((u) => u.activo).length || 0,
-    veterinarios: usuarios?.filter((u) => u.rol?.nombreRol === "VETERINARIO").length || 0,
-    secretarios: usuarios?.filter((u) => u.rol?.nombreRol === "SECRETARIO").length || 0,
+    veterinarios: usuarios?.filter((u) => u.rol?.nombre === "VETERINARIO").length || 0,
+    secretarios: usuarios?.filter((u) => u.rol?.nombre === "SECRETARIO").length || 0,
   };
 
   if (isLoading) {
@@ -144,9 +144,27 @@ export const UsuariosPage = () => {
                     </td>
                     <td className="px-4 py-3 text-sm text-gray-600">{usuario.correo}</td>
                     <td className="px-4 py-3">
-                      <span className="rounded-full bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">
-                        {usuario.rol?.nombreRol || "Sin rol"}
-                      </span>
+                      {usuario.rol ? (
+                        <span 
+                          className={`rounded-full px-2 py-1 text-xs font-semibold ${
+                            usuario.rol.nombre === 'ADMIN' 
+                              ? 'bg-purple-100 text-purple-700'
+                              : usuario.rol.nombre === 'VETERINARIO'
+                              ? 'bg-blue-100 text-blue-700'
+                              : usuario.rol.nombre === 'SECRETARIO'
+                              ? 'bg-green-100 text-green-700'
+                              : usuario.rol.nombre === 'CLIENTE'
+                              ? 'bg-gray-100 text-gray-700'
+                              : 'bg-primary/10 text-primary'
+                          }`}
+                        >
+                          {usuario.rol.nombre}
+                        </span>
+                      ) : (
+                        <span className="rounded-full bg-cyan-100 px-2 py-1 text-xs font-semibold text-cyan-700">
+                          Sin rol
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3">
                       <span

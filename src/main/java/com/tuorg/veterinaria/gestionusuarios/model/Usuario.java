@@ -1,18 +1,11 @@
 package com.tuorg.veterinaria.gestionusuarios.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.time.LocalDateTime;
 
 /**
- * Entidad que representa un usuario del sistema.
- * 
- * Esta clase extiende de Persona y agrega información específica
- * de autenticación y autorización del usuario.
+ * Entidad Usuario que extiende de Persona.
+ * Representa un usuario autenticado en el sistema.
  * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
@@ -20,72 +13,114 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "usuarios", schema = "public")
 @PrimaryKeyJoinColumn(name = "id_usuario")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class Usuario extends Persona {
 
+    @Column(name = "username", nullable = false, unique = true, length = 60)
+    private String username;
+
+    @Column(name = "password_hash", nullable = false, length = 255)
+    private String passwordHash;
+
+    @Column(name = "activo", nullable = false)
+    private Boolean activo = Boolean.TRUE;
+
+    @Column(name = "ultimo_acceso")
+    private LocalDateTime ultimoAcceso;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "rol_id", nullable = false)
+    private Rol rol;
+
+    @Column(name = "password_reset_token", length = 255)
+    private String passwordResetToken;
+
+    @Column(name = "password_reset_token_expiry")
+    private LocalDateTime passwordResetTokenExpiry;
+
     /**
-     * Identificador del usuario reutiliza la clave primaria de Persona.
+     * Constructor por defecto.
      */
+    public Usuario() {
+        super();
+    }
+
+    /**
+     * Constructor con parámetros básicos.
+     */
+    public Usuario(String nombre, String apellido, String correo, String telefono, 
+                   String direccion, String username, String passwordHash, Rol rol) {
+        super(nombre, apellido, correo, telefono, direccion);
+        this.username = username;
+        this.passwordHash = passwordHash;
+        this.rol = rol;
+        this.activo = Boolean.TRUE;
+    }
+
+    // Getters y Setters
+
     @Transient
     public Long getIdUsuario() {
         return getIdPersona();
     }
 
+    @Transient
     public void setIdUsuario(Long idUsuario) {
         setIdPersona(idUsuario);
     }
 
-    /**
-     * Nombre de usuario único para autenticación.
-     * Debe ser único en toda la tabla (constraint UNIQUE).
-     */
-    @Column(name = "username", nullable = false, unique = true, length = 60)
-    private String username;
+    public String getUsername() {
+        return username;
+    }
 
-    /**
-     * Hash de la contraseña del usuario.
-     * La contraseña nunca debe almacenarse en texto plano.
-     */
-    @Column(name = "password_hash", nullable = false, length = 255)
-    private String passwordHash;
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-    /**
-     * Indica si la cuenta del usuario está activa.
-     * Los usuarios inactivos no pueden autenticarse.
-     */
-    @Column(name = "activo", nullable = false)
-    private Boolean activo = true;
+    public String getPasswordHash() {
+        return passwordHash;
+    }
 
-    /**
-     * Fecha y hora del último acceso del usuario al sistema.
-     * Incluye información de zona horaria.
-     */
-    @Column(name = "ultimo_acceso")
-    private LocalDateTime ultimoAcceso;
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
 
-    /**
-     * Rol asignado al usuario.
-     * Relación Many-to-One con la entidad Rol.
-     */
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "rol_id", nullable = false)
-    private Rol rol;
+    public Boolean getActivo() {
+        return activo;
+    }
 
-    /**
-     * Token único para recuperación de contraseña.
-     * Se genera cuando el usuario solicita restablecer su contraseña.
-     */
-    @Column(name = "password_reset_token", length = 255)
-    private String passwordResetToken;
+    public void setActivo(Boolean activo) {
+        this.activo = activo;
+    }
 
-    /**
-     * Fecha y hora de expiración del token de recuperación de contraseña.
-     * El token es válido por un período limitado (ej: 1 hora).
-     */
-    @Column(name = "password_reset_token_expiry")
-    private LocalDateTime passwordResetTokenExpiry;
+    public LocalDateTime getUltimoAcceso() {
+        return ultimoAcceso;
+    }
+
+    public void setUltimoAcceso(LocalDateTime ultimoAcceso) {
+        this.ultimoAcceso = ultimoAcceso;
+    }
+
+    public Rol getRol() {
+        return rol;
+    }
+
+    public void setRol(Rol rol) {
+        this.rol = rol;
+    }
+
+    public String getPasswordResetToken() {
+        return passwordResetToken;
+    }
+
+    public void setPasswordResetToken(String passwordResetToken) {
+        this.passwordResetToken = passwordResetToken;
+    }
+
+    public LocalDateTime getPasswordResetTokenExpiry() {
+        return passwordResetTokenExpiry;
+    }
+
+    public void setPasswordResetTokenExpiry(LocalDateTime passwordResetTokenExpiry) {
+        this.passwordResetTokenExpiry = passwordResetTokenExpiry;
+    }
 }
-

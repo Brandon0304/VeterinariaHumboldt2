@@ -6,8 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Entidad que representa un registro médico dentro de una historia clínica.
@@ -66,8 +70,9 @@ public class RegistroMedico {
      * Signos vitales registrados en formato JSON.
      * Ejemplo: {"temperatura": 38.5, "frecuencia_cardiaca": 120, ...}
      */
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "signos_vitales", columnDefinition = "JSONB")
-    private String signosVitales;
+    private Map<String, Object> signosVitales;
 
     /**
      * Tratamiento prescrito.
@@ -87,13 +92,16 @@ public class RegistroMedico {
      * Insumos utilizados durante la consulta en formato JSON.
      * Ejemplo: [{"productoId": 1, "cantidad": 2}, ...]
      */
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "insumos_usados", columnDefinition = "JSONB")
-    private String insumosUsados;
+    private List<Map<String, Object>> insumosUsados;
 
     /**
      * Archivos adjuntos (URLs o referencias) en formato JSON.
      * Ejemplo: ["url1", "url2", ...]
      */
+    @JdbcTypeCode(SqlTypes.JSON)
     @Column(name = "archivos", columnDefinition = "JSONB")
-    private String archivos;
+    private List<String> archivos;
 }
+

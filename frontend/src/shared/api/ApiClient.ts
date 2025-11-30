@@ -44,9 +44,26 @@ const buildClient = (): AxiosInstance => {
       if (response.config.url?.includes("/auth/login")) {
         console.log("✅ Login exitoso:", response.status, response.data);
       }
+      if (response.config.url?.includes("/horarios-disponibles")) {
+        console.log("✅ Horarios obtenidos:", response.status, response.data);
+      }
       return response;
     },
     (error) => {
+      // Si es error 401, significa que el token expiró o no hay sesión
+      if (error.response?.status === 401) {
+        const isLoginRequest = error.config?.url?.includes("/auth/login");
+        
+        if (!isLoginRequest) {
+          console.warn("⚠️ Error 401 - Token inválido o expirado. Cerrando sesión...");
+          // Limpiar el estado de autenticación
+          authStore.getState().logout();
+          // Redirigir al login
+          globalThis.location.href = "/login";
+          return Promise.reject(error);
+        }
+      }
+
       // Log detallado del error
       if (error.config?.url?.includes("/auth/login")) {
         const errorData = error.response?.data;
@@ -57,6 +74,16 @@ const buildClient = (): AxiosInstance => {
           message: error.message,
           validationErrors: errorData?.data, // Errores de validación del backend
         });
+      } else if (error.config?.url?.includes("/horarios-disponibles")) {
+        console.error("❌ Error obteniendo horarios:", {
+          url: error.config?.url,
+          status: error.response?.status,
+          statusText: error.response?.statusText,
+          data: error.response?.data,
+          message: error.message,
+        });
+      } else if (error.response?.status === 401) {
+        console.error("❌ Error 401 - No autenticado");
       } else {
         console.error("Error en solicitud HTTP:", error);
       }
