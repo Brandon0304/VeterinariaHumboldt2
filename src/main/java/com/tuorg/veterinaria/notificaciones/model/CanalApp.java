@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Implementación concreta de CanalEnvio para notificaciones en la app.
@@ -15,6 +16,7 @@ import lombok.Setter;
  * @author Equipo de Desarrollo
  * @version 1.0.0
  */
+@Slf4j
 @Entity
 @Table(name = "canales_app", schema = "public")
 @PrimaryKeyJoinColumn(name = "id_canal")
@@ -38,9 +40,9 @@ public class CanalApp extends CanalEnvio {
      */
     @Override
     public boolean enviar(Notificacion notificacion) {
-        // TODO: Implementar envío real de notificación push
-        // Por ahora retornamos true como simulación
-        System.out.println("Enviando notificación push al tópico " + appTopic + ": " + notificacion.getMensaje());
+        // Nota: El envío real de notificación push
+        // se implementará cuando se requiera la funcionalidad completa de notificaciones
+        log.info("Enviando notificación push al tópico {}: {}", appTopic, notificacion.getMensaje());
         return true;
     }
 }

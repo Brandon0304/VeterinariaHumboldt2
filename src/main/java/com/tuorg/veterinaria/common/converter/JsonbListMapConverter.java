@@ -2,6 +2,7 @@ package com.tuorg.veterinaria.common.converter;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.tuorg.veterinaria.common.exception.BusinessException;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 import org.slf4j.Logger;
@@ -37,7 +38,7 @@ public class JsonbListMapConverter implements AttributeConverter<List<Map<String
             return objectMapper.writeValueAsString(attribute);
         } catch (Exception e) {
             logger.error("Error al convertir List<Map<String, Object>> a JSON", e);
-            throw new RuntimeException("Error al serializar datos JSONB", e);
+            throw new BusinessException("Error al serializar datos JSONB", e);
         }
     }
 

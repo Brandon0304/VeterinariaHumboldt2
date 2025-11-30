@@ -39,3 +39,4 @@ public interface VacunacionRepository extends JpaRepository<Vacunacion, Long> {
     @Query("SELECT v FROM Vacunacion v WHERE v.proximaDosis IS NOT NULL AND v.proximaDosis <= :fechaLimite")
     List<Vacunacion> findVacunacionesPendientes(@Param("fechaLimite") LocalDate fechaLimite);
 }
+

@@ -3,6 +3,7 @@ package com.tuorg.veterinaria.gestioninventario.service;
 import com.tuorg.veterinaria.common.constants.AppConstants;
 import com.tuorg.veterinaria.common.exception.BusinessException;
 import com.tuorg.veterinaria.common.exception.ResourceNotFoundException;
+import com.tuorg.veterinaria.common.validation.BusinessValidator;
 import com.tuorg.veterinaria.gestioninventario.dto.MovimientoEntradaRequest;
 import com.tuorg.veterinaria.gestioninventario.dto.MovimientoInventarioResponse;
 import com.tuorg.veterinaria.gestioninventario.dto.MovimientoSalidaRequest;
@@ -20,8 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
-
 /**
  * Servicio para la gestión de movimientos de inventario.
  * 
@@ -60,6 +59,11 @@ public class MovimientoInventarioService {
     private final ProductoService productoService;
 
     /**
+     * Validador de reglas de negocio.
+     */
+    private final BusinessValidator businessValidator;
+
+    /**
      * Constructor con inyección de dependencias.
      * 
      * @param movimientoInventarioRepository Repositorio de movimientos
@@ -74,12 +78,14 @@ public class MovimientoInventarioService {
             ProductoRepository productoRepository,
             ProveedorRepository proveedorRepository,
             UsuarioRepository usuarioRepository,
-            ProductoService productoService) {
+            ProductoService productoService,
+            BusinessValidator businessValidator) {
         this.movimientoInventarioRepository = movimientoInventarioRepository;
         this.productoRepository = productoRepository;
         this.proveedorRepository = proveedorRepository;
         this.usuarioRepository = usuarioRepository;
         this.productoService = productoService;
+        this.businessValidator = businessValidator;
     }
 
     /**
@@ -145,6 +151,9 @@ public class MovimientoInventarioService {
             throw new BusinessException("La cantidad debe ser mayor que cero");
         }
 
+        // Validación mejorada de stock con mensaje detallado
+        businessValidator.validarStockSuficiente(request.getProductoId(), request.getCantidad());
+
         if (!productoService.verificarDisponibilidad(request.getProductoId(), request.getCantidad())) {
             Producto producto = productoService.obtenerEntidad(request.getProductoId());
             throw new BusinessException("Stock insuficiente. Stock disponible: " + producto.getStock());
@@ -181,7 +190,7 @@ public class MovimientoInventarioService {
         return movimientoInventarioRepository.findByProductoId(productoId)
                 .stream()
                 .map(mov -> mapToResponse(mov, null))
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -196,7 +205,74 @@ public class MovimientoInventarioService {
         return movimientoInventarioRepository.findByFechaBetween(fechaInicio, fechaFin)
                 .stream()
                 .map(mov -> mapToResponse(mov, null))
-                .collect(Collectors.toList());
+                .toList();
+    }
+
+    /**
+     * Revierte un movimiento de inventario (patrón Command con reversión).
+     * 
+     * Esta operación es transaccional: crea un movimiento inverso y
+     * actualiza el stock del producto. Solo se pueden revertir movimientos
+     * que no hayan sido revertidos previamente.
+     * 
+     * @param movimientoId ID del movimiento a revertir
+     * @param usuarioId ID del usuario que realiza la reversión
+     * @return MovimientoInventario de reversión creado
+     */
+    @Transactional
+    public MovimientoInventarioResponse revertirMovimiento(Long movimientoId, Long usuarioId) {
+        MovimientoInventario movimientoOriginal = movimientoInventarioRepository.findById(movimientoId)
+                .orElseThrow(() -> new ResourceNotFoundException("MovimientoInventario", "id", movimientoId));
+
+        // Verificar que el movimiento no haya sido revertido previamente
+        // (esto se puede hacer buscando si existe un movimiento de reversión para este)
+        boolean yaRevertido = movimientoInventarioRepository.existsByReferencia(
+                "REVERSION-" + movimientoId);
+        if (yaRevertido) {
+            throw new BusinessException("Este movimiento ya ha sido revertido");
+        }
+
+        // Crear movimiento inverso
+        MovimientoInventario movimientoReversion = new MovimientoInventario();
+        movimientoReversion.setProducto(movimientoOriginal.getProducto());
+        
+        // Invertir el tipo de movimiento
+        if (AppConstants.TIPO_MOVIMIENTO_ENTRADA.equals(movimientoOriginal.getTipoMovimiento())) {
+            movimientoReversion.setTipoMovimiento(AppConstants.TIPO_MOVIMIENTO_SALIDA);
+        } else if (AppConstants.TIPO_MOVIMIENTO_SALIDA.equals(movimientoOriginal.getTipoMovimiento())) {
+            movimientoReversion.setTipoMovimiento(AppConstants.TIPO_MOVIMIENTO_ENTRADA);
+        } else {
+            throw new BusinessException("No se puede revertir un movimiento de tipo AJUSTE");
+        }
+        
+        // Mantener la misma cantidad (pero con signo inverso implícito en el tipo)
+        movimientoReversion.setCantidad(movimientoOriginal.getCantidad());
+        movimientoReversion.setFecha(LocalDateTime.now());
+        movimientoReversion.setReferencia("REVERSION-" + movimientoId);
+        movimientoReversion.setProveedor(movimientoOriginal.getProveedor());
+
+        if (usuarioId != null) {
+            movimientoReversion.setUsuario(usuarioRepository.findById(usuarioId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Usuario", "id", usuarioId)));
+        }
+
+        MovimientoInventario guardado = movimientoInventarioRepository.save(movimientoReversion);
+        
+        // Actualizar stock (invertir el cambio original)
+        Integer cantidadAjuste;
+        if (AppConstants.TIPO_MOVIMIENTO_ENTRADA.equals(movimientoOriginal.getTipoMovimiento())) {
+            // Si era entrada, ahora es salida (restar)
+            cantidadAjuste = -movimientoOriginal.getCantidad();
+        } else {
+            // Si era salida, ahora es entrada (sumar)
+            cantidadAjuste = movimientoOriginal.getCantidad();
+        }
+        
+        Producto actualizado = productoService.actualizarStock(
+                movimientoOriginal.getProducto().getIdProducto(), 
+                cantidadAjuste);
+        
+        return mapToResponse(guardado, actualizado.getStock());
     }
 
     private MovimientoInventarioResponse mapToResponse(MovimientoInventario movimiento, Integer stockResultante) {
@@ -238,4 +314,5 @@ public class MovimientoInventarioService {
         );
     }
 }
+
 

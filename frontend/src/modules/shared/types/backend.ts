@@ -131,11 +131,11 @@ export interface ApiUsuarioResponse {
   readonly activo: boolean;
   readonly ultimoAcceso: string | null;
   readonly rol: {
-    readonly idRol: number;
-    readonly nombreRol: string;
+    readonly id: number;
+    readonly nombre: string;
     readonly descripcion: string | null;
     readonly permisos: Array<{
-      readonly idPermiso: number;
+      readonly id: number;
       readonly nombre: string;
       readonly descripcion: string | null;
     }>;

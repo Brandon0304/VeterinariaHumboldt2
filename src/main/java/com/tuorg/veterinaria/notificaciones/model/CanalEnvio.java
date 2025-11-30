@@ -10,7 +10,7 @@ import lombok.Setter;
  * Clase base que representa un canal de envío de notificaciones.
  * 
  * Esta clase implementa el patrón Strategy, permitiendo diferentes
- * estrategias de envío (Email, SMS, App) sin modificar el código cliente.
+ * estrategias de envío (Email, App) sin modificar el código cliente.
  * 
  * Nota: En JPA, no podemos usar @Entity en clases abstractas, por lo que
  * esta clase es concreta pero las implementaciones específicas usan
@@ -38,7 +38,7 @@ public class CanalEnvio {
     private Long idCanal;
 
     /**
-     * Nombre del canal (EMAIL, SMS, APP).
+     * Nombre del canal (EMAIL, APP).
      */
     @Column(name = "nombre", nullable = false, length = 50)
     private String nombre;

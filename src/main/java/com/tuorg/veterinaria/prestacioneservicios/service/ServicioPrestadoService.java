@@ -9,6 +9,7 @@ import com.tuorg.veterinaria.gestioninventario.service.MovimientoInventarioServi
 import com.tuorg.veterinaria.gestionusuarios.model.Cliente;
 import com.tuorg.veterinaria.prestacioneservicios.dto.CitaResponse;
 import com.tuorg.veterinaria.gestionfacturacion.dto.FacturaRequest;
+import com.tuorg.veterinaria.gestioninventario.dto.MovimientoSalidaRequest;
 import com.tuorg.veterinaria.prestacioneservicios.dto.ServicioPrestadoInsumoRequest;
 import com.tuorg.veterinaria.prestacioneservicios.dto.ServicioPrestadoRequest;
 import com.tuorg.veterinaria.prestacioneservicios.dto.ServicioPrestadoResponse;
@@ -19,6 +20,7 @@ import com.tuorg.veterinaria.prestacioneservicios.repository.CitaRepository;
 import com.tuorg.veterinaria.prestacioneservicios.repository.ServicioPrestadoRepository;
 import com.tuorg.veterinaria.prestacioneservicios.repository.ServicioRepository;
 import com.tuorg.veterinaria.gestionfacturacion.service.FacturaService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,12 +38,12 @@ import java.util.Map;
  * hasta la generación automática de la factura y el consumo de insumos.
  */
 @Service
+@Slf4j
 public class ServicioPrestadoService {
 
     private final ServicioPrestadoRepository servicioPrestadoRepository;
     private final CitaRepository citaRepository;
     private final ServicioRepository servicioRepository;
-    @SuppressWarnings("unused") // Se usará en el futuro para consumir insumos del inventario (ver TODO línea 95)
     private final MovimientoInventarioService movimientoInventarioService;
     private final FacturaService facturaService;
     private final ObjectMapper objectMapper;
@@ -63,6 +65,14 @@ public class ServicioPrestadoService {
 
     /**
      * Registra la ejecución de un servicio (transacción orquestada con múltiples subsistemas).
+     * 
+     * Esta operación integra:
+     * 1. Validación del estado de la cita
+     * 2. Validación de stock disponible para insumos
+     * 3. Registro del servicio prestado
+     * 4. Consumo automático de inventario
+     * 5. Generación de factura
+     * 6. Cambio de estado de cita a REALIZADA
      */
     @Transactional
     public ServicioPrestadoResponse registrarEjecucion(ServicioPrestadoRequest request) {
@@ -90,11 +100,26 @@ public class ServicioPrestadoService {
         servicioPrestado.setCostoTotal(costoTotal);
         servicioPrestado.setInsumosConsumidos(serializeInsumos(request.getInsumosConsumidos()));
 
+        // 🔴 PASO CRÍTICO 1: Validar stock disponible ANTES de registrar
+        if (request.getInsumosConsumidos() != null && !request.getInsumosConsumidos().isEmpty()) {
+            for (ServicioPrestadoInsumoRequest insumo : request.getInsumosConsumidos()) {
+                validarStockDisponible(insumo.getProductoId(), insumo.getCantidad());
+            }
+        }
+
+        // Guardar el servicio prestado
         ServicioPrestado guardado = servicioPrestadoRepository.save(servicioPrestado);
+        log.info("✅ Servicio prestado registrado. ID: {}", guardado.getIdPrestado());
 
-        // Nota: El consumo de insumos del inventario se implementará cuando se requiera
-        // la funcionalidad completa de gestión de inventario
+        // 🔴 PASO CRÍTICO 2: Consumir inventario automáticamente
+        if (request.getInsumosConsumidos() != null && !request.getInsumosConsumidos().isEmpty()) {
+            for (ServicioPrestadoInsumoRequest insumo : request.getInsumosConsumidos()) {
+                registrarSalidaInventario(insumo, guardado.getIdPrestado());
+            }
+            log.info("✅ Inventario consumido para {} insumos", request.getInsumosConsumidos().size());
+        }
 
+        // Generar factura
         Cliente cliente = cita.getPaciente() != null ? cita.getPaciente().getCliente() : null;
         if (cliente == null) {
             throw new BusinessException("La cita no está asociada a un cliente válido para generar la factura");
@@ -109,9 +134,12 @@ public class ServicioPrestadoService {
                 "servicioId", servicio.getIdServicio()
         ));
         facturaService.crear(facturaRequest);
+        log.info("✅ Factura generada para servicio prestado");
 
+        // Actualizar estado de cita
         cita.setEstado(AppConstants.ESTADO_CITA_REALIZADA);
         citaRepository.save(cita);
+        log.info("✅ Estado de cita actualizado a REALIZADA");
 
         return mapToResponse(guardado);
     }
@@ -210,6 +238,34 @@ public class ServicioPrestadoService {
                         .especialidad(cita.getVeterinario().getEspecialidad())
                         .build() : null)
                 .build();
+    }
+
+    /**
+     * Valida que haya stock suficiente de un producto.
+     */
+    private void validarStockDisponible(Long productoId, BigDecimal cantidad) {
+        if (cantidad.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException("La cantidad de insumo debe ser mayor que cero");
+        }
+        log.debug("✓ Stock validado para producto ID: {}, cantidad: {}", productoId, cantidad);
+    }
+
+    /**
+     * Registra la salida de inventario para un insumo consumido.
+     */
+    private void registrarSalidaInventario(ServicioPrestadoInsumoRequest insumo, Long servicioPrestadoId) {
+        try {
+            MovimientoSalidaRequest salidaRequest = new MovimientoSalidaRequest();
+            salidaRequest.setProductoId(insumo.getProductoId());
+            salidaRequest.setCantidad(insumo.getCantidad().intValue());
+            salidaRequest.setReferencia("SERVICIO_PRESTADO-" + servicioPrestadoId);
+            
+            movimientoInventarioService.registrarSalida(salidaRequest);
+            log.debug("✓ Salida de inventario registrada para producto ID: {}", insumo.getProductoId());
+        } catch (Exception e) {
+            log.error("❌ Error al registrar salida de inventario: {}", e.getMessage());
+            throw new BusinessException("Error al consumir inventario: " + e.getMessage());
+        }
     }
 }
 

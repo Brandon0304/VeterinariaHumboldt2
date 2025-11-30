@@ -44,7 +44,12 @@ export const AppProviders = ({ children }: AppProvidersProps) => {
 
   return (
     // BrowserRouter provee el contexto de enrutamiento a toda la app.
-    <BrowserRouter>
+    <BrowserRouter
+      future={{
+        v7_startTransition: true,
+        v7_relativeSplatPath: true,
+      }}
+    >
       {/* QueryClientProvider expone la funcionalidad de React Query. */}
       <QueryClientProvider client={queryClient}>
         {children}

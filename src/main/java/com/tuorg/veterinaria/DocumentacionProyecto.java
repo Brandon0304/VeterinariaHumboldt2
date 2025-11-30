@@ -430,8 +430,6 @@ package com.tuorg.veterinaria;
  *       * Método abstracto: enviar(Notificacion)
  *     - CanalEmail (implementación): Envío por email
  *       * smtp_server, from_address
- *     - CanalSMS (implementación): Envío por SMS
- *       * proveedor_api
  *     - CanalApp (implementación): Notificaciones push en app
  *       * app_topic
  *     - Notificacion: Notificaciones del sistema
@@ -492,7 +490,7 @@ package com.tuorg.veterinaria;
  *     - Acceso global: ConfigService.getInstance()
  * 
  * 5.2. STRATEGY
- *     - CanalEnvio y sus implementaciones (CanalEmail, CanalSMS, CanalApp)
+ *     - CanalEnvio y sus implementaciones (CanalEmail, CanalApp)
  *     - Permite cambiar estrategia de envío sin modificar código cliente
  *     - NotificacionService usa el canal apropiado dinámicamente
  * 
@@ -756,7 +754,6 @@ package com.tuorg.veterinaria;
  * 13.1. FUNCIONALIDADES PENDIENTES:
  *      - Generación real de PDFs (iText/JasperReports)
  *      - Envío real de emails (JavaMailSender)
- *      - Envío real de SMS (API de proveedor)
  *      - Notificaciones push reales
  *      - Cálculos reales de estadísticas
  *      - Dashboard en tiempo real

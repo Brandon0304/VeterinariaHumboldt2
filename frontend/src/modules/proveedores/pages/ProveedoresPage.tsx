@@ -8,6 +8,8 @@ import type { ApiProveedorResponse } from "../../shared/types/backend";
 import { CreateProveedorModal } from "../components/CreateProveedorModal";
 import { EditProveedorModal } from "../components/EditProveedorModal";
 import { ProveedorDetailModal } from "../components/ProveedorDetailModal";
+import ConfirmDialog from "../../../shared/components/ConfirmDialog";
+import { useConfirmDialog } from "../../../shared/hooks/useConfirmDialog";
 
 export const ProveedoresPage = () => {
   const queryClient = useQueryClient();
@@ -16,6 +18,8 @@ export const ProveedoresPage = () => {
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
   const [selectedProveedorId, setSelectedProveedorId] = useState<number | null>(null);
   const [search, setSearch] = useState("");
+  
+  const confirmDialog = useConfirmDialog();
 
   const { data: proveedores, isLoading } = useQuery({
     queryKey: ["proveedores"],
@@ -125,9 +129,12 @@ export const ProveedoresPage = () => {
                   setIsEditModalOpen(true);
                 }}
                 onDelete={() => {
-                  if (confirm(`¿Está seguro de que desea eliminar al proveedor ${proveedor.nombre}?`)) {
-                    deleteMutation.mutate(proveedor.idProveedor);
-                  }
+                  confirmDialog.openDialog({
+                    title: 'Eliminar Proveedor',
+                    message: `¿Está seguro de que desea eliminar al proveedor "${proveedor.nombre}"? Esta acción no se puede deshacer.`,
+                    variant: 'danger',
+                    onConfirm: () => deleteMutation.mutate(proveedor.idProveedor),
+                  });
                 }}
               />
             ))}
@@ -156,6 +163,15 @@ export const ProveedoresPage = () => {
           />
         </>
       )}
+      
+      <ConfirmDialog
+        isOpen={confirmDialog.isOpen}
+        onClose={confirmDialog.closeDialog}
+        onConfirm={confirmDialog.handleConfirm}
+        title={confirmDialog.options.title || 'Confirmar'}
+        message={confirmDialog.options.message || '¿Continuar?'}
+        variant={confirmDialog.options.variant}
+      />
     </div>
   );
 };

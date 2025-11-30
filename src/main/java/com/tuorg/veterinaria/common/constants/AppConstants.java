@@ -2,10 +2,10 @@ package com.tuorg.veterinaria.common.constants;
 
 /**
  * Clase de constantes de la aplicación.
- *
+ * 
  * Esta clase centraliza todas las constantes utilizadas en la aplicación,
  * incluyendo mensajes, códigos de error, valores por defecto, etc.
- *
+ * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
  */
@@ -64,10 +64,62 @@ public final class AppConstants {
      */
     public static final String ESTADO_CITA_CANCELADA = "CANCELADA";
 
+    // ==================== Estados de Solicitud de Cita ====================
+
+    /**
+     * Estado de solicitud: Pendiente.
+     */
+    public static final String ESTADO_SOLICITUD_PENDIENTE = "PENDIENTE";
+
+    /**
+     * Estado de solicitud: Aprobada.
+     */
+    public static final String ESTADO_SOLICITUD_APROBADA = "APROBADA";
+
+    /**
+     * Estado de solicitud: Rechazada.
+     */
+    public static final String ESTADO_SOLICITUD_RECHAZADA = "RECHAZADA";
+
+    /**
+     * Estado de solicitud: Cancelada.
+     */
+    public static final String ESTADO_SOLICITUD_CANCELADA = "CANCELADA";
+
     /**
      * Duración estándar de una cita en minutos.
      */
     public static final int DURACION_CITA_MINUTOS = 30;
+
+    /**
+     * Tiempo mínimo de anticipación para agendar/cancelar una cita (en horas).
+     */
+    public static final int ANTICIPACION_MINIMA_HORAS = 2;
+
+    /**
+     * Hora de inicio del horario laboral - mañana (formato 24 horas).
+     */
+    public static final int HORARIO_MANANA_INICIO = 8;
+
+    /**
+     * Hora de fin del horario laboral - mañana (formato 24 horas).
+     */
+    public static final int HORARIO_MANANA_FIN = 12;
+
+    /**
+     * Hora de inicio del horario laboral - tarde (formato 24 horas).
+     */
+    public static final int HORARIO_TARDE_INICIO = 14;
+
+    /**
+     * Hora de fin del horario laboral - tarde (formato 24 horas).
+     */
+    public static final int HORARIO_TARDE_FIN = 18;
+
+    /**
+     * Máximo de citas que un cliente puede agendar por día.
+     */
+    public static final int MAX_CITAS_POR_DIA_CLIENTE = 3;
 
     // ==================== Tipos de Movimiento de Inventario ====================
 
@@ -126,11 +178,6 @@ public final class AppConstants {
      * Canal de notificación: Email.
      */
     public static final String CANAL_EMAIL = "EMAIL";
-
-    /**
-     * Canal de notificación: SMS.
-     */
-    public static final String CANAL_SMS = "SMS";
 
     /**
      * Canal de notificación: App.

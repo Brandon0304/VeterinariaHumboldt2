@@ -306,12 +306,6 @@ CREATE TABLE IF NOT EXISTS canales_email (
     from_address VARCHAR(150)
 );
 
--- Tabla de canales SMS
-CREATE TABLE IF NOT EXISTS canales_sms (
-    id_canal BIGINT PRIMARY KEY REFERENCES canales_envio(id_canal) ON DELETE CASCADE,
-    proveedor_api VARCHAR(150)
-);
-
 -- Tabla de canales App
 CREATE TABLE IF NOT EXISTS canales_app (
     id_canal BIGINT PRIMARY KEY REFERENCES canales_envio(id_canal) ON DELETE CASCADE,
@@ -456,7 +450,6 @@ ON CONFLICT DO NOTHING;
 -- Insertar parámetros del sistema iniciales
 INSERT INTO parametros_sistema (clave, valor, descripcion, aplicacion) VALUES
     ('notificaciones.email.enabled', 'true', 'Habilita el envío de notificaciones por email', 'notificaciones'),
-    ('notificaciones.sms.enabled', 'false', 'Habilita el envío de notificaciones por SMS', 'notificaciones'),
     ('inventario.stock.minimo', '10', 'Stock mínimo para generar alertas', 'inventario'),
     ('sistema.mantenimiento', 'false', 'Indica si el sistema está en mantenimiento', 'global')
 ON CONFLICT (clave) DO NOTHING;
@@ -624,7 +617,6 @@ ON CONFLICT (numero) DO NOTHING;
 -- Configuración de notificaciones
 INSERT INTO canales_envio (nombre, configuracion) VALUES
     ('EMAIL', '{"host":"smtp.gmail.com","puerto":587}'::jsonb),
-    ('SMS', '{"proveedor":"twilio"}'::jsonb),
     ('APP', '{"topic":"veterinaria"}'::jsonb)
 ON CONFLICT (nombre) DO NOTHING;
 
@@ -632,12 +624,6 @@ INSERT INTO canales_email (id_canal, smtp_server, from_address)
 SELECT c.id_canal, 'smtp.gmail.com', 'notificaciones@veterinaria.com'
 FROM canales_envio c
 WHERE c.nombre = 'EMAIL'
-ON CONFLICT (id_canal) DO NOTHING;
-
-INSERT INTO canales_sms (id_canal, proveedor_api)
-SELECT c.id_canal, 'twilio'
-FROM canales_envio c
-WHERE c.nombre = 'SMS'
 ON CONFLICT (id_canal) DO NOTHING;
 
 INSERT INTO canales_app (id_canal, app_topic)

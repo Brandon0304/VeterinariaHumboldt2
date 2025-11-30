@@ -9,13 +9,14 @@ import com.tuorg.veterinaria.gestioninventario.dto.ProductoUpdateRequest;
 import com.tuorg.veterinaria.gestioninventario.model.Producto;
 import com.tuorg.veterinaria.gestioninventario.repository.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
 /**
  * Servicio para la gestión de productos del inventario.
  * 
@@ -50,6 +51,10 @@ public class ProductoService {
      * @return Producto creado
      */
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = "productos", allEntries = true),
+        @CacheEvict(value = "productosPorTipo", allEntries = true)
+    })
     public ProductoResponse crear(ProductoRequest request) {
         if (productoRepository.existsBySku(request.getSku())) {
             throw new BusinessException("El SKU ya está en uso");
@@ -94,11 +99,12 @@ public class ProductoService {
      * @return Lista de productos
      */
     @Transactional(readOnly = true)
+    @Cacheable(value = "productos")
     public List<ProductoResponse> obtenerTodos() {
         return productoRepository.findAll()
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -109,6 +115,10 @@ public class ProductoService {
      * @return Producto actualizado
      */
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = "productos", allEntries = true),
+        @CacheEvict(value = "productosPorTipo", allEntries = true)
+    })
     public ProductoResponse actualizar(Long id, ProductoUpdateRequest request) {
         Producto producto = obtenerEntidad(id);
 
@@ -151,6 +161,10 @@ public class ProductoService {
      * @return Producto actualizado
      */
     @Transactional
+    @Caching(evict = {
+        @CacheEvict(value = "productos", allEntries = true),
+        @CacheEvict(value = "productosPorTipo", allEntries = true)
+    })
     public Producto actualizarStock(Long productoId, Integer delta) {
         Producto producto = obtenerEntidad(productoId);
         int nuevoStock = producto.getStock() + delta;
@@ -187,7 +201,7 @@ public class ProductoService {
         return productoRepository.findProductosConStockBajo(nivelStock)
                 .stream()
                 .map(this::mapToResponse)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional(readOnly = true)
@@ -211,4 +225,5 @@ public class ProductoService {
         );
     }
 }
+
 

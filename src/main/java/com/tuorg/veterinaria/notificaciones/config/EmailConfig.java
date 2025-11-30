@@ -2,6 +2,7 @@ package com.tuorg.veterinaria.notificaciones.config;
 
 import com.tuorg.veterinaria.notificaciones.model.CanalEmail;
 import com.tuorg.veterinaria.notificaciones.repository.CanalEnvioRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -18,6 +19,7 @@ import java.util.List;
  * @author Equipo de Desarrollo
  * @version 1.0.0
  */
+@Slf4j
 @Configuration
 public class EmailConfig {
 
@@ -37,16 +39,15 @@ public class EmailConfig {
             List<?> canales = canalEnvioRepository.findAll();
             
             long canalesConfigurados = canales.stream()
-                .filter(canal -> canal instanceof CanalEmail)
-                .map(canal -> (CanalEmail) canal)
+                .filter(CanalEmail.class::isInstance)
+                .map(CanalEmail.class::cast)
                 .peek(canalEmail -> canalEmail.setMailSender(mailSender))
                 .count();
             
-            System.out.println("✅ JavaMailSender configurado en " + canalesConfigurados + " canales de email");
+            log.info("JavaMailSender configurado en {} canales de email", canalesConfigurados);
                     
         } catch (Exception e) {
-            System.err.println("⚠️ No se pudieron configurar los canales de email: " + e.getMessage());
-            System.err.println("⚠️ Esto es normal si la base de datos aún no tiene registros de canales.");
+            log.warn("No se pudieron configurar los canales de email: {}. Esto es normal si la base de datos aún no tiene registros de canales.", e.getMessage());
         }
     }
 }

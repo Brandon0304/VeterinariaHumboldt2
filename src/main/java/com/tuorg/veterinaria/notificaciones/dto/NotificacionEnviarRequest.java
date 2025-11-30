@@ -25,7 +25,7 @@ public class NotificacionEnviarRequest {
     private String mensaje;
 
     @NotNull(message = "El identificador del canal es obligatorio")
-    @Schema(description = "Identificador del canal de envío (EMAIL, SMS, APP)", example = "2", requiredMode = Schema.RequiredMode.REQUIRED)
+    @Schema(description = "Identificador del canal de envío (EMAIL, APP)", example = "1", requiredMode = Schema.RequiredMode.REQUIRED)
     private Long canalId;
 
     @Schema(description = "Datos dinámicos para personalizar la notificación", example = "{\"nivel\":\"alto\",\"producto\":\"Vacuna Rabia\"}")

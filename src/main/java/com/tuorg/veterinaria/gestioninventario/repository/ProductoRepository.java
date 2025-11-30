@@ -1,6 +1,8 @@
 package com.tuorg.veterinaria.gestioninventario.repository;
 
 import com.tuorg.veterinaria.gestioninventario.model.Producto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -13,7 +15,7 @@ import java.util.Optional;
  * Repositorio para la entidad Producto.
  * 
  * Proporciona métodos de acceso a datos para productos
- * utilizando Spring Data JPA.
+ * utilizando Spring Data JPA con soporte de paginación.
  * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
@@ -44,6 +46,15 @@ public interface ProductoRepository extends JpaRepository<Producto, Long> {
      * @return Lista de productos del tipo especificado
      */
     List<Producto> findByTipo(String tipo);
+
+    /**
+     * Busca productos por tipo con paginación.
+     * 
+     * @param tipo Tipo de producto
+     * @param pageable Información de paginación
+     * @return Página de productos del tipo especificado
+     */
+    Page<Producto> findByTipo(String tipo, Pageable pageable);
 
     /**
      * Busca productos con stock bajo (menor o igual al nivel especificado).

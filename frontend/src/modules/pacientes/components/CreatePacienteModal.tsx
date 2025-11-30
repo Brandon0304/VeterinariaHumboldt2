@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
 import { PacientesRepository, type PacienteRequest } from "../services/PacientesRepository";
 import { ClientesRepository } from "../../clientes/services/ClientesRepository";
+import { calculateSimilarity } from "../../../shared/utils/validations";
 
 interface CreatePacienteModalProps {
   readonly isOpen: boolean;
@@ -24,13 +25,41 @@ interface FormData {
 
 export const CreatePacienteModal = ({ isOpen, onClose }: CreatePacienteModalProps) => {
   const queryClient = useQueryClient();
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<FormData>();
+  const { register, handleSubmit, formState: { errors }, reset, watch } = useForm<FormData>();
+  const [similarPatients, setSimilarPatients] = useState<any[]>([]);
 
   const { data: clientes } = useQuery({
     queryKey: ["clientes"],
     queryFn: ClientesRepository.getAll,
     enabled: isOpen,
   });
+
+  const { data: allPacientes } = useQuery({
+    queryKey: ["pacientes"],
+    queryFn: PacientesRepository.getAll,
+    enabled: isOpen,
+  });
+
+  // Detectar pacientes similares mientras el usuario escribe
+  const nombreValue = watch("nombre");
+  const especieValue = watch("especie");
+  const clienteIdValue = watch("clienteId");
+
+  useEffect(() => {
+    if (nombreValue && nombreValue.length >= 3 && allPacientes) {
+      const similar = allPacientes.filter((p: any) => {
+        const nameSimilarity = calculateSimilarity(nombreValue, p.nombre);
+        const sameClient = clienteIdValue && p.clienteId === Number.parseInt(clienteIdValue);
+        const sameSpecies = especieValue && p.especie === especieValue;
+        
+        return nameSimilarity > 0.7 || (nameSimilarity > 0.5 && sameClient && sameSpecies);
+      });
+      
+      setSimilarPatients(similar.slice(0, 3)); // Máximo 3 sugerencias
+    } else {
+      setSimilarPatients([]);
+    }
+  }, [nombreValue, especieValue, clienteIdValue, allPacientes]);
 
   const mutation = useMutation({
     mutationFn: (data: PacienteRequest) => PacientesRepository.create(data),
@@ -83,6 +112,34 @@ export const CreatePacienteModal = ({ isOpen, onClose }: CreatePacienteModalProp
                   placeholder="Ej: Max"
                 />
                 {errors.nombre && <p className="mt-1 text-xs text-red-500">{errors.nombre.message}</p>}
+                
+                {/* Alerta de pacientes similares */}
+                {similarPatients.length > 0 && (
+                  <div className="mt-2 rounded-md bg-yellow-50 border border-yellow-200 p-3">
+                    <div className="flex">
+                      <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                          <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                      </div>
+                      <div className="ml-3">
+                        <h3 className="text-sm font-medium text-yellow-800">
+                          Posibles pacientes duplicados
+                        </h3>
+                        <div className="mt-2 text-sm text-yellow-700">
+                          <p>Se encontraron pacientes con nombres similares:</p>
+                          <ul className="mt-1 list-disc list-inside">
+                            {similarPatients.map((p: any) => (
+                              <li key={p.id}>
+                                {p.nombre} ({p.especie}) - Propietario: {p.clienteNombre}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               <div>

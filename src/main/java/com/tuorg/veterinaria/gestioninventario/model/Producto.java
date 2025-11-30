@@ -1,5 +1,6 @@
 package com.tuorg.veterinaria.gestioninventario.model;
 
+import com.tuorg.veterinaria.common.audit.Auditable;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,6 +17,7 @@ import java.util.Map;
  * 
  * Esta clase almacena información sobre los productos disponibles
  * en el inventario de la clínica veterinaria.
+ * Extiende de Auditable para trazabilidad automática.
  * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
@@ -26,7 +28,7 @@ import java.util.Map;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Producto {
+public class Producto extends Auditable {
 
     /**
      * Identificador único del producto (clave primaria).

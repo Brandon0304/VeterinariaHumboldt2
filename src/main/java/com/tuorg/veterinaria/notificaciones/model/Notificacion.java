@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * Entidad que representa una notificación del sistema.
  * 
  * Esta clase almacena información sobre las notificaciones que se envían
- * a través de diferentes canales (Email, SMS, App).
+ * a través de diferentes canales (Email, App).
  * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
@@ -80,7 +80,8 @@ public class Notificacion {
      * Datos adicionales en formato JSON.
      * Puede incluir información contextual para el renderizado de plantillas.
      */
-    @Column(name = "datos", columnDefinition = "JSONB")
+    @Column(name = "datos", columnDefinition = "jsonb")
+    @org.hibernate.annotations.JdbcTypeCode(org.hibernate.type.SqlTypes.JSON)
     private String datos;
 }
 

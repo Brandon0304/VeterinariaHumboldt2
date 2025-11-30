@@ -1,5 +1,6 @@
 package com.tuorg.veterinaria.prestacioneservicios.model;
 
+import com.tuorg.veterinaria.common.audit.Auditable;
 import com.tuorg.veterinaria.common.constants.AppConstants;
 import com.tuorg.veterinaria.gestionpacientes.model.Paciente;
 import com.tuorg.veterinaria.gestionusuarios.model.UsuarioVeterinario;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
  * 
  * Esta clase almacena información sobre las citas programadas
  * entre pacientes y veterinarios.
+ * Extiende de Auditable para trazabilidad automática.
  * 
  * @author Equipo de Desarrollo
  * @version 1.0.0
@@ -26,7 +28,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Cita {
+public class Cita extends Auditable {
 
     /**
      * Identificador único de la cita (clave primaria).

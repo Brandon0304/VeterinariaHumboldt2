@@ -46,9 +46,9 @@ export const VeterinarianDashboardPage = () => {
   } = data;
 
   return (
-    <div className="w-full space-y-6">
+    <div className="w-full space-y-4 sm:space-y-6">
       {/* Tarjetas de resumen superior */}
-      <section className="grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="grid w-full gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <SummaryCard title="Citas Hoy" value={citasHoy} subtitle={`${citasCompletadasHoy} completadas`} />
         <SummaryCard title="Pacientes" value={pacientesAsignados} subtitle="Bajo tu cuidado" />
         <SummaryCard title="Pendientes" value={pendientes} subtitle="Seguimientos activos" tone="warning" />
@@ -60,66 +60,66 @@ export const VeterinarianDashboardPage = () => {
       </section>
 
       {/* Sección de citas de hoy */}
-      <section className="w-full overflow-hidden rounded-3xl border border-gray-200/80 bg-white shadow-lg">
-        <div className="border-b border-gray-100 bg-gradient-to-r from-white to-gray-50/50 px-6 py-5">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-                  <span className="text-xl">📅</span>
+      <section className="w-full overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-lg sm:rounded-3xl">
+        <div className="border-b border-gray-100 bg-gradient-to-r from-white to-gray-50/50 px-4 py-4 sm:px-6 sm:py-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 sm:h-10 sm:w-10 sm:rounded-xl">
+                  <span className="text-base sm:text-xl">📅</span>
                 </div>
-                <div>
-                  <h2 className="text-xl font-bold text-secondary">Citas de hoy</h2>
-                  <p className="mt-0.5 text-sm font-medium text-gray-500">Gestiona tus citas programadas para el día</p>
+                <div className="min-w-0 flex-1">
+                  <h2 className="text-base font-bold text-secondary sm:text-xl">Citas de hoy</h2>
+                  <p className="mt-0.5 hidden text-sm font-medium text-gray-500 sm:block">Gestiona tus citas programadas para el día</p>
                 </div>
               </div>
             </div>
-            <div className="flex flex-wrap gap-2.5">
+            <div className="flex flex-wrap gap-2">
               {/* Oculto para rol VETERINARIO: creación de consultas/citas no permitida */}
-              <button className="rounded-xl border-2 border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:border-primary hover:bg-primary/5 hover:text-primary hover:shadow-md">
-                🔍 Buscar paciente
+              <button className="flex-1 rounded-lg border-2 border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm transition-all hover:border-primary hover:bg-primary/5 hover:text-primary hover:shadow-md sm:flex-none sm:rounded-xl sm:px-4 sm:py-2.5 sm:text-sm">
+                🔍 <span className="hidden sm:inline">Buscar paciente</span><span className="sm:hidden">Buscar</span>
               </button>
-              <button className="rounded-xl border-2 border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 shadow-sm transition-all hover:border-primary hover:bg-primary/5 hover:text-primary hover:shadow-md">
-                📆 Ver mi agenda
+              <button className="flex-1 rounded-lg border-2 border-gray-200 bg-white px-3 py-2 text-xs font-semibold text-gray-700 shadow-sm transition-all hover:border-primary hover:bg-primary/5 hover:text-primary hover:shadow-md sm:flex-none sm:rounded-xl sm:px-4 sm:py-2.5 sm:text-sm">
+                📆 <span className="hidden sm:inline">Ver mi agenda</span><span className="sm:hidden">Agenda</span>
               </button>
             </div>
           </div>
         </div>
 
-        <div className="p-6">
+        <div className="p-4 sm:p-6">
           {citasDelDia.length === 0 ? (
-            <div className="rounded-2xl border-2 border-dashed border-gray-200 bg-gradient-to-br from-gray-50 to-white p-16 text-center">
-              <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 shadow-inner">
-                <span className="text-4xl">📅</span>
+            <div className="rounded-xl border-2 border-dashed border-gray-200 bg-gradient-to-br from-gray-50 to-white p-8 text-center sm:rounded-2xl sm:p-16">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 shadow-inner sm:mb-6 sm:h-20 sm:w-20 sm:rounded-2xl">
+                <span className="text-2xl sm:text-4xl">📅</span>
               </div>
-              <p className="text-lg font-bold text-gray-700">No hay citas programadas</p>
-              <p className="mt-2 text-sm font-medium text-gray-500">No hay citas programadas para el día de hoy.</p>
+              <p className="text-base font-bold text-gray-700 sm:text-lg">No hay citas programadas</p>
+              <p className="mt-2 text-xs font-medium text-gray-500 sm:text-sm">No hay citas programadas para el día de hoy.</p>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {citasDelDia.map((cita) => {
                 const statusTone = statusLabels[cita.estado] ?? statusLabels.PENDIENTE;
                 return (
                   <article
                     key={cita.idCita}
-                    className="group flex items-center gap-5 rounded-2xl border-2 border-gray-200/80 bg-white p-5 shadow-sm transition-all hover:border-primary/40 hover:shadow-lg"
+                    className="group flex flex-col gap-3 rounded-xl border-2 border-gray-200/80 bg-white p-4 shadow-sm transition-all hover:border-primary/40 hover:shadow-lg sm:flex-row sm:items-center sm:gap-5 sm:rounded-2xl sm:p-5"
                   >
-                    <div className="flex min-w-[90px] flex-col items-center justify-center rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 py-3 px-4 shadow-inner">
-                      <span className="text-xl font-bold text-primary">{cita.hora}</span>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500">Hora</span>
+                    <div className="flex min-w-[70px] flex-col items-center justify-center rounded-lg bg-gradient-to-br from-primary/10 to-primary/5 py-2 px-3 shadow-inner sm:min-w-[90px] sm:rounded-xl sm:py-3 sm:px-4">
+                      <span className="text-base font-bold text-primary sm:text-xl">{cita.hora}</span>
+                      <span className="text-[9px] font-bold uppercase tracking-wider text-gray-500 sm:text-[10px]">Hora</span>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-start justify-between gap-4">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
                         <div className="min-w-0 flex-1">
-                          <p className="truncate text-base font-bold text-secondary">
+                          <p className="truncate text-sm font-bold text-secondary sm:text-base">
                             {cita.paciente} <span className="font-normal text-gray-500">- {cita.especie}</span>
                           </p>
-                          <p className="mt-1.5 text-sm font-medium text-gray-600">{cita.motivo}</p>
-                          <p className="mt-1.5 text-xs font-medium text-gray-500">
+                          <p className="mt-1 text-xs font-medium text-gray-600 sm:mt-1.5 sm:text-sm">{cita.motivo}</p>
+                          <p className="mt-1 text-[10px] font-medium text-gray-500 sm:mt-1.5 sm:text-xs">
                             Propietario: <span className="font-semibold text-gray-700">{cita.propietario}</span>
                           </p>
                         </div>
-                        <span className={classNames("whitespace-nowrap rounded-xl px-3.5 py-2 text-xs font-bold shadow-sm", statusTone.tone)}>
+                        <span className={classNames("self-start whitespace-nowrap rounded-lg px-2.5 py-1.5 text-[10px] font-bold shadow-sm sm:rounded-xl sm:px-3.5 sm:py-2 sm:text-xs", statusTone.tone)}>
                           {statusTone.label}
                         </span>
                       </div>
@@ -129,9 +129,9 @@ export const VeterinarianDashboardPage = () => {
                         const citaOriginal = citasOriginales?.find((c) => c.idCita === cita.idCita);
                         if (citaOriginal) setSelectedCita(citaOriginal);
                       }}
-                      className="rounded-xl border-2 border-primary/30 bg-white px-5 py-2.5 text-sm font-bold text-primary shadow-sm transition-all hover:border-primary hover:bg-primary hover:text-white hover:shadow-md"
+                      className="w-full rounded-lg border-2 border-primary/30 bg-white px-4 py-2 text-xs font-bold text-primary shadow-sm transition-all hover:border-primary hover:bg-primary hover:text-white hover:shadow-md sm:w-auto sm:rounded-xl sm:px-5 sm:py-2.5 sm:text-sm"
                     >
-                      {cita.estado === "PENDIENTE" ? "▶ Iniciar" : "👁 Ver detalle"}
+                      {cita.estado === "PENDIENTE" ? "▶ Iniciar" : "👁 Ver"}
                     </button>
                   </article>
                 );
@@ -142,7 +142,7 @@ export const VeterinarianDashboardPage = () => {
       </section>
 
       {/* Tarjetas de accesos rápidos */}
-      <section className="grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="grid w-full gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <ShortcutCard
           title="Seguimientos activos"
           description="Tratamientos en progreso"

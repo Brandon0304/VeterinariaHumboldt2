@@ -60,3 +60,4 @@ public class Desparasitacion {
     @Column(name = "proxima_aplicacion")
     private LocalDate proximaAplicacion;
 }
+
