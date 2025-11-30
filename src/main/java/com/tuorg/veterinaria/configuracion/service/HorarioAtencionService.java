@@ -93,7 +93,7 @@ public class HorarioAtencionService {
         }
         
         // Validar que no haya duplicados activos para el mismo día
-        if (horario.getIdHorario() == null && horario.getActivo()) {
+        if (horario.getId() == null && horario.getActivo()) {
             boolean existe = horarioAtencionRepository.findByDiaSemanaAndActivoTrue(horario.getDiaSemana()).isPresent();
             if (existe) {
                 throw new IllegalArgumentException(

@@ -48,7 +48,7 @@ public class InformacionClinicaService {
             InformacionClinica actual = informacionClinicaRepository.findActivaClinica()
                     .orElseThrow();
             
-            if (!actual.getIdClinica().equals(informacion.getIdClinica())) {
+            if (!actual.getId().equals(informacion.getId())) {
                 throw new IllegalStateException(
                         "Ya existe una clínica activa. Solo puede haber una configuración activa."
                 );

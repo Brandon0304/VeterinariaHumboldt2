@@ -123,8 +123,7 @@ public class RespaldoService {
      */
     @Transactional(readOnly = true)
     public RespaldoSistema obtenerUltimoRespaldoExitoso() {
-        return respaldoRepository.findUltimoRespaldoExitoso()
-                .orElse(null);
+        return respaldoRepository.findUltimoRespaldoExitoso();
     }
 
     /**
@@ -147,7 +146,7 @@ public class RespaldoService {
      */
     @Transactional(readOnly = true)
     public List<RespaldoSistema> obtenerPorTipo(RespaldoSistema.TipoRespaldo tipo) {
-        return respaldoRepository.findByTipoOrderByFechaRespaldoDesc(tipo);
+        return respaldoRepository.findByTipoRespaldoOrderByFechaRespaldoDesc(tipo);
     }
 
     /**

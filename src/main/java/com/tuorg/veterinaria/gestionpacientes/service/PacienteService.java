@@ -290,7 +290,8 @@ public class PacienteService {
                 paciente.getPesoKg(),
                 paciente.getEstadoSalud(),
                 owner,
-                paciente.getIdentificadorExterno()
+                paciente.getIdentificadorExterno(),
+                paciente.getCodigoUnico()
         );
     }
 }

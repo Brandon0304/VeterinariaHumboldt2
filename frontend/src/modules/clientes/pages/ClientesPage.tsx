@@ -66,19 +66,19 @@ export const ClientesPage = () => {
     <div className="w-full space-y-4 sm:space-y-6">
       <header className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between sm:gap-4">
         <div className="min-w-0 flex-1">
-          <h2 className="text-xl font-semibold text-secondary sm:text-2xl">Gestión de Clientes</h2>
-          <p className="mt-1 text-xs text-gray-500 sm:text-sm">Administra la información de los clientes del sistema</p>
+          <h2 className="text-xl font-semibold text-secondary sm:text-2xl">Gestión de Propietarios</h2>
+          <p className="mt-1 text-xs text-gray-500 sm:text-sm">Administra la información de los propietarios de mascotas</p>
         </div>
         <button
           onClick={() => setIsCreateModalOpen(true)}
           className="w-full rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-soft transition-base hover:bg-primary-dark sm:w-auto sm:rounded-2xl"
         >
-          ➕ Nuevo Cliente
+          ➕ Nuevo Propietario
         </button>
       </header>
 
       <section className="grid gap-3 sm:gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <StatCard title="Total Clientes" value={stats.total.toString()} description="Registrados" tone="primary" />
+        <StatCard title="Total Propietarios" value={stats.total.toString()} description="Registrados" tone="primary" />
         <StatCard
           title="Con Teléfono"
           value={stats.conTelefono.toString()}
@@ -95,7 +95,7 @@ export const ClientesPage = () => {
 
       <section className="rounded-2xl bg-white p-4 shadow-soft sm:rounded-3xl sm:p-6">
         <div className="mb-4 flex flex-col gap-3 sm:mb-6 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
-          <h3 className="text-base font-semibold text-secondary sm:text-lg">Listado de Clientes</h3>
+          <h3 className="text-base font-semibold text-secondary sm:text-lg">Listado de Propietarios</h3>
           <input
             type="text"
             placeholder="Buscar cliente..."

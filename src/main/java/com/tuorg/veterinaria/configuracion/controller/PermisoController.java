@@ -94,7 +94,7 @@ public class PermisoController {
             @PathVariable Long id,
             @RequestBody PermisoRol permiso) {
         log.info("PUT /api/v1/configuracion/permisos/{} - Actualizando", id);
-        permiso.setIdPermiso(id);
+        permiso.setId(id);
         PermisoRol actualizado = permisoService.guardarPermiso(permiso);
         return ResponseEntity.ok(actualizado);
     }

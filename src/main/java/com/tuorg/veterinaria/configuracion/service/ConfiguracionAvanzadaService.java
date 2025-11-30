@@ -186,6 +186,10 @@ public class ConfiguracionAvanzadaService {
                 case DECIMAL -> Double.parseDouble(valor);
                 case BOOLEAN -> Boolean.parseBoolean(valor);
                 case STRING, JSON -> valor;
+                default -> {
+                    log.warn("Tipo de dato no reconocido: {}, retornando valor como String", tipoDato);
+                    yield valor;
+                }
             };
         } catch (Exception e) {
             log.error("Error convirtiendo valor {} a tipo {}", valor, tipo, e);

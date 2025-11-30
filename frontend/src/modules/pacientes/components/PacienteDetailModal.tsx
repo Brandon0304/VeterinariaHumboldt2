@@ -154,6 +154,9 @@ export const PacienteDetailModal = ({ isOpen, pacienteId, onClose }: PacienteDet
                         <p className="text-sm text-gray-600 capitalize mt-1">
                           {paciente.especie} {paciente.raza && `• ${paciente.raza}`} {paciente.sexo && `• ${paciente.sexo}`}
                         </p>
+                        <p className="text-xs font-mono font-bold text-primary mt-1 tracking-wide">
+                          {paciente.codigoUnico}
+                        </p>
                       </div>
                       {paciente.estadoSalud && (
                         <span className={`rounded-full px-3 py-1.5 text-xs font-semibold whitespace-nowrap ${

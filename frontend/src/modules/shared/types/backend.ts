@@ -38,6 +38,7 @@ export interface ApiPacienteResponse {
     readonly telefono: string | null;
   } | null;
   readonly identificadorExterno: string | null;
+  readonly codigoUnico: string;
 }
 
 export interface ApiVacunacionResponse {

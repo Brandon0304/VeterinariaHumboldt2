@@ -98,7 +98,7 @@ public class HorarioAtencionController {
             @PathVariable Long id,
             @RequestBody HorarioAtencion horario) {
         log.info("PUT /api/v1/configuracion/horarios/{} - Actualizando", id);
-        horario.setIdHorario(id);
+        horario.setId(id);
         HorarioAtencion actualizado = horarioService.guardarHorario(horario);
         return ResponseEntity.ok(actualizado);
     }

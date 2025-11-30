@@ -109,7 +109,7 @@ public class ServicioConfiguracionController {
             @PathVariable Long id,
             @RequestBody ServicioConfiguracion servicio) {
         log.info("PUT /api/v1/configuracion/servicios/{} - Actualizando", id);
-        servicio.setIdServicioConfig(id);
+        servicio.setId(id);
         ServicioConfiguracion actualizado = servicioService.guardarServicio(servicio);
         return ResponseEntity.ok(actualizado);
     }

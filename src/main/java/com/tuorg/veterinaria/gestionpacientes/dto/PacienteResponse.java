@@ -44,6 +44,9 @@ public class PacienteResponse {
 
     @Schema(description = "Identificador externo", example = "550e8400-e29b-41d4-a716-446655440000")
     private UUID identificadorExterno;
+
+    @Schema(description = "Código único legible (ej: PAC-00001)", example = "PAC-00042")
+    private String codigoUnico;
 }
 
 

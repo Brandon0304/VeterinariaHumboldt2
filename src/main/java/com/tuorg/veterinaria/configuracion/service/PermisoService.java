@@ -95,7 +95,7 @@ public class PermisoService {
                 permiso.getRol().getIdRol(), permiso.getModulo(), permiso.getAccion());
         
         // Validar duplicados
-        if (permiso.getIdPermiso() == null) {
+        if (permiso.getId() == null) {
             boolean existe = permisoRolRepository.existsByRolIdAndModuloAndAccionAndActivoTrue(
                     permiso.getRol().getIdRol(), permiso.getModulo(), permiso.getAccion()
             );

@@ -42,7 +42,7 @@ public class AuditoriaController {
         
         log.info("GET /api/v1/configuracion/auditoria - Buscando auditorías");
         Page<AuditoriaDetallada> auditorias = auditoriaService.buscarAuditorias(
-                entidad, entidadId, operacion, usuarioId, fechaDesde, fechaHasta, pageable
+                entidad, entidadId, operacion != null ? operacion.name() : null, usuarioId, fechaDesde, fechaHasta, pageable
         );
         return ResponseEntity.ok(auditorias);
     }

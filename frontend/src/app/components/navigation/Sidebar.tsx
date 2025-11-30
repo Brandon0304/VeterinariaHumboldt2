@@ -14,10 +14,10 @@ interface NavigationItem {
 }
 
 const navigationItems: NavigationItem[] = [
-  // Navegación para ADMIN - Orden: Dashboard, Usuarios, Clientes, Inventario, Finanzas, Reportes, Proveedores, Configuración
+  // Navegación para ADMIN - Orden: Dashboard, Usuarios, Propietarios, Inventario, Finanzas, Reportes, Proveedores, Configuración
   { label: "Dashboard", to: "/admin/dashboard", icon: "dashboard", roles: ["ADMIN"] },
   { label: "Usuarios", to: "/usuarios", icon: "user", roles: ["ADMIN"] },
-  { label: "Clientes", to: "/clientes", icon: "people", roles: ["ADMIN"] },
+  { label: "Propietarios", to: "/clientes", icon: "people", roles: ["ADMIN"] },
   { label: "Inventario", to: "/admin/inventario", icon: "box", roles: ["ADMIN"] },
   { label: "Finanzas", to: "/admin/finanzas", icon: "receipt", roles: ["ADMIN"] },
   { label: "Reportes", to: "/reportes", icon: "chart", roles: ["ADMIN"] },
@@ -34,9 +34,9 @@ const navigationItems: NavigationItem[] = [
   { label: "Reportes", to: "/reportes", icon: "chart", roles: ["VETERINARIO"] },
   { label: "Notificaciones", to: "/notificaciones", icon: "bell", roles: ["VETERINARIO"] },
 
-  // Navegación para SECRETARIO - Orden: Inicio, Clientes, Pacientes, Citas, Inventario, Proveedores, Reportes, Facturas, Notificaciones
+  // Navegación para SECRETARIO - Orden: Inicio, Propietarios, Pacientes, Citas, Inventario, Proveedores, Reportes, Facturas, Notificaciones
   { label: "Inicio", to: "/secretario/inicio", icon: "home", roles: ["SECRETARIO"] },
-  { label: "Clientes", to: "/clientes", icon: "people", roles: ["SECRETARIO"] },
+  { label: "Propietarios", to: "/clientes", icon: "people", roles: ["SECRETARIO"] },
   { label: "Pacientes", to: "/secretario/pacientes", icon: "users", roles: ["SECRETARIO"] },
   { label: "Citas", to: "/secretario/citas", icon: "calendar", roles: ["SECRETARIO"] },
   { label: "Inventario", to: "/secretario/inventario", icon: "box", roles: ["SECRETARIO"] },

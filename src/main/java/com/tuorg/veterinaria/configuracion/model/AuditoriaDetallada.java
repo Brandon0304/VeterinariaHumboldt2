@@ -119,4 +119,24 @@ public class AuditoriaDetallada {
     @Column(name = "fecha_accion")
     private LocalDateTime fechaAccion;
 
+    /**
+     * Tipo de operación realizada.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_operacion", length = 30)
+    private TipoOperacion tipoOperacion;
+
+    /**
+     * Enumeración que representa los tipos de operaciones auditables.
+     */
+    public enum TipoOperacion {
+        CREAR,
+        EDITAR,
+        ELIMINAR,
+        EXPORTAR,
+        APROBAR,
+        RECHAZAR,
+        CONSULTAR
+    }
+
 }

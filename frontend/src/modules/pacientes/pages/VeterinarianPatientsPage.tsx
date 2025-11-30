@@ -308,6 +308,9 @@ const PatientCard = ({ paciente, onViewDetail }: PatientCardProps) => {
           <p className={`text-xs font-semibold ${config.textColor} capitalize truncate`}>
             {paciente.especie ?? "Sin especie"} {paciente.raza && `• ${paciente.raza}`}
           </p>
+          <p className="text-[10px] font-mono font-bold text-gray-500 mt-0.5">
+            {paciente.codigoUnico}
+          </p>
         </div>
       </div>
 

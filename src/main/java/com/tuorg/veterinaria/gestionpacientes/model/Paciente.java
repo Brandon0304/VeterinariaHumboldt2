@@ -97,5 +97,14 @@ public class Paciente extends Auditable {
      */
     @Column(name = "identificador_externo")
     private UUID identificadorExterno;
+
+    /**
+     * Código único legible para humanos (ej: PAC-00001).
+     * Se genera automáticamente mediante trigger en la base de datos.
+     * Este código es inmutable y se utiliza para identificar al paciente
+     * de forma única en el sistema.
+     */
+    @Column(name = "codigo_unico", nullable = false, unique = true, length = 20, updatable = false)
+    private String codigoUnico;
 }
 

@@ -101,7 +101,7 @@ export const EditClienteModal = ({ isOpen, clienteId, onClose }: EditClienteModa
       <div className="w-full max-w-2xl rounded-2xl bg-white shadow-xl">
         <div className="border-b border-gray-200 px-6 py-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">Editar Cliente</h2>
+            <h2 className="text-xl font-semibold text-gray-900">Editar Propietario</h2>
             <button
               onClick={onClose}
               className="rounded-lg p-2 text-gray-400 transition-all hover:bg-gray-100 hover:text-gray-600"
