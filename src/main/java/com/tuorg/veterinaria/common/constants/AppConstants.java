@@ -64,8 +64,6 @@ public final class AppConstants {
      */
     public static final String ESTADO_CITA_CANCELADA = "CANCELADA";
 
-<<<<<<< Updated upstream
-=======
     // ==================== Estados de Solicitud de Cita ====================
 
     /**
@@ -123,7 +121,6 @@ public final class AppConstants {
      */
     public static final int MAX_CITAS_POR_DIA_CLIENTE = 3;
 
->>>>>>> Stashed changes
     // ==================== Tipos de Movimiento de Inventario ====================
 
     /**
