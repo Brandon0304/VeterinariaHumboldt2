@@ -142,8 +142,6 @@
             <version>2.2.0</version>
         </dependency>
 
-<<<<<<< Updated upstream
-=======
         <!-- Soporte de Jackson para proxys de Hibernate -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -157,7 +155,13 @@
             <version>3.0.0</version>
         </dependency>
 
->>>>>>> Stashed changes
+        <!-- Hypersistence Utils para tipos JSON en Hibernate -->
+        <dependency>
+            <groupId>io.hypersistence</groupId>
+            <artifactId>hypersistence-utils-hibernate-63</artifactId>
+            <version>3.7.0</version>
+        </dependency>
+
         <!-- Testing -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -189,11 +193,6 @@
             <artifactId>junit-jupiter</artifactId>
             <version>${testcontainers.version}</version>
             <scope>test</scope>
-        </dependency>
-        <!-- Jackson Hibernate5 Module para Jakarta EE (Spring Boot 3.x) -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-hibernate5-jakarta</artifactId>
         </dependency>
     </dependencies>
 

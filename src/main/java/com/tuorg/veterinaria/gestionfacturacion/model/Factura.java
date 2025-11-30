@@ -77,6 +77,13 @@ public class Factura extends Auditable {
     private String estado = AppConstants.ESTADO_FACTURA_PENDIENTE;
 
     /**
+     * Fecha y hora en que se registró el pago de la factura.
+     * Solo aplicable cuando el estado es PAGADA.
+     */
+    @Column(name = "fecha_pago")
+    private LocalDateTime fechaPago;
+
+    /**
      * Cliente al que se emite la factura.
      * Relación Many-to-One con la entidad Cliente.
      */
