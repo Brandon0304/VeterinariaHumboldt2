@@ -1,6 +1,7 @@
 package com.tuorg.veterinaria.gestionpacientes.controller;
 
 import com.tuorg.veterinaria.common.dto.ApiResponse;
+import com.tuorg.veterinaria.gestionpacientes.dto.PacienteEstadisticasResponse;
 import com.tuorg.veterinaria.gestionpacientes.dto.PacienteRequest;
 import com.tuorg.veterinaria.gestionpacientes.dto.PacienteResponse;
 import com.tuorg.veterinaria.gestionpacientes.dto.PacienteUpdateRequest;
@@ -114,6 +115,17 @@ public class PacienteController {
     public ResponseEntity<ApiResponse<String>> generarResumen(@PathVariable Long id) {
         String resumen = pacienteService.generarResumenClinico(id);
         return ResponseEntity.ok(ApiResponse.success("Resumen clínico generado exitosamente", resumen));
+    }
+
+    /**
+     * Obtiene estadísticas generales de pacientes.
+     * 
+     * @return Respuesta con las estadísticas
+     */
+    @GetMapping("/estadisticas")
+    public ResponseEntity<ApiResponse<PacienteEstadisticasResponse>> obtenerEstadisticas() {
+        PacienteEstadisticasResponse estadisticas = pacienteService.obtenerEstadisticas();
+        return ResponseEntity.ok(ApiResponse.success("Estadísticas obtenidas exitosamente", estadisticas));
     }
 }
 

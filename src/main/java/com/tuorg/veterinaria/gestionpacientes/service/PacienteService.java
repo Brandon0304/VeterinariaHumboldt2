@@ -4,6 +4,7 @@ import com.tuorg.veterinaria.common.constants.AppConstants;
 import com.tuorg.veterinaria.common.exception.BusinessException;
 import com.tuorg.veterinaria.common.exception.ResourceNotFoundException;
 import com.tuorg.veterinaria.common.util.ValidationUtil;
+import com.tuorg.veterinaria.gestionpacientes.dto.PacienteEstadisticasResponse;
 import com.tuorg.veterinaria.gestionpacientes.dto.PacienteOwnerResponse;
 import com.tuorg.veterinaria.gestionpacientes.dto.PacienteRequest;
 import com.tuorg.veterinaria.gestionpacientes.dto.PacienteResponse;
@@ -292,6 +293,54 @@ public class PacienteService {
                 owner,
                 paciente.getIdentificadorExterno(),
                 paciente.getCodigoUnico()
+        );
+    }
+
+    /**
+     * Obtiene estadísticas generales de pacientes.
+     * 
+     * @return Estadísticas agregadas
+     */
+    @Transactional(readOnly = true)
+    public PacienteEstadisticasResponse obtenerEstadisticas() {
+        List<Paciente> todosLosPacientes = pacienteRepository.findAll();
+        
+        long total = todosLosPacientes.size();
+        long totalPerros = todosLosPacientes.stream()
+                .filter(p -> p.getEspecie() != null && p.getEspecie().toLowerCase().contains("perro"))
+                .count();
+        long totalGatos = todosLosPacientes.stream()
+                .filter(p -> p.getEspecie() != null && p.getEspecie().toLowerCase().contains("gato"))
+                .count();
+        
+        // Pacientes creados este mes
+        LocalDateTime inicioMes = LocalDateTime.now().withDayOfMonth(1).withHour(0).withMinute(0).withSecond(0);
+        long nuevosEsteMes = todosLosPacientes.stream()
+                .filter(p -> p.getCreatedAt() != null && p.getCreatedAt().isAfter(inicioMes))
+                .count();
+        
+        // Pacientes en tratamiento (estado no sano)
+        long enTratamiento = todosLosPacientes.stream()
+                .filter(p -> p.getEstadoSalud() != null && 
+                        !p.getEstadoSalud().toLowerCase().contains("sano") &&
+                        !p.getEstadoSalud().toLowerCase().contains("bueno"))
+                .count();
+        
+        // Calcular edad promedio
+        LocalDate hoy = LocalDate.now();
+        double edadPromedio = todosLosPacientes.stream()
+                .filter(p -> p.getFechaNacimiento() != null)
+                .mapToLong(p -> hoy.getYear() - p.getFechaNacimiento().getYear())
+                .average()
+                .orElse(0.0);
+        
+        return new PacienteEstadisticasResponse(
+                total,
+                totalPerros,
+                totalGatos,
+                nuevosEsteMes,
+                enTratamiento,
+                Math.round(edadPromedio * 10.0) / 10.0 // Redondear a 1 decimal
         );
     }
 }
