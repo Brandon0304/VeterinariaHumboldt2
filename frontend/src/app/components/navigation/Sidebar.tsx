@@ -32,10 +32,13 @@ const navigationItems: NavigationItem[] = [
   // Navegación compartida
   { label: "Reportes", to: "/reportes", icon: "chart", roles: ["VETERINARIO", "SECRETARIO"] },
   { label: "Notificaciones", to: "/notificaciones", icon: "bell", roles: ["VETERINARIO", "SECRETARIO"] },
-  // Solo administradores
+  // Solo administradores - Orden: Dashboard, Usuarios, Inventario, Pacientes, Finanzas, Reportes, Configuración
   { label: "Dashboard", to: "/admin/dashboard", icon: "dashboard", roles: ["ADMIN"] },
-  { label: "Configuración", to: "/configuracion", icon: "settings", roles: ["ADMIN"] },
   { label: "Usuarios", to: "/usuarios", icon: "user", roles: ["ADMIN"] },
+  { label: "Inventario", to: "/admin/inventario", icon: "box", roles: ["ADMIN"] },
+  { label: "Finanzas", to: "/admin/finanzas", icon: "receipt", roles: ["ADMIN"] },
+  { label: "Reportes", to: "/reportes", icon: "chart", roles: ["ADMIN"] },
+  { label: "Configuración", to: "/configuracion", icon: "settings", roles: ["ADMIN"] },
 ];
 
 const getIcon = (icon?: string) => {
@@ -76,11 +79,7 @@ const getIcon = (icon?: string) => {
   }
 };
 
-interface SidebarProps {
-  readonly onClose?: () => void;
-}
-
-export const Sidebar = ({ onClose }: SidebarProps = {}) => {
+export const Sidebar = () => {
   const user = authStore((state) => state.user);
   const userRole = user?.rol?.toUpperCase() || "";
 
@@ -90,13 +89,6 @@ export const Sidebar = ({ onClose }: SidebarProps = {}) => {
     return item.roles.includes(userRole);
   });
 
-  const handleNavClick = () => {
-    // Cerrar el menú móvil al hacer clic en un link
-    if (onClose) {
-      onClose();
-    }
-  };
-
   return (
     <aside className="relative flex h-full w-72 flex-col overflow-hidden bg-gradient-to-br from-secondary via-secondary/95 to-secondary/90 text-white shadow-2xl lg:w-80">
       {/* Patrón de fondo sutil */}
@@ -104,16 +96,6 @@ export const Sidebar = ({ onClose }: SidebarProps = {}) => {
       
       {/* Header del sidebar */}
       <div className="relative z-10 flex flex-col items-center gap-5 border-b border-white/10 p-8 pb-6">
-        {/* Close button for mobile */}
-        {onClose && (
-          <button
-            onClick={onClose}
-            className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-lg bg-white/10 text-white transition-all hover:bg-white/20 lg:hidden"
-            aria-label="Cerrar menú"
-          >
-            ✕
-          </button>
-        )}
         <div className="relative">
           <div className="absolute inset-0 rounded-full blur-2xl" style={{ background: "rgba(255,255,255,0.08)" }}></div>
           <div className="relative rounded-full p-2" style={{ border: "2px solid rgba(255,255,255,0.35)" }}>
@@ -142,7 +124,6 @@ export const Sidebar = ({ onClose }: SidebarProps = {}) => {
           <NavLink
             key={item.to}
             to={item.to}
-            onClick={handleNavClick}
             className={({ isActive }) =>
               classNames(
                 "group relative flex items-center gap-3 rounded-xl px-4 py-3.5 text-sm font-semibold transition-all duration-200",
