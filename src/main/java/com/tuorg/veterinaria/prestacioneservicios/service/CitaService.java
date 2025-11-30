@@ -15,8 +15,6 @@ import com.tuorg.veterinaria.prestacioneservicios.dto.CitaResponse;
 import com.tuorg.veterinaria.prestacioneservicios.dto.CitaReprogramarRequest;
 import com.tuorg.veterinaria.prestacioneservicios.model.Cita;
 import com.tuorg.veterinaria.prestacioneservicios.repository.CitaRepository;
-<<<<<<< Updated upstream
-=======
 import com.tuorg.veterinaria.notificaciones.service.NotificacionService;
 import com.tuorg.veterinaria.notificaciones.dto.NotificacionEnviarRequest;
 import com.tuorg.veterinaria.common.events.CitaCancelledEvent;
@@ -27,7 +25,6 @@ import com.tuorg.veterinaria.gestionpacientes.repository.HistoriaClinicaReposito
 import com.tuorg.veterinaria.gestionpacientes.repository.RegistroMedicoRepository;
 import com.tuorg.veterinaria.common.events.CitaReprogrammedEvent;
 import lombok.extern.slf4j.Slf4j;
->>>>>>> Stashed changes
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
@@ -36,7 +33,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 /**
  * Servicio para la gestión de citas.
  *
@@ -51,23 +51,14 @@ public class CitaService {
     private final CitaRepository citaRepository;
     private final PacienteRepository pacienteRepository;
     private final UsuarioRepository usuarioRepository;
-<<<<<<< Updated upstream
-=======
     private final NotificacionService notificacionService;
     private final ApplicationEventPublisher eventPublisher;
     private final HistoriaClinicaRepository historiaClinicaRepository;
     private final RegistroMedicoRepository registroMedicoRepository;
->>>>>>> Stashed changes
 
     @Autowired
     public CitaService(CitaRepository citaRepository,
                        PacienteRepository pacienteRepository,
-<<<<<<< Updated upstream
-                       UsuarioRepository usuarioRepository) {
-        this.citaRepository = citaRepository;
-        this.pacienteRepository = pacienteRepository;
-        this.usuarioRepository = usuarioRepository;
-=======
                        UsuarioRepository usuarioRepository,
                        NotificacionService notificacionService,
                        ApplicationEventPublisher eventPublisher,
@@ -80,7 +71,6 @@ public class CitaService {
         this.eventPublisher = eventPublisher;
         this.historiaClinicaRepository = historiaClinicaRepository;
         this.registroMedicoRepository = registroMedicoRepository;
->>>>>>> Stashed changes
     }
 
     /**
@@ -156,13 +146,10 @@ public class CitaService {
         cita.setEstado(AppConstants.ESTADO_CITA_PROGRAMADA);
 
         Cita guardada = citaRepository.save(cita);
-<<<<<<< Updated upstream
-=======
         
         // Publicar evento para envío asíncrono de notificación
         publicarEventoCitaCreada(guardada);
         
->>>>>>> Stashed changes
         return mapToResponse(guardada);
     }
 
@@ -226,13 +213,10 @@ public class CitaService {
         LocalDateTime fechaAnterior = cita.getFechaHora();
         cita.setFechaHora(nuevaFechaHora);
         Cita actualizada = citaRepository.save(cita);
-<<<<<<< Updated upstream
-=======
         
         // Publicar evento para envío asíncrono de notificación
         publicarEventoCitaReprogramada(actualizada, fechaAnterior);
         
->>>>>>> Stashed changes
         return mapToResponse(actualizada);
     }
 
@@ -575,8 +559,6 @@ public class CitaService {
                         .build() : null)
                 .build();
     }
-<<<<<<< Updated upstream
-=======
     
     /**
      * Publica evento de cita creada para procesamiento asíncrono.
@@ -900,7 +882,6 @@ public class CitaService {
             }
         }
     }
->>>>>>> Stashed changes
 }
 
 

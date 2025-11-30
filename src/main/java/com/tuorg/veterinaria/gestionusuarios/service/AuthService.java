@@ -148,7 +148,6 @@ public class AuthService {
 
             LoginResponse.UsuarioLoginResponse usuarioResponse = new LoginResponse.UsuarioLoginResponse(
                     idUsuario,
-                    usuario.getUsername() != null ? usuario.getUsername() : "",
                     usuario.getNombre() != null ? usuario.getNombre() : "",
                     usuario.getApellido() != null ? usuario.getApellido() : "",
                     usuario.getCorreo() != null ? usuario.getCorreo() : "",

@@ -149,9 +149,17 @@ public class FacturaService {
             throw new BusinessException("Solo se pueden pagar facturas en estado PENDIENTE");
         }
 
+        // Validar que el monto pagado coincida con el total de la factura
+        if (request.getMontoPagado().compareTo(factura.getTotal()) != 0) {
+            throw new BusinessException(
+                String.format("El monto pagado (%s) no coincide con el total de la factura (%s)",
+                    request.getMontoPagado(), factura.getTotal())
+            );
+        }
+
         factura.setEstado(AppConstants.ESTADO_FACTURA_PAGADA);
         factura.setFormaPago(request.getFormaPago());
-        factura.setFechaEmision(factura.getFechaEmision() != null ? factura.getFechaEmision() : LocalDateTime.now());
+        factura.setFechaPago(LocalDateTime.now());
 
         Factura pagada = facturaRepository.save(factura);
         return mapToResponse(pagada);
@@ -163,6 +171,7 @@ public class FacturaService {
                 .idFactura(factura.getIdFactura())
                 .numero(factura.getNumero())
                 .fechaEmision(factura.getFechaEmision())
+                .fechaPago(factura.getFechaPago())
                 .total(factura.getTotal())
                 .formaPago(factura.getFormaPago())
                 .estado(factura.getEstado())

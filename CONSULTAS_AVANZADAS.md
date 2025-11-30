@@ -80,7 +80,7 @@ ORDER BY consultas_realizadas DESC;
 
 ## 3. Pacientes con más vacunas aplicadas que otros de su misma especie
 
-**Descripción**: Lista pacientes que tienen más vacunas que el promedio de su especie.
+**Descripción**: Lista pacientes que tienen más vacunas que el promedio de su especie. FUNCIONA
 
 ```sql
 SELECT 

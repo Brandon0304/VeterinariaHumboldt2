@@ -25,6 +25,9 @@ public class FacturaResponse {
     @Schema(description = "Fecha y hora de emisión", example = "2025-11-10T14:25:00")
     private LocalDateTime fechaEmision;
 
+    @Schema(description = "Fecha y hora del pago", example = "2025-11-10T16:45:00")
+    private LocalDateTime fechaPago;
+
     @Schema(description = "Monto total cobrado", example = "145000.50")
     private BigDecimal total;
 

@@ -100,8 +100,6 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
                               @Param("fechaHoraInicio") LocalDateTime fechaHoraInicio,
                               @Param("fechaHoraFin") LocalDateTime fechaHoraFin,
                               @Param("estado") String estado);
-<<<<<<< Updated upstream
-=======
 
     /**
      * Busca una cita por ID cargando todas las relaciones necesarias para notificaciones.
@@ -133,6 +131,5 @@ public interface CitaRepository extends JpaRepository<Cita, Long> {
             @Param("veterinario") com.tuorg.veterinaria.gestionusuarios.model.UsuarioVeterinario veterinario,
             @Param("inicio") LocalDateTime inicio,
             @Param("fin") LocalDateTime fin);
->>>>>>> Stashed changes
 }
 
