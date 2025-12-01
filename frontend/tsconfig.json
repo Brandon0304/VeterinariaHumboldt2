@@ -9,22 +9,20 @@
     "jsx": "react-jsx",
 
     "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
     "verbatimModuleSyntax": false,
     "moduleDetection": "force",
 
-    // ===========================
-    // TEMPORAL: PARA DESPLIEGUE
-    // ===========================
-    "noEmit": false,                   // permite emitir JS
-    "strict": false,                   // relaja todos los checks estrictos
-    "noUnusedLocals": false,           // ignora imports/variables no usados
-    "noUnusedParameters": false,       // ignora params no usados
+    "noEmit": false,
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": false,
     "noUncheckedSideEffectImports": false,
 
-    "esModuleInterop": true,           // facilita importaciones comunes
+    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": false
+
+    // ✅ quitar "allowImportingTsExtensions" mientras hacemos deploy
   },
   "include": ["src"]
 }
