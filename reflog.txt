@@ -1,0 +1,179 @@
+5172edb6 HEAD@{Mon Dec 1 09:53:12 2025}: reset: moving to 5172edb6
+d9055d5d HEAD@{Mon Dec 1 09:46:22 2025}: reset: moving to HEAD~3
+8b13001c HEAD@{Mon Dec 1 09:46:12 2025}: checkout: moving from main to Main
+8b13001c HEAD@{Mon Dec 1 09:44:28 2025}: checkout: moving from Main to main
+8b13001c HEAD@{Mon Dec 1 09:43:45 2025}: checkout: moving from main to Main
+8b13001c HEAD@{Mon Dec 1 09:37:46 2025}: checkout: moving from fix/deploy to main
+7a5e7747 HEAD@{Mon Dec 1 09:37:13 2025}: reset: moving to Head~3
+f709feef HEAD@{Mon Dec 1 09:35:24 2025}: reset: moving to HEAD~3
+a8efaf76 HEAD@{Mon Dec 1 09:34:57 2025}: commit: Nuevo commit limpio
+7ac6a82c HEAD@{Mon Dec 1 09:34:42 2025}: reset: moving to HEAD~3
+8a070ab0 HEAD@{Mon Dec 1 08:43:48 2025}: commit: arreglo de variables de entorno para despliegue
+3dddb478 HEAD@{Mon Dec 1 08:00:49 2025}: commit: fix(deploy): configurar CORS y variables de entorno para Railway
+9a3a5091 HEAD@{Mon Dec 1 07:58:21 2025}: checkout: moving from fix/schema-migrations to fix/deploy
+9a3a5091 HEAD@{Mon Dec 1 00:31:12 2025}: commit: arreglo del jwt
+7ac6a82c HEAD@{Mon Dec 1 00:10:18 2025}: commit: correccion dockerfile
+e5590205 HEAD@{Mon Dec 1 00:02:35 2025}: commit: correccion comandos para despliegue
+f709feef HEAD@{Sun Nov 30 23:57:01 2025}: commit: errores
+def30b8c HEAD@{Sun Nov 30 23:48:29 2025}: commit: arreglo frontend para despliegue
+84ce9c30 HEAD@{Sun Nov 30 23:33:54 2025}: commit: correccion dockerfile
+7a5e7747 HEAD@{Sun Nov 30 23:17:27 2025}: commit: correccion .yml
+ee0169af HEAD@{Sun Nov 30 23:13:06 2025}: commit: prod
+f6f8f7a2 HEAD@{Sun Nov 30 22:47:23 2025}: commit: error por despliegue
+1efd919b HEAD@{Sun Nov 30 21:54:20 2025}: commit: fix: Add missing LogSistema and ParametroSistema classes for Railway deployment
+daca305c HEAD@{Sun Nov 30 21:46:17 2025}: commit: feat: Add Railway deployment configuration
+ef54f4a2 HEAD@{Sun Nov 30 21:28:29 2025}: commit: fix: Add database schema migrations V11-V28
+8b13001c HEAD@{Sun Nov 30 21:28:06 2025}: reset: moving to HEAD
+8b13001c HEAD@{Sun Nov 30 21:26:06 2025}: checkout: moving from main to fix/schema-migrations
+8b13001c HEAD@{Sun Nov 30 20:06:43 2025}: reset: moving to repo2/main
+8b13001c HEAD@{Sun Nov 30 20:06:26 2025}: checkout: moving from Main to main
+8b13001c HEAD@{Sun Nov 30 19:24:27 2025}: reset: moving to repo2/Main
+5d9c56f6 HEAD@{Sun Nov 30 19:24:09 2025}: checkout: moving from main to Main
+5d9c56f6 HEAD@{Sun Nov 30 19:19:54 2025}: reset: moving to HEAD
+5d9c56f6 HEAD@{Sun Nov 30 19:18:01 2025}: checkout: moving from feature/configuracion-icons-phases-4-5-6 to main
+986b313a HEAD@{Sun Nov 30 19:17:43 2025}: reset: moving to HEAD
+986b313a HEAD@{Sun Nov 30 17:09:56 2025}: commit: feat(pacientes): seed data + endpoint estadísticas
+58106c64 HEAD@{Sun Nov 30 16:57:37 2025}: commit: feat(pacientes): agregar código único + renombrar Clientes a Propietarios
+d7246e87 HEAD@{Sun Nov 30 16:17:42 2025}: commit: feat: Implementar módulo de configuración completo y sistema de iconos CSS
+06810c12 HEAD@{Sun Nov 30 16:15:33 2025}: checkout: moving from feature/configuracion-module-phase1-3 to feature/configuracion-icons-phases-4-5-6
+06810c12 HEAD@{Sun Nov 30 14:23:42 2025}: commit: feat(configuracion): Implementar módulo de configuración - Fases 1-3
+f821a363 HEAD@{Sun Nov 30 14:21:36 2025}: checkout: moving from feature/sidebar-menu-roles to feature/configuracion-module-phase1-3
+f821a363 HEAD@{Sun Nov 30 12:21:06 2025}: commit: feat(usuarios): agregar campo de edición de rol en modal de editar usuario
+a9aea67f HEAD@{Sun Nov 30 12:10:47 2025}: commit: feat(navigation): reorganizar menús de navegación por rol con íconos SVG profesionales
+5d9c56f6 HEAD@{Sun Nov 30 11:59:59 2025}: checkout: moving from Main to feature/sidebar-menu-roles
+5d9c56f6 HEAD@{Sun Nov 30 11:59:23 2025}: checkout: moving from feature/sidebar-menu-roles to Main
+06e4cf46 HEAD@{Sun Nov 30 11:50:06 2025}: commit (initial): feat(navigation): reorganizar menús de navegación por rol con íconos SVG- Reemplazar emojis por íconos SVG profesionales en todos los menús- Reorganizar menú Administrador: Dashboard, Usuarios, Clientes, Inventario, Finanzas, Reportes, Proveedores, Configuración- Reorganizar menú Secretario: Inicio, Clientes, Pacientes, Citas, Inventario, Proveedores, Reportes, Facturas, Notificaciones- Agregar menú Cliente: Inicio, Mis Mascotas, Mis Citas, Historial Médico, Mis Facturas- Separar items compartidos por rol para mantener orden específico- Mejorar UX con íconos vectoriales escalables y consistentes
+5d9c56f6 HEAD@{Sun Nov 30 11:49:14 2025}: checkout: moving from feature/sidebar-menu-roles to Main
+26832ea3 HEAD@{Sun Nov 30 11:45:48 2025}: commit (initial): feat(navigation): reorganizar menús de navegación por rol con íconos SVG- Reemplazar emojis por íconos SVG profesionales en todos los menús- Reorganizar menú Administrador: Dashboard, Usuarios, Clientes, Inventario, Finanzas, Reportes, Proveedores, Configuración- Reorganizar menú Secretario: Inicio, Clientes, Pacientes, Citas, Inventario, Proveedores, Reportes, Facturas, Notificaciones- Agregar menú Cliente: Inicio, Mis Mascotas, Mis Citas, Historial Médico, Mis Facturas- Separar items compartidos por rol para mantener orden específico- Mejorar UX con íconos vectoriales escalables y consistentes
+5d9c56f6 HEAD@{Sun Nov 30 10:15:49 2025}: commit: fix(admin): recuperar módulos Inventario, Finanzas y Reportes en menú administrador
+d9055d5d HEAD@{Sun Nov 30 10:06:14 2025}: checkout: moving from develop to Main
+b76bf0ee HEAD@{Fri Nov 28 18:10:37 2025}: merge feature/rol-admin: Merge made by the 'ort' strategy.
+0097d386 HEAD@{Fri Nov 28 18:10:28 2025}: checkout: moving from feature/rol-admin to develop
+52883e30 HEAD@{Fri Nov 28 18:09:28 2025}: commit (merge): Merge develop: resolver conflictos manteniendo cambios de frontend admin y backend de develop
+595e456e HEAD@{Fri Nov 28 18:06:11 2025}: reset: moving to HEAD
+595e456e HEAD@{Fri Nov 28 17:59:01 2025}: commit (initial): feat(admin): agregar Inventario, Finanzas y Reportes al menú de administrador- Agregar ruta /admin/inventario con acceso solo para ADMIN- Agregar ruta /admin/finanzas con acceso solo para ADMIN - Actualizar ruta /reportes para incluir rol ADMIN- Actualizar Sidebar con el orden: Dashboard, Usuarios, Inventario, Finanzas, Reportes, Configuración- Reutilizar páginas existentes (SecretaryInventarioPage, FacturasPage, ReportesPage)- Todas las rutas protegidas con RoleGuard
+529aede4 HEAD@{Fri Nov 28 17:57:08 2025}: checkout: moving from feature/rol-admin to master
+529aede4 HEAD@{Fri Nov 28 17:56:43 2025}: reset: moving to HEAD~1
+e1e8d8e0 HEAD@{Fri Nov 28 17:41:56 2025}: commit: feat(admin): agregar Inventario, Finanzas y Reportes al menú de administrador- Agregar ruta /admin/inventario con acceso solo para ADMIN- Agregar ruta /admin/finanzas con acceso solo para ADMIN - Actualizar ruta /reportes para incluir rol ADMIN- Actualizar Sidebar con el orden: Dashboard, Usuarios, Inventario, Finanzas, Reportes, Configuración- Reutilizar páginas existentes (SecretaryInventarioPage, FacturasPage, ReportesPage)- Todas las rutas protegidas con RoleGuard
+529aede4 HEAD@{Fri Nov 28 17:41:37 2025}: checkout: moving from master to feature/rol-admin
+529aede4 HEAD@{Thu Nov 27 23:35:44 2025}: checkout: moving from develop to master
+0097d386 HEAD@{Thu Nov 27 23:34:22 2025}: checkout: moving from master to develop
+529aede4 HEAD@{Thu Nov 27 23:31:15 2025}: checkout: moving from develop to master
+0097d386 HEAD@{Thu Nov 27 23:25:30 2025}: reset: moving to HEAD
+0097d386 HEAD@{Thu Nov 27 23:24:15 2025}: checkout: moving from develop to develop
+0097d386 HEAD@{Thu Nov 27 23:22:19 2025}: commit: fix: eliminar selección manual de roles en login- Se eliminaron los botones de selección de rol- El backend determina automáticamente el rol del usuario- Mejora en seguridad y UX
+958b764d HEAD@{Thu Nov 27 23:21:59 2025}: checkout: moving from fix/login-sin-seleccion-roles to develop
+d1fcbbfd HEAD@{Thu Nov 27 23:21:51 2025}: checkout: moving from develop to fix/login-sin-seleccion-roles
+958b764d HEAD@{Thu Nov 27 23:21:45 2025}: reset: moving to HEAD
+958b764d HEAD@{Thu Nov 27 23:21:39 2025}: reset: moving to HEAD
+958b764d HEAD@{Thu Nov 27 23:19:25 2025}: checkout: moving from fix/login-sin-seleccion-roles to develop
+d1fcbbfd HEAD@{Thu Nov 27 23:19:20 2025}: commit: temp: guardar archivos antes de cambiar de rama
+76541427 HEAD@{Thu Nov 27 23:17:38 2025}: commit (initial): fix: eliminar selección manual de roles en login- Se eliminaron los botones de selección de rol (mala práctica de seguridad)- El backend ahora determina automáticamente el rol del usuario- Login simplificado con solo email/usuario y contraseña- Mejora en la seguridad: el rol no se manipula desde el frontend- Agregados comentarios explicativos en el código- Agregados placeholders en formulario de registro
+529aede4 HEAD@{Thu Nov 27 23:17:00 2025}: checkout: moving from fix/login-sin-seleccion-roles to master
+529aede4 HEAD@{Thu Nov 27 23:07:28 2025}: checkout: moving from master to fix/login-sin-seleccion-roles
+529aede4 HEAD@{Thu Nov 27 23:06:31 2025}: checkout: moving from feature-gestionusuarios to master
+8843fa1c HEAD@{Thu Nov 27 23:06:25 2025}: reset: moving to repo2/feature-gestionusuarios
+8843fa1c HEAD@{Thu Nov 27 23:04:59 2025}: checkout: moving from master to feature-gestionusuarios
+529aede4 HEAD@{Thu Nov 27 23:04:34 2025}: commit: fix: eliminar selección manual de roles en login
+8503ea99 HEAD@{Thu Nov 27 22:43:30 2025}: checkout: moving from master to master
+8503ea99 HEAD@{Thu Nov 27 22:41:26 2025}: checkout: moving from develop to master
+958b764d HEAD@{Thu Nov 27 22:40:26 2025}: reset: moving to HEAD
+958b764d HEAD@{Thu Nov 27 22:34:10 2025}: merge frontend/main: Merge made by the 'ort' strategy.
+22c047d9 HEAD@{Thu Nov 27 22:34:03 2025}: checkout: moving from frontend/main to develop
+5ef7e933 HEAD@{Thu Nov 27 22:33:57 2025}: reset: moving to HEAD
+5ef7e933 HEAD@{Thu Nov 27 22:29:22 2025}: commit: feat: agregar tipos compartidos del backend
+df0e469f HEAD@{Thu Nov 27 22:29:17 2025}: commit: feat: implementar módulo de secretario
+48ad6ccd HEAD@{Thu Nov 27 22:29:12 2025}: commit: feat: implementar configuración del sistema
+68c04911 HEAD@{Thu Nov 27 22:29:08 2025}: commit: feat: implementar generación de reportes
+017ac28d HEAD@{Thu Nov 27 22:29:04 2025}: commit: feat: implementar sistema de notificaciones
+87447a33 HEAD@{Thu Nov 27 22:29:01 2025}: commit: feat: implementar gestión de usuarios
+53264e6e HEAD@{Thu Nov 27 22:28:58 2025}: commit: feat: implementar gestión de proveedores
+f4e30a5c HEAD@{Thu Nov 27 22:28:53 2025}: commit: feat: implementar gestión de inventario
+6fce4236 HEAD@{Thu Nov 27 22:28:48 2025}: commit: feat: implementar sistema de facturación
+5a58e1dc HEAD@{Thu Nov 27 22:28:45 2025}: commit: feat: implementar seguimientos médicos
+93c74d45 HEAD@{Thu Nov 27 22:28:42 2025}: commit: feat: implementar gestión de desparasitaciones
+13d1f36e HEAD@{Thu Nov 27 22:28:39 2025}: commit: feat: implementar gestión de vacunaciones
+6c86ce3d HEAD@{Thu Nov 27 22:28:36 2025}: commit: feat: implementar historias clínicas
+2934c912 HEAD@{Thu Nov 27 22:28:32 2025}: commit: feat: implementar gestión de consultas
+5f1dfac8 HEAD@{Thu Nov 27 22:28:28 2025}: commit: feat: implementar agenda del veterinario
+264de34c HEAD@{Thu Nov 27 22:28:25 2025}: commit: feat: implementar sistema de citas
+59d55283 HEAD@{Thu Nov 27 22:28:21 2025}: commit: feat: implementar gestión de pacientes
+7a12167a HEAD@{Thu Nov 27 22:28:15 2025}: commit: feat: implementar gestión de clientes
+12889fb5 HEAD@{Thu Nov 27 22:28:12 2025}: commit: feat: implementar dashboards por rol
+7540ae25 HEAD@{Thu Nov 27 22:28:08 2025}: commit: feat: agregar páginas core del sistema
+9705e7a6 HEAD@{Thu Nov 27 22:28:04 2025}: commit: feat: implementar módulo de autenticación
+eb7f1d17 HEAD@{Thu Nov 27 22:28:00 2025}: commit: feat: configurar providers y sistema de rutas
+5b023b98 HEAD@{Thu Nov 27 22:27:56 2025}: commit: feat: agregar componentes de feedback UI
+b78114fb HEAD@{Thu Nov 27 22:27:50 2025}: commit: feat: implementar layouts y navegación
+0e10894b HEAD@{Thu Nov 27 22:27:44 2025}: commit: feat: implementar guards de autenticación y roles
+9a62444c HEAD@{Thu Nov 27 22:27:36 2025}: commit: feat: agregar componentes compartidos
+92fd4643 HEAD@{Thu Nov 27 22:27:30 2025}: commit: feat: implementar cliente API y manejo de estado
+c46935b3 HEAD@{Thu Nov 27 22:27:25 2025}: commit: feat: configurar entry point y componente principal
+5172edb6 HEAD@{Thu Nov 27 22:27:20 2025}: commit: feat: agregar estilos globales del proyecto
+741d8fb6 HEAD@{Thu Nov 27 22:27:13 2025}: commit: feat: agregar assets y recursos estáticos
+b93f534c HEAD@{Thu Nov 27 22:27:05 2025}: commit (initial): feat: configuración inicial del proyecto frontend
+8503ea99 HEAD@{Thu Nov 27 17:36:09 2025}: checkout: moving from frontend/clean-history to master
+8bbdc54f HEAD@{Thu Nov 27 17:33:19 2025}: cherry-pick: feat: agregar tipos compartidos del backend
+efd6a529 HEAD@{Thu Nov 27 17:33:18 2025}: cherry-pick: feat: implementar módulo de secretario
+a02aa876 HEAD@{Thu Nov 27 17:33:18 2025}: cherry-pick: feat: implementar configuración del sistema
+46537b77 HEAD@{Thu Nov 27 17:33:18 2025}: cherry-pick: feat: implementar generación de reportes
+f51f36a6 HEAD@{Thu Nov 27 17:33:18 2025}: cherry-pick: feat: implementar sistema de notificaciones
+602799d9 HEAD@{Thu Nov 27 17:33:18 2025}: cherry-pick: feat: implementar gestión de usuarios
+739acb67 HEAD@{Thu Nov 27 17:33:18 2025}: cherry-pick: feat: implementar gestión de proveedores
+7d05a7ae HEAD@{Thu Nov 27 17:33:18 2025}: cherry-pick: feat: implementar gestión de inventario
+52dfb93b HEAD@{Thu Nov 27 17:33:18 2025}: cherry-pick: feat: implementar sistema de facturación
+4d56640c HEAD@{Thu Nov 27 17:33:18 2025}: cherry-pick: feat: implementar seguimientos médicos
+e2b5b064 HEAD@{Thu Nov 27 17:33:18 2025}: cherry-pick: feat: implementar gestión de desparasitaciones
+7e9dad9f HEAD@{Thu Nov 27 17:33:18 2025}: cherry-pick: feat: implementar gestión de vacunaciones
+02b6a7f8 HEAD@{Thu Nov 27 17:33:18 2025}: cherry-pick: feat: implementar historias clínicas
+4ca51234 HEAD@{Thu Nov 27 17:33:17 2025}: cherry-pick: feat: implementar gestión de consultas
+444b6ada HEAD@{Thu Nov 27 17:33:17 2025}: cherry-pick: feat: implementar agenda del veterinario
+c1bb5f12 HEAD@{Thu Nov 27 17:33:17 2025}: cherry-pick: feat: implementar sistema de citas
+9f5c5400 HEAD@{Thu Nov 27 17:33:17 2025}: cherry-pick: feat: implementar gestión de pacientes
+c175e793 HEAD@{Thu Nov 27 17:33:17 2025}: cherry-pick: feat: implementar gestión de clientes
+20885553 HEAD@{Thu Nov 27 17:33:17 2025}: cherry-pick: feat: implementar dashboards por rol
+8f5af286 HEAD@{Thu Nov 27 17:33:17 2025}: cherry-pick: feat: agregar páginas core del sistema
+d2c9367b HEAD@{Thu Nov 27 17:33:17 2025}: cherry-pick: feat: implementar módulo de autenticación
+b34f9404 HEAD@{Thu Nov 27 17:33:17 2025}: cherry-pick: feat: configurar providers y sistema de rutas
+9dc9868f HEAD@{Thu Nov 27 17:33:17 2025}: cherry-pick: feat: agregar componentes de feedback UI
+ef9fed97 HEAD@{Thu Nov 27 17:33:17 2025}: cherry-pick: feat: implementar layouts y navegación
+7332cca8 HEAD@{Thu Nov 27 17:33:16 2025}: cherry-pick: feat: implementar guards de autenticación y roles
+9f49952d HEAD@{Thu Nov 27 17:33:16 2025}: cherry-pick: feat: agregar componentes compartidos
+c83126b2 HEAD@{Thu Nov 27 17:33:16 2025}: cherry-pick: feat: implementar cliente API y manejo de estado
+a95cc9ef HEAD@{Thu Nov 27 17:33:16 2025}: cherry-pick: feat: configurar entry point y componente principal
+0a65f4f0 HEAD@{Thu Nov 27 17:33:16 2025}: cherry-pick: feat: agregar estilos globales del proyecto
+4d573472 HEAD@{Thu Nov 27 17:33:08 2025}: commit (initial): feat: configuración inicial del proyecto frontend
+e884d404 HEAD@{Thu Nov 27 17:29:42 2025}: checkout: moving from frontend/clean to frontend/base
+e884d404 HEAD@{Thu Nov 27 17:16:35 2025}: commit: feat: agregar tipos compartidos del backend
+000a440c HEAD@{Thu Nov 27 17:16:28 2025}: commit: feat: implementar módulo de secretario
+cb693231 HEAD@{Thu Nov 27 17:16:23 2025}: commit: feat: implementar configuración del sistema
+8e3ba2a5 HEAD@{Thu Nov 27 17:16:17 2025}: commit: feat: implementar generación de reportes
+d4d43e32 HEAD@{Thu Nov 27 17:16:10 2025}: commit: feat: implementar sistema de notificaciones
+ee8759dc HEAD@{Thu Nov 27 17:16:03 2025}: commit: feat: implementar gestión de usuarios
+88acddec HEAD@{Thu Nov 27 17:15:57 2025}: commit: feat: implementar gestión de proveedores
+c4ae1c12 HEAD@{Thu Nov 27 17:15:51 2025}: commit: feat: implementar gestión de inventario
+32ed3ebd HEAD@{Thu Nov 27 17:15:45 2025}: commit: feat: implementar sistema de facturación
+5a018bbb HEAD@{Thu Nov 27 17:15:40 2025}: commit: feat: implementar seguimientos médicos
+3d0842b6 HEAD@{Thu Nov 27 17:15:35 2025}: commit: feat: implementar gestión de desparasitaciones
+131d6e07 HEAD@{Thu Nov 27 17:15:29 2025}: commit: feat: implementar gestión de vacunaciones
+0fa40731 HEAD@{Thu Nov 27 17:15:24 2025}: commit: feat: implementar historias clínicas
+cc89c6e7 HEAD@{Thu Nov 27 17:15:18 2025}: commit: feat: implementar gestión de consultas
+5beb96d5 HEAD@{Thu Nov 27 17:15:12 2025}: commit: feat: implementar agenda del veterinario
+72066bf8 HEAD@{Thu Nov 27 17:15:06 2025}: commit: feat: implementar sistema de citas
+789bbc96 HEAD@{Thu Nov 27 17:15:00 2025}: commit: feat: implementar gestión de pacientes
+2cce482e HEAD@{Thu Nov 27 17:14:55 2025}: commit: feat: implementar gestión de clientes
+d4545e22 HEAD@{Thu Nov 27 17:14:48 2025}: commit: feat: implementar dashboards por rol
+cebd2b61 HEAD@{Thu Nov 27 17:14:40 2025}: commit: feat: agregar páginas core del sistema
+44fb067c HEAD@{Thu Nov 27 17:14:33 2025}: commit: feat: implementar módulo de autenticación
+9f1a350b HEAD@{Thu Nov 27 17:14:27 2025}: commit: feat: configurar providers y sistema de rutas
+148c30f8 HEAD@{Thu Nov 27 17:14:21 2025}: commit: feat: agregar componentes de feedback UI
+1a93971d HEAD@{Thu Nov 27 17:14:14 2025}: commit: feat: implementar layouts y navegación
+8ab61540 HEAD@{Thu Nov 27 17:14:08 2025}: commit: feat: implementar guards de autenticación y roles
+66c9793f HEAD@{Thu Nov 27 17:14:02 2025}: commit: feat: agregar componentes compartidos
+7b38b450 HEAD@{Thu Nov 27 17:13:56 2025}: commit: feat: implementar cliente API y manejo de estado
+fc1394f1 HEAD@{Thu Nov 27 17:13:49 2025}: commit: feat: configurar entry point y componente principal
+41df5994 HEAD@{Thu Nov 27 17:13:43 2025}: commit: feat: agregar estilos globales del proyecto
+2f0a72fb HEAD@{Thu Nov 27 17:13:36 2025}: commit: feat: agregar assets y recursos estáticos
+349c833c HEAD@{Thu Nov 27 17:13:21 2025}: commit: feat: configuración inicial del proyecto frontend
+8503ea99 HEAD@{Thu Nov 27 17:09:03 2025}: checkout: moving from master to frontend/base
+8503ea99 HEAD@{Wed Nov 26 23:11:38 2025}: clone: from https://github.com/Brandon0304/VeterinariaHumboldt2.git
