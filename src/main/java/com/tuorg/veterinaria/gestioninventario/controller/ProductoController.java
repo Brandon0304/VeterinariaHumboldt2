@@ -23,7 +23,7 @@ import java.util.List;
  * @version 1.0.0
  */
 @RestController
-@RequestMapping("/api/productos")
+@RequestMapping("/productos")
 public class ProductoController {
 
     /**

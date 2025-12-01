@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
  * @version 1.0.0
  */
 @RestController
-@RequestMapping("/api/reportes")
+@RequestMapping("/reportes")
 public class ReporteController {
 
     /**

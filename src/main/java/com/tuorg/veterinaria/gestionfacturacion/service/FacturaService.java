@@ -71,6 +71,7 @@ public class FacturaService {
             numeroFactura = generarNumeroFactura();
         }
         factura.setNumero(numeroFactura);
+        factura.setNumeroFactura(numeroFactura); // Legacy column, mantener sincronizado
 
         if (factura.getTotal() == null || factura.getTotal().compareTo(BigDecimal.ZERO) < 0) {
             throw new BusinessException("El total de la factura debe ser mayor o igual a cero");

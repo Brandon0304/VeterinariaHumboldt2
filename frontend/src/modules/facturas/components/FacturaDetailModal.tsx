@@ -155,14 +155,56 @@ export const FacturaDetailModal = ({ isOpen, facturaId, onClose }: FacturaDetail
             </div>
           )}
 
-          {factura.contenido && (
-            <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
-              <p className="mb-2 text-sm font-semibold text-secondary">Contenido</p>
-              <pre className="text-xs text-gray-600 overflow-auto">
-                {JSON.stringify(factura.contenido, null, 2)}
-              </pre>
-            </div>
-          )}
+          {factura.contenido && (() => {
+            try {
+              const contenido = typeof factura.contenido === 'string' 
+                ? JSON.parse(factura.contenido) 
+                : factura.contenido;
+              
+              const detalles = contenido?.detalles || [];
+              
+              return (
+                <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+                  <p className="mb-3 text-sm font-semibold text-secondary">Contenido</p>
+                  {detalles.length > 0 ? (
+                    <div className="space-y-2">
+                      {detalles.map((detalle: any, index: number) => (
+                        <div key={index} className="flex justify-between items-start border-b border-gray-200 pb-2 last:border-0">
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-700">
+                              {detalle.servicio || detalle.descripcion || `Item ${index + 1}`}
+                            </p>
+                            {detalle.cantidad && (
+                              <p className="text-xs text-gray-500">
+                                Cantidad: {detalle.cantidad}
+                              </p>
+                            )}
+                          </div>
+                          <div className="text-right ml-4">
+                            <p className="text-sm font-semibold text-secondary">
+                              {parseFloat(detalle.valor || detalle.precio || 0).toLocaleString("es-CO", { 
+                                style: "currency", 
+                                currency: "COP" 
+                              })}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-gray-500">Sin detalles</p>
+                  )}
+                </div>
+              );
+            } catch (error) {
+              return (
+                <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
+                  <p className="mb-2 text-sm font-semibold text-secondary">Contenido</p>
+                  <p className="text-xs text-gray-500">No disponible</p>
+                </div>
+              );
+            }
+          })()}
 
           <div className="flex flex-wrap gap-3 pt-4">
             <button

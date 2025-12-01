@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
 
@@ -65,6 +67,7 @@ public class Reporte {
      * Ejemplo: {"fechaInicio": "2024-01-01", "fechaFin": "2024-01-31"}
      */
     @Column(name = "parametros", columnDefinition = "JSONB")
+    @JdbcTypeCode(SqlTypes.JSON)
     private String parametros;
 }
 

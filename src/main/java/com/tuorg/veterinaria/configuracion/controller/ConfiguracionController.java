@@ -18,7 +18,7 @@ import java.util.Map;
  * @version 1.0.0
  */
 @RestController
-@RequestMapping("/api/configuracion")
+@RequestMapping("/configuracion")
 public class ConfiguracionController {
 
     /**

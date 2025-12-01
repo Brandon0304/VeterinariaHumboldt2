@@ -24,7 +24,7 @@ import java.util.List;
  * @version 1.0.0
  */
 @RestController
-@RequestMapping("/api/movimientos-inventario")
+@RequestMapping("/movimientos-inventario")
 public class MovimientoInventarioController {
 
     /**
