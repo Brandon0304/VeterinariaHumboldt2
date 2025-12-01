@@ -56,6 +56,30 @@ const ClienteDashboardPage = lazy(() =>
   })),
 );
 
+const ClienteMascotasPage = lazy(() =>
+  import("../../modules/cliente/pages/ClienteMascotasPage").then((module) => ({
+    default: module.ClienteMascotasPage,
+  })),
+);
+
+const ClienteCitasPage = lazy(() =>
+  import("../../modules/cliente/pages/ClienteCitasPage").then((module) => ({
+    default: module.ClienteCitasPage,
+  })),
+);
+
+const ClienteHistorialPage = lazy(() =>
+  import("../../modules/cliente/pages/ClienteHistorialPage").then((module) => ({
+    default: module.ClienteHistorialPage,
+  })),
+);
+
+const ClienteFacturasPage = lazy(() =>
+  import("../../modules/cliente/pages/ClienteFacturasPage").then((module) => ({
+    default: module.ClienteFacturasPage,
+  })),
+);
+
 // Páginas del secretario
 const SecretaryDashboardPage = lazy(() =>
   import("../../modules/secretario/pages/SecretaryDashboardPage").then((module) => ({
@@ -281,6 +305,38 @@ export const AppRoutes = ({ renderDashboard }: AppRoutesProps) => {
           element={
             <RoleGuard allowedRoles={["CLIENTE"]}>
               <ClienteDashboardPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/cliente/mascotas"
+          element={
+            <RoleGuard allowedRoles={["CLIENTE"]}>
+              <ClienteMascotasPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/cliente/citas"
+          element={
+            <RoleGuard allowedRoles={["CLIENTE"]}>
+              <ClienteCitasPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/cliente/historial"
+          element={
+            <RoleGuard allowedRoles={["CLIENTE"]}>
+              <ClienteHistorialPage />
+            </RoleGuard>
+          }
+        />
+        <Route
+          path="/cliente/facturas"
+          element={
+            <RoleGuard allowedRoles={["CLIENTE"]}>
+              <ClienteFacturasPage />
             </RoleGuard>
           }
         />
